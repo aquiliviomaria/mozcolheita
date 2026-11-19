@@ -33,6 +33,15 @@ var camera: Node3D
 var terreno: Node3D
 var cerca: Node3D
 var hud: CanvasLayer
+var caminhao: CharacterBody3D
+var equipa_grupo: Node
+var entregas: Node
+var calendario: Node
+var comunidade: Node3D
+var mundo_vivo: Node3D
+var guia_entrega: CanvasLayer
+var luz_diaria: Node
+var casa: Node3D
 var relogio: float = 0.0
 var materiais: Dictionary = {}
 var falhas_testes: PackedStringArray = []
@@ -41,7 +50,7 @@ func material(cor: Color) -> StandardMaterial3D:
 	var chave: String = cor.to_html()
 	if not materiais.has(chave):
 		var novo: StandardMaterial3D = StandardMaterial3D.new()
-		novo.albedo_color = cor
+		novo.albedo_color = cor.srgb_to_linear()
 		novo.roughness = 0.86
 		if cor.a<1.0: novo.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		materiais[chave] = novo
@@ -98,22 +107,27 @@ func _ready() -> void:
 	configuracao.background_color = Color("90b9cb")
 	configuracao.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	configuracao.ambient_light_color = Color("eef2df")
-	configuracao.ambient_light_energy = 0.48
+	configuracao.ambient_light_energy = 0.65
 	ambiente.environment = configuracao
 	add_child(ambiente)
 	var sol: DirectionalLight3D = DirectionalLight3D.new()
 	sol.rotation_degrees = Vector3(-50,-25,0)
-	sol.light_energy = 1.25
+	sol.light_energy = 1.0
 	sol.light_color = Color("fff2d6")
 	sol.shadow_enabled = true
 	sol.directional_shadow_max_distance = 160
 	add_child(sol)
+	luz_diaria = preload("res://scripts/daylight.gd").new()
+	luz_diaria.mundo = self; luz_diaria.sol = sol; luz_diaria.ambiente = configuracao; luz_diaria.ceu = atmosfera
+	add_child(luz_diaria)
 	relevo = sistema(preload("res://scripts/landscape.gd")) as Node3D
 	terreno = sistema(Terreno) as Node3D
 	cerca = sistema(Cerca) as Node3D
 	criar_edificios()
+	casa = sistema(preload("res://scripts/farmhouse.gd")) as Node3D
+	calendario = sistema(preload("res://scripts/calendar.gd"))
 	jogador = sistema(Jogador) as CharacterBody3D
-	jogador.position = Vector3(0,altura(Vector3(0,0,9))+0.05,9)
+	jogador.position = preload("res://scripts/farmhouse.gd").INICIO
 	jogador.position.y = altura(jogador.position)+0.05
 	camera = sistema(Camara) as Node3D
 	camera.alvo = jogador
@@ -132,6 +146,9 @@ func _ready() -> void:
 	aldeia = sistema(preload("res://scripts/village.gd")) as Node3D
 	contrato = sistema(preload("res://scripts/contract.gd"))
 	economia = sistema(preload("res://scripts/economy.gd"))
+	entregas = sistema(preload("res://scripts/deliveries.gd"))
+	caminhao = sistema(preload("res://scripts/truck.gd")) as CharacterBody3D
+	caminhao.position = Vector3(49,altura(Vector3(49,0,18))+0.1,18)
 	armazem = sistema(preload("res://scripts/warehouse.gd")) as Node3D
 	for indice: int in range(3):
 		var fabrica: Node3D = preload("res://scripts/factory.gd").new()
@@ -139,7 +156,11 @@ func _ready() -> void:
 		fabrica.numero = indice
 		add_child(fabrica)
 		fabricas.append(fabrica)
+	equipa_grupo = sistema(preload("res://scripts/crew.gd"))
+	comunidade = sistema(preload("res://scripts/community.gd")) as Node3D
+	mundo_vivo = sistema(preload("res://scripts/world_details.gd")) as Node3D
 	hud = sistema(Hud) as CanvasLayer
+	guia_entrega = sistema(preload("res://scripts/delivery_route.gd")) as CanvasLayer
 	if "--capturar-logistica" in OS.get_cmdline_user_args(): capturar_logistica.call_deferred()
 	if "--teste-logistica" in OS.get_cmdline_user_args(): testar_logistica.call_deferred()
 	if "--teste" in OS.get_cmdline_user_args(): testar.call_deferred()
@@ -232,6 +253,7 @@ func retirar_stock() -> Dictionary:
 	return armazem.retirar()
 
 func trator_proximo() -> CharacterBody3D:
+	if caminhao!=null and not caminhao.ocupado and caminhao.position.distance_to(jogador.position)<4: return caminhao
 	for veiculo: CharacterBody3D in tratores:
 		if veiculo.global_position.distance_to(jogador.global_position)<3.0 and not veiculo.ocupado and veiculo.atribuido==null: return veiculo
 	return null
@@ -242,7 +264,7 @@ func interagir() -> void:
 		if not trator_actual.sair(): avisar("Pare antes de sair do tractor.")
 		return
 	for fabrica: Node3D in fabricas:
-		if fabrica.perto(): economia.vender(sacola,fabrica.numero); return
+		if fabrica.perto(): entregas.entregar(sacola,fabrica.numero); economia.vender(sacola,fabrica.numero); return
 	if armazem!=null and armazem.perto():
 		var carga: Dictionary = retirar_stock()
 		for cultura_id: int in carga: sacola[cultura_id] = int(sacola.get(cultura_id,0))+int(carga[cultura_id])
@@ -258,6 +280,7 @@ func interagir() -> void:
 
 func accionar() -> void:
 	if drone_actual!=null: return
+	if trator_actual==caminhao and caminhao!=null: caminhao.transferir(); return
 	if trator_actual!=null:
 		if trator_actual.implemento!=null:
 			if trator_actual.implemento.is_in_group("reboques"): trator_actual.implemento.transferir()
@@ -265,7 +288,7 @@ func accionar() -> void:
 	else: ferramentas.usar()
 
 func bloqueia_jogador() -> bool:
-	return pausado() or trator_actual!=null or drone_actual!=null or (contrato!=null and contrato.activo)
+	return pausado() or (camera!=null and camera.livre) or trator_actual!=null or drone_actual!=null or (contrato!=null and contrato.activo)
 
 func camera_giro() -> float:
 	return float(camera.giro) if is_instance_valid(camera) else 0.0
@@ -307,7 +330,7 @@ func dica() -> String:
 	return ""
 
 func ajuda() -> String:
-	return "MOZCOLHEITA · H fecha\nWASD andar · Shift correr · Rato olhar · Roda/+/- zoom\nK kit · 1–6 ferramentas · Clique/Espaço usar\nE conversar/entrar/sair/entregar · G engatar · Espaço no tractor liga máquina\nF pilota/devolve drone · Espaço/Ctrl sobem/descem · R irrigação\nLavrar → semear → regar → crescer (60 s) → colher\nFuncionários: tarefa e orçamento obrigatórios · máximo três contratos\nSaldo: %s · Sementes: %d · Madeira: %d" % [preload("res://scripts/economy.gd").formatar(saldo),ferramentas.sementes,ferramentas.madeira]
+	return "MOZCOLHEITA · H fecha\nWASD andar · Shift correr · Rato olhar · Roda/+/- zoom\nL dia/noite e nova manhã · V câmara livre · +1 dia no topo\nK kit · 1–6 ferramentas · Clique/Espaço usar\nE conversar/entrar/sair/entregar · G engatar · Espaço no tractor liga máquina\nF pilota/devolve drone · Espaço/Ctrl sobem/descem · R irrigação\nLavrar → semear → regar → crescer (3 dias) → colher\nFuncionários: tarefa e orçamento obrigatórios · máximo três contratos\nSaldo: %s · Sementes: %d · Madeira: %d" % [preload("res://scripts/economy.gd").formatar(saldo),ferramentas.sementes,ferramentas.madeira]
 
 func resumo_stock() -> String:
 	var texto: String = "PRODUTOS · consigo / armazém\n"
@@ -316,7 +339,7 @@ func resumo_stock() -> String:
 
 func _process(delta: float) -> void:
 	aviso_tempo = maxf(0,aviso_tempo-delta)
-	if not pausado(): relogio += delta*0.5
+	if not pausado(): relogio += delta
 
 func alternar_cursor() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if Input.mouse_mode==Input.MOUSE_MODE_CAPTURED else Input.MOUSE_MODE_CAPTURED
@@ -331,9 +354,13 @@ func _input(evento: InputEvent) -> void:
 func _unhandled_input(evento: InputEvent) -> void:
 	if hud==null or hud.selecao.visible: return
 	if evento is InputEventKey and evento.pressed and not evento.echo:
+		if evento.physical_keycode == KEY_L and not pausado(): calendario.proximo_periodo()
+		if evento.physical_keycode == KEY_V and not pausado(): camera.alternar_livre()
+		if camera.livre and evento.physical_keycode not in [KEY_V,KEY_L,KEY_H,KEY_ESCAPE,KEY_TAB]: return
 		if evento.physical_keycode == KEY_TAB: alternar_cursor()
 		if evento.physical_keycode == KEY_H and not contrato.activo: hud.alternar()
 		if evento.physical_keycode == KEY_K and trator_actual==null and drone_actual==null and not contrato.activo: hud.alternar_kit()
+		if evento.physical_keycode == KEY_C and trator_actual==caminhao and not pausado(): caminhao.transferir()
 		if evento.physical_keycode == KEY_C and trator_actual!=null and trator_actual.implemento!=null and trator_actual.implemento.is_in_group("reboques") and not pausado(): trator_actual.implemento.transferir()
 		if evento.physical_keycode == KEY_B and not pausado() and not contrato.activo: reabastecer()
 		if evento.physical_keycode == KEY_R and drone_actual!=null and not pausado(): drone_actual.irrigando = not drone_actual.irrigando
@@ -415,7 +442,7 @@ func testar_contratos() -> void:
 func testar() -> void:
 	hud.escolher(false)
 	verificar(relevo.amplitude>5 and cerca.portoes.size()==6,"Relevo original e seis portões")
-	verificar(aldeia.campos.size()==6 and pessoas.size()==18,"Seis fazendas e dezoito NPCs")
+	verificar(aldeia.campos.size()==6 and pessoas.size()>=26,"Seis fazendas e comunidade com pelo menos 26 NPCs")
 	verificar(not jogador.mulher and hud.logo!=null and hud.minimapa.visible,"Homem, logótipo e minimapa por defeito")
 	verificar(terreno.celulas.is_empty() and terreno.lote_solo.multimesh.instance_count==0,"Nenhum solo demarcado ou preparado no início")
 	var estacionados: Array[Node3D] = []; estacionados.append_array(implementos); estacionados.append_array(tratores); estacionados.append_array(drones); estacionados.append_array(carrinhas)
@@ -433,7 +460,7 @@ func testar() -> void:
 	verificar(terreno.trabalhar(chave,"lavrar") and terreno.trabalhar(chave,"semear"),"Preparar e semear")
 	terreno.avancar(100)
 	verificar(int(terreno.celulas[chave].estado)==2 and float(terreno.celulas[chave].tempo)==0,"Secas não crescem")
-	terreno.trabalhar(chave,"regar"); terreno.avancar(60)
+	terreno.trabalhar(chave,"regar"); terreno.avancar(Terreno.DURACAO)
 	verificar(terreno.trabalhar(chave,"colher") and not terreno.trabalhar(chave,"colher"),"Colheita única")
 	verificar(int(sacola.get(0,0))==3 and missoes.produzido==3,"Produção entra na sacola e na missão uma única vez")
 	verificar(tratores.size()==3 and implementos.size()==12 and drones.size()==3,"Veículos preservados")
@@ -465,7 +492,7 @@ func testar() -> void:
 	verificar(reboque.acoplar(tractor_teste),"Carrinha acopla após libertar espaço")
 	reboque.carregar({0:7}); tractor_teste.position = Vector3(32,altura(Vector3(32,0,18)),18)
 	verificar(reboque.transferir()==7 and int(stock.get(0,0))==7,"Carrinha deposita no armazém")
-	reboque.carregar({1:8}); tractor_teste.position = Vector3(-60,altura(Vector3(-60,0,102)),102)
+	reboque.carregar({1:8}); tractor_teste.position = Vector3(0,altura(Vector3(0,0,102)),102)
 	verificar(reboque.transferir()>0 and reboque.total()==0 and reboque.transferir()==0,"Carrinha vende sem duplicação")
 	reboque.soltar()
 	testar_contratos()
@@ -499,7 +526,7 @@ func capturar() -> void:
 			terreno.trabalhar(chave,"lavrar")
 			if x<3: terreno.trabalhar(chave,"semear",posmod(x,4))
 			if x<0: terreno.trabalhar(chave,"regar")
-	terreno.avancar(60)
+	terreno.avancar(Terreno.DURACAO)
 	terreno._process(0.3)
 	await fotografia("cultivo")
 	camera.enquadramento = true
@@ -575,11 +602,13 @@ func testar_percurso() -> void:
 	terreno.trabalhar(Vector2i(0,0),"lavrar")
 	var pagamentos: int = 0
 	for tipo: int in [3,2,4,5,6]:
+		if tipo==4: calendario.saltar(3)
 		var plano: Dictionary = assinar_teste(pessoa,tipo,3 if tipo in [5,6] else 1)
 		pagamentos += int(plano.total)
 		for i: int in range(4000):
 			await get_tree().physics_frame
 			if pessoa.servico.is_empty(): break
+		if not pessoa.servico.is_empty(): print("DIAGNÓSTICO ",pessoa.estado," peão ",pessoa.position," veículo ",pessoa.veiculo.position if pessoa.veiculo!=null else Vector3.ZERO," fila ",pessoa.fila," percurso ",pessoa.percurso)
 		verificar(pessoa.servico.is_empty(),"Contrato físico conclui "+tarefas.NOMES[tipo])
 	verificar(economia.vendas>0 and pessoa.pago==pagamentos,"Ciclo completo paga exactamente os cinco orçamentos")
 	print("PERCURSO E CICLO COMPLETO · VALIDAÇÃO: ","PASSOU" if falhas_testes.is_empty() else "FALHOU")
@@ -638,6 +667,8 @@ func reabastecer(todas: bool = false) -> void:
 	avisar("Semeadoras reabastecidas · %d MT" % custo)
 
 func comandos_actuais() -> String:
+	if trator_actual==caminhao and caminhao!=null: return "CAMIÃO · WASD conduzir · W+T turbo · E sair parado\nC carregar/entregar · Carga %d/500 · Pare dentro da garagem da empresa" % caminhao.total()
+	if camera.livre: return "CÂMARA LIVRE · WASD mover · Q/E altura · Shift acelerar\nRato olhar · V regressar · L dia/noite · +1 dia avança calendário"
 	if drone_actual!=null: return "DRONE · WASD voar · Espaço subir · Ctrl descer\nR ligar/desligar irrigação · F devolver"
 	if trator_actual!=null:
 		var texto: String = "TRACTOR · WASD conduzir · W+T turbo\nE sair parado · G engatar/soltar · Espaço ligar máquina"
@@ -655,7 +686,7 @@ func comandos_actuais() -> String:
 func testar_logistica() -> void:
 	hud.escolher(false); Engine.time_scale = 5
 	for pessoa: Node3D in pessoas: pessoa.set_physics_process(false)
-	verificar(carrinhas.size()==3 and fabricas.size()==3,"Três carrinhas e três fábricas")
+	verificar(carrinhas.size()==3 and fabricas.size()>=6,"Três carrinhas e seis garagens de fábricas")
 	for fabrica_teste: Node3D in fabricas: verificar(not preload("res://scripts/layout.gd").dentro(fabrica_teste.position),"Fábrica fora da quinta")
 	stock.clear(); sacola = {0:80,1:70}
 	jogador.position = Vector3(32,altura(Vector3(32,0,35)),35)

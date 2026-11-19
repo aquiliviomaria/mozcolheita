@@ -29,11 +29,17 @@ func _ready() -> void:
 		minimo = minf(minimo,valor)
 		maximo = maxf(maximo,valor)
 	amplitude = maximo-minimo
+	# Suaviza a topografia antiga: sem montanhas; cidade praticamente plana.
+	for z: int in range(tamanho):
+		for x: int in range(tamanho):
+			var px: float = inicio+x*passo; var pz: float = inicio+z*passo
+			var nivel: float = smoothstep(115,145,px)*(1.0-smoothstep(140,170,pz))*smoothstep(-130,-100,pz)
+			dados[z*tamanho+x] = lerpf(dados[z*tamanho+x]*0.12,0,nivel)
 	criar_material()
 	criar_colisao()
 	for z: int in range(8):
 		for x: int in range(8): criar_bloco(x*50,z*50)
-	criar_arvores()
+	# A vegetação exterior é distribuída após os bairros em world_details.gd.
 
 func ruido_periodico(ruido: FastNoiseLite,x: float,z: float,escala: float) -> float:
 	var u: float = x/255.0
@@ -116,10 +122,10 @@ func criar_bloco(ox: int,oz: int) -> void:
 	vista.material_override = material_chao
 	add_child(vista)
 
-func estrada(pontos: Array[Vector3], largura: float = 4.5) -> void:
+func estrada(pontos: Array[Vector3], largura: float = 4.5,cor: Color = Color("726549")) -> void:
 	var superficie: SurfaceTool = SurfaceTool.new()
 	superficie.begin(Mesh.PRIMITIVE_TRIANGLES)
-	superficie.set_material(mundo.material(Color("726549")))
+	superficie.set_material(mundo.material(cor))
 	for trecho: int in range(pontos.size()-1):
 		var a: Vector3 = pontos[trecho]
 		var b: Vector3 = pontos[trecho+1]
@@ -128,9 +134,9 @@ func estrada(pontos: Array[Vector3], largura: float = 4.5) -> void:
 		for etapa: int in range(passos):
 			var inicio_trecho: Vector3 = a.lerp(b,float(etapa)/passos)
 			var fim_trecho: Vector3 = a.lerp(b,float(etapa+1)/passos)
-			for canto: Vector2i in [Vector2i(0,0),Vector2i(1,0),Vector2i(1,1),Vector2i(0,0),Vector2i(1,1),Vector2i(0,1)]:
+			for canto: Vector2i in [Vector2i(0,0),Vector2i(1,1),Vector2i(1,0),Vector2i(0,0),Vector2i(0,1),Vector2i(1,1)]:
 				var ponto: Vector3 = (inicio_trecho if canto.y==0 else fim_trecho)+direita*(-1 if canto.x==0 else 1)
-				ponto.y = altura(ponto)+0.035
+				ponto.y = altura(ponto)+(0.045 if largura>=8 else 0.035)
 				superficie.add_vertex(ponto)
 	superficie.generate_normals()
 	var vista: MeshInstance3D = MeshInstance3D.new()
@@ -143,7 +149,7 @@ func criar_arvores() -> void:
 	var posicoes: Array[Vector3] = []
 	for indice: int in range(110):
 		var ponto: Vector3 = Vector3(aleatorio.randf_range(-360,360),0,aleatorio.randf_range(-360,360))
-		if absf(ponto.x)<110 and absf(ponto.z)<100: continue
+		if (absf(ponto.x)<170 and absf(ponto.z)<160) or (ponto.x>115 and ponto.z>-115 and ponto.z<150) or ponto.x<-285: continue
 		var ocupado: bool = false
 		for centro: Vector3 in preload("res://scripts/village.gd").CENTROS:
 			if preload("res://scripts/layout.gd").distancia(ponto,centro)<52: ocupado = true

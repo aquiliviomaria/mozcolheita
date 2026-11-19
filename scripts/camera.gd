@@ -31,6 +31,11 @@ func _unhandled_input(evento: InputEvent) -> void:
 		if evento.physical_keycode in [KEY_MINUS,KEY_KP_SUBTRACT]: distancia = minf(15.0,distancia+0.6)
 
 func _process(delta: float) -> void:
+	if livre:
+		var entrada: Vector3 = Vector3(float(Input.is_physical_key_pressed(KEY_D))-float(Input.is_physical_key_pressed(KEY_A)),float(Input.is_physical_key_pressed(KEY_E))-float(Input.is_physical_key_pressed(KEY_Q)),float(Input.is_physical_key_pressed(KEY_S))-float(Input.is_physical_key_pressed(KEY_W)))
+		camara.rotation = Vector3(inclinacao,giro,0)
+		if not mundo.pausado(): camara.position += camara.basis*entrada.limit_length(1)*(delta/maxf(1,Engine.time_scale))*(65 if Input.is_physical_key_pressed(KEY_SHIFT) else 24)
+		return
 	if enquadramento:
 		camara.global_position = camara.global_position.lerp(ponto_fixo,minf(1.0,delta*8.0))
 		camara.look_at(olhar_fixo)
@@ -44,3 +49,8 @@ func _process(delta: float) -> void:
 	if not obstaculo.is_empty(): destino = obstaculo.position+obstaculo.normal*0.25
 	camara.global_position = destino
 	camara.look_at(centro)
+
+func alternar_livre() -> void:
+	if mundo.contrato.activo or mundo.trator_actual!=null or mundo.drone_actual!=null: mundo.avisar("Saia do veículo antes de usar a câmara livre."); return
+	livre = not livre
+	mundo.avisar("Câmara livre · WASD · Q/E altura · V regressar" if livre else "Câmara do agricultor")

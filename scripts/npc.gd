@@ -1,5 +1,6 @@
 extends "res://scripts/player.gd"
 ## Peão com percursos pelo portão; tarefas e contratação ficam em módulos próprios.
+var grupo: bool = false
 var numero: int = 0
 var servico: Dictionary = {}
 var ultimo_servico: String = "Sem contrato"
@@ -39,18 +40,21 @@ func dizer(texto: String) -> void:
 
 func planear(destino: Vector3) -> void:
 	destino_actual = destino
-	percurso = preload("res://scripts/layout.gd").caminho(global_position,destino)
+	percurso = preload("res://scripts/layout.gd").caminho(global_position,destino,6.0 if veiculo!=null else 2.0)
 
 func caminhar(destino: Vector3, delta: float, alcance: float = 0.7) -> bool:
+	if preload("res://scripts/layout.gd").distancia(global_position,destino)<alcance:
+		velocity = Vector3.ZERO; percurso.clear(); return true
 	if not destino_actual.is_equal_approx(destino): planear(destino)
-	if percurso.is_empty(): return preload("res://scripts/layout.gd").distancia(global_position,destino)<alcance
+	if percurso.is_empty(): planear(destino)
+	if percurso.is_empty(): return false
 	var proximo: Vector3 = percurso[0]
 	var diferenca: Vector3 = proximo-global_position
 	diferenca.y = 0
 	if diferenca.length()<(alcance if percurso.size()==1 else 0.7):
 		percurso.pop_front()
 		velocity = Vector3.ZERO
-		return percurso.is_empty()
+		return percurso.is_empty() and preload("res://scripts/layout.gd").distancia(global_position,destino)<alcance
 	var direccao: Vector3 = diferenca.normalized()
 	var desvio: Vector3 = Vector3.ZERO
 	for outra: Node3D in mundo.pessoas:
@@ -70,9 +74,12 @@ func caminhar(destino: Vector3, delta: float, alcance: float = 0.7) -> bool:
 	intervalo_desvio = maxf(0,intervalo_desvio-delta)
 	if ultima_posicao.is_finite() and global_position.distance_to(ultima_posicao)<0.35: tempo_preso += delta
 	else: ultima_posicao = global_position; tempo_preso = 0
-	if tempo_preso>1.4 and intervalo_desvio<=0:
+	if tempo_preso>1.4 and intervalo_desvio<=0 and (contratado or grupo or em_conversa or global_position.distance_squared_to(mundo.jogador.position)<70*70):
 		var desvio_local: Array[Vector3] = preload("res://scripts/navigation.gd").contornar(self,proximo)
-		if not desvio_local.is_empty(): desvio_local.append_array(percurso); percurso = desvio_local
+		if not desvio_local.is_empty():
+			var restantes: Array[Vector3] = percurso.slice(1)
+			if preload("res://scripts/layout.gd").distancia(desvio_local.back(),proximo)>1.4: desvio_local.append(proximo)
+			desvio_local.append_array(restantes); percurso = desvio_local
 		tempo_preso = 0; intervalo_desvio = 3.0
 	move_and_slide()
 	visual.rotation.y = lerp_angle(visual.rotation.y,atan2(-direccao.x,-direccao.z),minf(1,delta*8))
@@ -81,16 +88,21 @@ func caminhar(destino: Vector3, delta: float, alcance: float = 0.7) -> bool:
 
 func _physics_process(delta: float) -> void:
 	if mundo.hud==null or mundo.pausado(): return
+	var observador: Vector3 = mundo.camera.camara.global_position if mundo.camera.livre else mundo.jogador.global_position
+	visual.visible = global_position.distance_squared_to(observador)<85*85
 	tempo_fala = maxf(0,tempo_fala-delta)
 	balão.visible = global_position.distance_to(mundo.jogador.global_position)<15
-	if tempo_fala<=0: balão.text = nome+(" · "+estado if contratado else "")
+	if tempo_fala<=0: balão.text = nome+(" · "+estado if contratado or grupo else "")
 	if em_conversa: return
-	if contratado:
+	if grupo:
+		mundo.equipa_grupo.actualizar(self,delta)
+	elif contratado:
 		mundo.tarefas.actualizar(self,delta)
 	elif not rota.is_empty():
 		if vizinho and pausa_trabalho>0:
 			pausa_trabalho -= delta
 			gesto = 0.65+sin(fase)*0.2
+			tempo_acao = 1; acao_animacao = "planting" if numero%2==0 else "harvesting"
 			animar(delta,0)
 			return
 		if caminhar(rota[segmento],delta):

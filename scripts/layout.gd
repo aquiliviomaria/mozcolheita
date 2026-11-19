@@ -4,6 +4,7 @@ const METADE: Vector2 = Vector2(96,78)
 const PORTOES: Array[Vector3] = [Vector3(0,0,78),Vector3(60,0,78),Vector3(0,0,-78),Vector3(-60,0,-78),Vector3(96,0,0),Vector3(-96,0,0)]
 const LARGURA_PORTAO: float = 12.0
 const GALPAO: Rect2 = Rect2(-57,29,30,22)
+const CASA: Rect2 = Rect2(-21,-60,26,23)
 const ARMAZEM: Rect2 = Rect2(22,24,20,26)
 
 static func distancia(a: Vector3,b: Vector3) -> float:
@@ -20,14 +21,14 @@ static func junto_portao(p: Vector3, margem: float = 18.0) -> bool:
 static func reservado(p: Vector3) -> bool:
 	var ponto: Vector2 = Vector2(p.x,p.z)
 	if not dentro(p) or absf(p.x)>92 or absf(p.z)>74 or junto_portao(p): return true
-	for area: Rect2 in [GALPAO.grow(3),ARMAZEM.grow(3),Rect2(-58,14,32,52),Rect2(-75,-45,30,24),Rect2(-5,-23,30,10),Rect2(-23,49,28,13)]:
+	for area: Rect2 in [CASA.grow(3),GALPAO.grow(3),ARMAZEM.grow(3),Rect2(-58,14,32,52),Rect2(-75,-45,30,24),Rect2(-5,-23,30,10),Rect2(-23,49,28,13),Rect2(44,12,12,13)]:
 		if area.has_point(ponto): return true
 	return false
 
 static func exterior(portao: Vector3) -> Vector3:
 	return portao+Vector3(signf(portao.x)*7 if absf(portao.x)==METADE.x else 0,0,signf(portao.z)*7 if absf(portao.z)==METADE.y else 0)
 
-static func livre(a: Vector3,b: Vector3) -> bool:
+static func livre(a: Vector3,b: Vector3,folga: float = 1.0) -> bool:
 	# Cada intersecção com a vedação tem de passar pela abertura de um portão.
 	var inicio: Vector2 = Vector2(a.x,a.z)
 	var fim: Vector2 = Vector2(b.x,b.z)
@@ -44,20 +45,23 @@ static func livre(a: Vector3,b: Vector3) -> bool:
 		for portao: Vector3 in PORTOES:
 			if ponto.distance_to(Vector2(portao.x,portao.z))<LARGURA_PORTAO*0.5-1: permitido = true
 		if not permitido: return false
-	for obstaculo: Rect2 in [GALPAO.grow(1),ARMAZEM.grow(1)]:
-		if obstaculo.has_point(inicio) or obstaculo.has_point(fim): continue
-		for passo: int in range(1,17):
-			if obstaculo.has_point(inicio.lerp(fim,float(passo)/17.0)): return false
+	for edificio: Rect2 in [CASA,GALPAO,ARMAZEM]:
+		if edificio.has_point(inicio) or edificio.has_point(fim): continue
+		var obstaculo: Rect2 = edificio.grow(folga)
+		if obstaculo.has_point(inicio) or obstaculo.has_point(fim): obstaculo = edificio.grow(1.0)
+		for passo: int in range(1,25):
+			if obstaculo.has_point(inicio.lerp(fim,float(passo)/25.0)): return false
 	return true
 
-static func caminho(a: Vector3,b: Vector3) -> Array[Vector3]:
+static func caminho(a: Vector3,b: Vector3,folga: float = 2.0) -> Array[Vector3]:
 	var pontos: Array[Vector3] = [a,b]
 	for portao: Vector3 in PORTOES:
-		pontos.append(exterior(portao))
-		pontos.append(portao-(exterior(portao)-portao))
-	for x: float in [-103.0,103.0]:
-		for z: float in [-85.0,85.0]: pontos.append(Vector3(x,0,z))
-	for area: Rect2 in [GALPAO.grow(2),ARMAZEM.grow(2)]:
+		var fora: Vector3 = portao+(exterior(portao)-portao).normalized()*maxf(7,folga*2+2)
+		pontos.append(fora)
+		pontos.append(portao-(fora-portao))
+	for x: float in [-96-folga*2-5,96+folga*2+5]:
+		for z: float in [-78-folga*2-5,78+folga*2+5]: pontos.append(Vector3(x,0,z))
+	for area: Rect2 in [CASA.grow(folga+1),GALPAO.grow(folga+1),ARMAZEM.grow(folga+1)]:
 		for canto: Vector2 in [area.position,area.end,Vector2(area.position.x,area.end.y),Vector2(area.end.x,area.position.y)]: pontos.append(Vector3(canto.x,0,canto.y))
 	var custos: PackedFloat32Array = []
 	var anteriores: PackedInt32Array = []
@@ -75,7 +79,7 @@ static func caminho(a: Vector3,b: Vector3) -> Array[Vector3]:
 		for i: int in range(pontos.size()):
 			if visitados[i]!=0 or i==actual: continue
 			var custo: float = custos[actual]+distancia(pontos[actual],pontos[i])
-			if custo<custos[i] and livre(pontos[actual],pontos[i]): custos[i] = custo; anteriores[i] = actual
+			if custo<custos[i] and livre(pontos[actual],pontos[i],maxf(1,folga-1)): custos[i] = custo; anteriores[i] = actual
 	var resultado: Array[Vector3] = []
 	var indice: int = 1
 	while indice>0 and anteriores[indice]>=0:

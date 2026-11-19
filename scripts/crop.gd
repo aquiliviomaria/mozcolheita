@@ -4,7 +4,7 @@ const G: GDScript = preload("res://scripts/geometry.gd")
 const NOMES: Array[String] = ["Tomate","Milho","Couve","Cenoura"]
 const CORES: Array[Color] = [Color("b8412e"),Color("d6b85e"),Color("5f8151"),Color("bd652d")]
 const FAMILIAS: Array[String] = ["solanaceas","cereais","brassicas","raizes"]
-const DURACAO: float = 60.0
+const DURACAO: float = preload("res://scripts/calendar.gd").CRESCIMENTO
 var mundo: Node3D
 var lotes: Array[MultiMeshInstance3D] = []
 var modelos: Dictionary = {}
@@ -113,7 +113,7 @@ func actualizar() -> void:
 	for chave: Vector2i in mundo.terreno.celulas:
 		var dados: Dictionary = mundo.terreno.celulas[chave]
 		if int(dados.estado)<2: continue
-		var etapa: int = 0 if int(dados.estado)==2 else 3 if int(dados.estado)==5 else mini(2,1+int(float(dados.tempo)/30))
+		var etapa: int = 0 if int(dados.estado)==2 else 3 if int(dados.estado)==5 else mini(2,1+int(float(dados.tempo)/(DURACAO/2.0)))
 		var ponto: Vector3 = Vector3(chave.x+0.5,0,chave.y+0.5); ponto.y = mundo.altura(ponto)+0.035
 		var giro: Basis = Basis(Vector3.UP,float(posmod(chave.x*17+chave.y*31,100))*0.0628)
 		grupos[int(dados.cultura)*4+etapa].append(Transform3D(giro,ponto))

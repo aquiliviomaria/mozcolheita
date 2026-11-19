@@ -1,40 +1,57 @@
 MOZCOLHEITA — PASTA PRINCIPAL
 Abra project.godot e prima F5, ou execute ./Jogar.sh.
-Clique Começar. Homem por defeito; capital de 500.000 MT.
-Quinta ampliada, seis portões. Nenhuma parcela vem preparada.
+Seleccione agricultor ou agricultora e Começar. Saldo: 500.000 MT.
+Começa à frente da casa principal com o logótipo MozColheita.
 
 WASD mover | Shift correr | Rato câmara | Roda/+/- zoom
 1 mãos | 2 martelo | 3 serrote | 4 enxada | 5 regador | 6 semeadora
-K kit; roda dentro do kit escolhe ferramentas. Clique/Espaço usa.
-H gestão por separadores; escolha a cultura em Culturas.
-Preparar → semear → regar → crescer (60 s) → colher.
-Sementes secas NÃO crescem. Alterne culturas para conservar o solo.
+K kit | Clique/Espaço usa | H gestão | Tab cursor | Esc menu
+Preparar → semear → regar → crescer TRÊS DIAS → colher.
+Sementes secas não crescem. Um dia = dez minutos reais em velocidade normal.
+V: câmara livre; WASD move, Q/E sobe/desce, V regressa.
+Botões +1 dia e Tempo ×1/12: avanço de calendário e aceleração da simulação.
+SALTAR DIAS TAMBÉM AVANÇA OS PRAZOS E PODE APLICAR MULTAS.
 
-E interagir / entrar-sair de tractor parado / conversar / confirmar contrato.
-G acoplar-soltar equipamento; sinal verde indica engate disponível.
-W+T: turbo do tractor. Espaço no tractor liga a máquina. F pilota/recolhe drone.
-No drone: WASD mover, Espaço subir, Ctrl descer, R irrigar.
-Há três carrinhas. G engata; C ou Espaço transfere carga com tractor parado.
-No campo carrega a sacola; no armazém descarrega ou recolhe stock se vazia;
-na fachada de uma fábrica vende a carga. Capacidade 120 unidades.
+E interagir/entrar-sair de veículo parado/conversar.
+G engatar-soltar equipamento; sinal verde mostra disponibilidade.
+Espaço no tractor liga máquina. W+T turbo.
+B abastece semeadora próxima/engatada: depósito de 300, 2 MT/semente.
+F drone | Espaço subir | Ctrl descer | R irrigar.
+Três carrinhas (120 unidades) e um camião (500 unidades).
+C transfere carga com veículo parado.
 
-NPC: E abre proposta. Escolha tarefa, quantidade, parcela, tractor e orçamento.
-Confirme o pagamento antes do aperto de mão; a tarefa inicia automaticamente.
-Máximo três contratos, um por tractor. Preço varia por trabalho/tempo/dificuldade/missão.
-Reserva o máximo aprovado; cancelar devolve a parte não executada.
-H → Equipa mostra tarefa, progresso, pagamento e cancelamento.
-Missão inicial: produzir 500 tomates. Colheita do funcionário fica na sua carga.
-Sacola: entrar no armazém deposita; E recolhe; E na fábrica vende.
-Tab liberta/captura cursor. Esc fecha/cancela ou abre menu.
-Minimapa sempre no canto inferior direito; logótipo no canto superior.
+GARAGEM: duas portas automáticas. Entre com colheita para guardar.
+Saia e volte com carrinha/camião vazio para carregar o stock.
+Excedentes ficam guardados; caixas abertas mostram produto e quantidade.
 
-O progresso ainda não é guardado. Consulte README.md.
+H → ENTREGAS: escolha urgência e reveja prazo, recompensa e multa antes de aceitar.
+Normal 8 dias | Prioritária 6 dias | Urgente 4 dias.
+Mais urgência aumenta recompensa e multa. Aviso nos últimos 20%.
+Tomates do Zambeze: tomate, a sul/esquerda (-60,110).
+Moageira Nhamatanda: milho, a sul/centro (0,110).
+Hortícolas Maputo: couve/cenoura, a sul/direita (60,110).
+Conduza o camião e pare dentro da garagem da empresa para entregar.
+Quantidade completa a tempo: pagamento e bónus.
+Falta de quantidade no prazo: quebra de contrato, multa automática única.
+H → HISTÓRICO mostra sucessos e falhas. Uma multa pode deixar o saldo negativo.
 
-GARAGEM: duas portas automáticas, passagem de um lado ao outro.
-Entre a pé com colheita para guardar. As portas fecham ao afastar-se.
-Carrinha carregada: entra e descarrega. Saia e volte vazia para carregar stock.
-O excedente acima de 120 unidades fica guardado. Três fábricas fora da quinta, a sul.
-B junto à semeadora/engatada: enche a 2 MT por semente; depósito próprio de 300.
-H → Mercado também reabastece semeadoras dos funcionários.
-Funcionários procuram e engatam equipamentos disponíveis; sem equipamento usam enxada.
-Os comandos do veículo ficam sempre visíveis durante a condução.
+H → GRUPO: aceite uma encomenda, escolha 1–10 trabalhadores e a parcela.
+Estacione o camião com espaço; confirme o orçamento antes de iniciar.
+A equipa prepara, planta, rega, espera, colhe e carrega. Excedentes vão ao armazém.
+Usa até três tractores livres e trabalho manual. O jogador faz a entrega final.
+Cancelar a equipa não cancela a encomenda nem o prazo.
+E junto de um NPC define contrato individual com tarefa, prazo e multa.
+H → EQUIPA acompanha esses serviços; até três tractores exclusivos.
+
+O progresso e o histórico ainda não são guardados. Consulte README.md e
+RELATORIO_COMUNIDADE.md para ficheiros alterados, verificações e limitações.
+
+MUNDO VIVO
+L: passar para a noite (18:00), depois para o novo dia (06:00), com canto de galo.
+L também funciona na câmara livre. +1 dia salta um dia completo.
+Os prazos e o crescimento avançam com o relógio.
+Com produtos transportados, siga a seta dourada e a rota no minimapa.
+Entre na garagem da fábrica e pare: entrega/venda automática dos produtos aceites.
+Há seis garagens (três empresas com filiais).
+Portas de casas e átrios dos prédios abrem ao aproximar-se; só o rés-do-chão é acessível.
+Novos bairros, ruas asfaltadas e de terra, quintas cercadas, moradores, tractores e riacho.

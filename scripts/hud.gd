@@ -1,6 +1,7 @@
 extends CanvasLayer
 ## Menu por ícones e separadores; minimapa independente e sempre visível.
 var mundo: Node3D
+var fundo_menu: ColorRect
 var raiz: Control
 var dinheiro: Label
 var missao_hud: Label
@@ -26,7 +27,7 @@ var botoes_itens: Array[Button] = []
 var botoes_culturas: Array[Button] = []
 var botoes_comandos: Array[Button] = []
 var minimapa: Control
-var logo: ImageTexture
+var logo: Texture2D
 var proposta_painel: PanelContainer
 var op_trabalho: OptionButton
 var op_tractor: OptionButton
@@ -39,6 +40,20 @@ var custo: Label
 var confirmar_pagamento: Button
 var progresso: ProgressBar
 var missao_label: Label
+var urgencia_entrega: OptionButton
+var historico_label: Label
+var descricoes_entregas: Array[Label] = []
+var grupo_empresa: OptionButton
+var grupo_numero: SpinBox
+var grupo_nivel: OptionButton
+var grupo_x: SpinBox
+var grupo_z: SpinBox
+var grupo_custo: Label
+var grupo_estado: Label
+var grupo_confirmar: Button
+var grupo_proposta: Dictionary = {}
+var feminino_escolhido: bool = false
+var previa: Node3D
 var paginas: TabContainer
 
 func tema() -> Theme:
@@ -85,7 +100,7 @@ func imagem_logo(pai: Node,tamanho: Vector2) -> TextureRect:
 	pai.add_child(vista); return vista
 
 func _ready() -> void:
-	logo = ImageTexture.create_from_image(Image.load_from_file("res://MozColheita-icon.png"))
+	logo = preload("res://MozColheita-icon.png")
 	raiz = Control.new(); raiz.theme = tema(); raiz.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(raiz); raiz.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	dinheiro = legenda(raiz,"500.000 MT  ·  06:00",19); dinheiro.position = Vector2(22,20)
@@ -94,7 +109,7 @@ func _ready() -> void:
 	marca.offset_left = -82; marca.offset_right = -20; marca.offset_top = 14; marca.offset_bottom = 76
 	missao_hud = legenda(raiz,"",13); missao_hud.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	missao_hud.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	missao_hud.offset_left = -380; missao_hud.offset_right = -98; missao_hud.offset_top = 22; missao_hud.offset_bottom = 65
+	missao_hud.offset_left = -380; missao_hud.offset_right = -98; missao_hud.offset_top = 22; missao_hud.offset_bottom = 105
 	minimapa = preload("res://scripts/minimap.gd").new(); minimapa.mundo = mundo; raiz.add_child(minimapa)
 	minimapa.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
 	minimapa.offset_left = -238; minimapa.offset_right = -18; minimapa.offset_top = -238; minimapa.offset_bottom = -18
@@ -113,6 +128,10 @@ func _ready() -> void:
 	var atalhos: HBoxContainer = HBoxContainer.new(); raiz.add_child(atalhos); atalhos.position = Vector2(22,58)
 	botao(atalhos,"H",alternar,"painel").tooltip_text = "Gestão da quinta"
 	botao(atalhos,"K",alternar_kit,"enxada").tooltip_text = "Ferramentas"
+	botao(atalhos,"V Câmara",func() -> void: mundo.camera.alternar_livre(),"cursor")
+	botao(atalhos,"L Dia/noite",func() -> void: mundo.calendario.proximo_periodo(),"sol")
+	botao(atalhos,"+1 dia",func() -> void: mundo.calendario.saltar(),"sol")
+	botao(atalhos,"Tempo ×1/12",func() -> void: mundo.calendario.alternar_velocidade(),"painel")
 	kit = HBoxContainer.new(); raiz.add_child(kit)
 	kit.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
 	kit.offset_left = 20; kit.offset_top = -100; kit.offset_bottom = -20
@@ -126,25 +145,38 @@ func _ready() -> void:
 	criar_proposta()
 
 func criar_menu() -> void:
-	selecao = painel_centrado(440,440)
+	fundo_menu = ColorRect.new(); fundo_menu.color = Color(0.02,0.055,0.035,0.72); raiz.add_child(fundo_menu); fundo_menu.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	selecao = painel_centrado(600,660)
 	var coluna: VBoxContainer = VBoxContainer.new(); selecao.add_child(coluna)
-	imagem_logo(coluna,Vector2(144,144))
-	var titulo: Label = legenda(coluna,"MOZCOLHEITA",28); titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var frase: Label = legenda(coluna,"A sua machamba. O seu futuro.",14); frase.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	botao(coluna,"Começar",func() -> void: escolher(),"quinta")
-	var ajuda: Label = legenda(coluna,"WASD mover · K ferramentas · H gestão\nE interagir · G engatar · F drone",13); ajuda.hide()
-	botao(coluna,"Controlos",func() -> void: ajuda.visible = not ajuda.visible,"cursor")
+	imagem_logo(coluna,Vector2(88,88))
+	var titulo: Label = legenda(coluna,"MOZCOLHEITA",26); titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var recipiente: SubViewportContainer = SubViewportContainer.new(); recipiente.custom_minimum_size = Vector2(400,300); recipiente.stretch = true; coluna.add_child(recipiente)
+	var viewport: SubViewport = SubViewport.new(); viewport.size = Vector2i(540,300); viewport.own_world_3d = true; viewport.transparent_bg = true; recipiente.add_child(viewport)
+	previa = preload("res://scripts/player.gd").new(); previa.mundo = mundo; viewport.add_child(previa); previa.set_physics_process(false)
+	previa.rotation.y = -0.22
+	var luz: DirectionalLight3D = DirectionalLight3D.new(); luz.rotation_degrees = Vector3(-30,155,0); luz.light_energy = 1.2; viewport.add_child(luz)
+	var ambiente: WorldEnvironment = WorldEnvironment.new(); ambiente.environment = Environment.new(); ambiente.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR; ambiente.environment.ambient_light_color = Color("fff1d6"); ambiente.environment.ambient_light_energy = 0.7; viewport.add_child(ambiente)
+	var cam: Camera3D = Camera3D.new(); viewport.add_child(cam); cam.position = Vector3(0,1.25,-3.2); cam.look_at(Vector3(0,1.12,0)); cam.current = true; cam.fov = 39
+	var personagens: HBoxContainer = HBoxContainer.new(); personagens.alignment = BoxContainer.ALIGNMENT_CENTER; coluna.add_child(personagens)
+	botao(personagens,"Agricultor",func() -> void: seleccionar_avatar(false),"enxada")
+	botao(personagens,"Agricultora",func() -> void: seleccionar_avatar(true),"semeadora")
+	botao(coluna,"Começar",func() -> void: escolher(feminino_escolhido),"quinta")
 	botao(coluna,"Sair",func() -> void: get_tree().quit(),"interagir")
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+func seleccionar_avatar(feminino: bool) -> void:
+	feminino_escolhido = feminino; previa.mulher = feminino; previa.criar_avatar()
+
 
 func pagina(nome: String,icone: String) -> VBoxContainer:
 	var margem: MarginContainer = MarginContainer.new(); margem.name = nome; paginas.add_child(margem)
 	for lado: String in ["left","right","top","bottom"]: margem.add_theme_constant_override("margin_"+lado,16)
-	var coluna: VBoxContainer = VBoxContainer.new(); coluna.add_theme_constant_override("separation",12); margem.add_child(coluna)
+	var scroll: ScrollContainer = ScrollContainer.new(); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; margem.add_child(scroll)
+	var coluna: VBoxContainer = VBoxContainer.new(); coluna.size_flags_horizontal = Control.SIZE_EXPAND_FILL; coluna.add_theme_constant_override("separation",12); scroll.add_child(coluna)
 	paginas.set_tab_icon(paginas.get_tab_count()-1,textura(icone)); return coluna
 
 func criar_painel() -> void:
-	detalhes = painel_centrado(720,510)
+	detalhes = painel_centrado(920,650)
 	var base: VBoxContainer = VBoxContainer.new(); detalhes.add_child(base)
 	legenda(base,"GESTÃO DA QUINTA",22)
 	missao_label = legenda(base,"",13)
@@ -176,6 +208,35 @@ func criar_painel() -> void:
 	stock = legenda(mercado,""); stock.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	botao(mercado,"Encher semeadoras · 2 MT/semente",func() -> void: mundo.reabastecer(true),"semeadora")
 	botao(mercado,"20 sementes · 40 MT",func() -> void: mundo.avisar("Sementes compradas." if mundo.economia.sementes() else "Visite o armazém com saldo suficiente."),"semeadora")
+	var entregas_pagina: VBoxContainer = pagina("Entregas","carga")
+	legenda(entregas_pagina,"ENCOMENDAS DAS EMPRESAS",19)
+	urgencia_entrega = OptionButton.new(); entregas_pagina.add_child(urgencia_entrega)
+	for nivel: String in ["Normal · 8 dias","Prioritária · 6 dias","Urgente · 4 dias"]: urgencia_entrega.add_item(nivel)
+	for i: int in range(3):
+		var indice: int = i
+		descricoes_entregas.append(legenda(entregas_pagina,mundo.entregas.descricao(i),13))
+		botao(entregas_pagina,"Aceitar encomenda · "+mundo.entregas.EMPRESAS[i],func() -> void: mundo.entregas.aceitar(indice,urgencia_entrega.selected),["tomate","milho","couve"][i])
+	legenda(entregas_pagina,"Camião no parque · C carrega · Pare dentro da garagem da empresa.\nSó produtos aceites são vendidos; mercadoria incompatível fica na carga.",13)
+	var grupo: VBoxContainer = pagina("Grupo","interagir")
+	legenda(grupo,"EQUIPA PARA UMA ENCOMENDA",19)
+	var linha: HBoxContainer = HBoxContainer.new(); grupo.add_child(linha)
+	grupo_empresa = OptionButton.new(); linha.add_child(grupo_empresa)
+	for empresa: String in mundo.entregas.EMPRESAS: grupo_empresa.add_item(empresa)
+	grupo_numero = SpinBox.new(); grupo_numero.min_value = 1; grupo_numero.max_value = 10; grupo_numero.value = 10; linha.add_child(grupo_numero)
+	grupo_nivel = OptionButton.new(); linha.add_child(grupo_nivel)
+	for nivel: String in ["Normal","Difícil","Muito difícil"]: grupo_nivel.add_item(nivel)
+	var parcela: HBoxContainer = HBoxContainer.new(); grupo.add_child(parcela); legenda(parcela,"Centro da parcela X / Z")
+	grupo_x = SpinBox.new(); grupo_z = SpinBox.new()
+	for campo: SpinBox in [grupo_x,grupo_z]: campo.min_value = -60; campo.max_value = 60; parcela.add_child(campo)
+	grupo_x.value = 12
+	grupo_custo = legenda(grupo,"",14)
+	grupo_confirmar = botao(grupo,"Confirmar contrato e reservar pagamento",func() -> void: mundo.equipa_grupo.confirmar(grupo_proposta); actualizar_grupo(),"interagir")
+	grupo_estado = legenda(grupo,"",13); grupo_estado.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	botao(grupo,"Cancelar equipa e devolver saldo não executado",func() -> void: mundo.equipa_grupo.terminar("Cancelado pelo jogador"),"carga")
+	for campo: SpinBox in [grupo_x,grupo_z,grupo_numero]: campo.value_changed.connect(func(_valor: float) -> void: actualizar_grupo())
+	grupo_empresa.item_selected.connect(func(_i: int) -> void: actualizar_grupo()); grupo_nivel.item_selected.connect(func(_i: int) -> void: actualizar_grupo())
+	var historico: VBoxContainer = pagina("Histórico","painel")
+	historico_label = legenda(historico,"",14); historico_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var comandos: VBoxContainer = pagina("Controlos","cursor")
 	for i: int in range(6):
 		var textos: Array[String] = ["WASD · Mover     Shift · Correr","1–6 / K · Ferramentas     Clique · Usar","E · Interagir / conduzir / conversar","G · Engatar     Espaço · Máquina     C · Carga","F · Drone     Espaço / Ctrl · Altura     R · Rega","Tab · Cursor     H · Gestão     Esc · Menu"]
@@ -183,9 +244,12 @@ func criar_painel() -> void:
 	botao(base,"Voltar ao campo  ·  H",alternar)
 	detalhes.hide()
 
-func escolher(_feminino: bool = false) -> void:
-	# O jogador começa sempre como homem, sem pergunta de género.
-	mundo.jogador.mulher = false
+func escolher(feminino: bool = false) -> void:
+	if mundo.jogador.mulher!=feminino:
+		mundo.jogador.mulher = feminino; mundo.jogador.criar_avatar(); mundo.ferramentas.seleccionar(mundo.ferramentas.actual)
+		if mundo.trator_actual!=null:
+			mundo.jogador.visual.reparent(mundo.trator_actual); mundo.jogador.visual.transform = Transform3D(Basis.IDENTITY,Vector3(0,0.65,-1.5) if mundo.trator_actual==mundo.caminhao else Vector3(0,0.45,0.6)); mundo.ferramentas.vista.hide()
+	fundo_menu.hide()
 	selecao.hide(); Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func alternar() -> void:
@@ -220,7 +284,7 @@ func criar_proposta() -> void:
 	op_tractor = OptionButton.new(); linha.add_child(op_tractor)
 	for i: int in range(3): op_tractor.add_item("Tractor %d" % [i+1])
 	op_fabrica = OptionButton.new(); linha.add_child(op_fabrica)
-	for nome: String in ["Fábrica A","Fábrica B","Fábrica C"]: op_fabrica.add_item(nome)
+	for nome: String in mundo.entregas.EMPRESAS: op_fabrica.add_item(nome)
 	op_nivel = OptionButton.new(); linha.add_child(op_nivel)
 	for nome: String in ["Normal","Exigente","Difícil"]: op_nivel.add_item(nome)
 	var quantidade: HBoxContainer = HBoxContainer.new(); base.add_child(quantidade)
@@ -264,6 +328,7 @@ func actualizar_orcamento() -> void:
 	mundo.contrato.centro_trabalho = Vector2i(int(op_x.value),int(op_z.value))
 	var plano: Dictionary = mundo.contrato.orcamento(op_trabalho.get_selected_id(),int(op_quantidade.value),op_tractor.selected,op_nivel.selected,op_fabrica.selected)
 	mundo.contrato.proposta = plano
+	if plano.is_empty(): custo.text = "Escolha uma empresa que aceite a cultura da missão."; confirmar_pagamento.disabled = true; return
 	custo.text = "%s
 %s · %d unidades · Tractor %d
 Trabalho: %d MT
@@ -271,15 +336,17 @@ Tempo estimado: %d min · %d MT
 Dificuldade / distância: +%d MT
 Procura da missão: +%d MT
 TOTAL MÁXIMO: %d MT" % [plano.objectivo,plano.tarefa,plano.quantidade,int(plano.trator)+1,plano.base,plano.minutos,plano.tempo,plano.dificuldade,plano.demanda,plano.total]
+	custo.text += "\nPrazo: %s · quebra de contrato: %d MT" % [mundo.calendario.restante(plano.prazo),plano.penalidade]
 	confirmar_pagamento.text = "Confirmar e reservar %d MT" % plano.total
 	confirmar_pagamento.disabled = mundo.saldo<int(plano.total)
 
 func _process(delta: float) -> void:
+	fundo_menu.visible = selecao.visible
 	tempo_actualizacao += delta
 	if tempo_actualizacao<0.15: return
 	tempo_actualizacao = 0
-	dinheiro.text = "%s   ·   %02d:%02d" % [preload("res://scripts/economy.gd").formatar(mundo.saldo),(6+int(mundo.relogio/60))%24,int(mundo.relogio)%60]
-	missao_hud.text = mundo.missoes.resumo()+"\nContratos: %d/3" % mundo.contrato.activos()
+	dinheiro.text = "%s · %s · ×%d" % [preload("res://scripts/economy.gd").formatar(mundo.saldo),mundo.calendario.hora(),int(mundo.calendario.velocidade)]
+	missao_hud.text = mundo.entregas.resumo()+"\n"+mundo.missoes.resumo()
 	ferramenta.texture = textura(mundo.ferramentas.ICONES[mundo.ferramentas.actual])
 	ferramenta.visible = not selecao.visible and not aberto and not kit_aberto
 	dica.text = mundo.dica(); dica.visible = not selecao.visible and not aberto
@@ -291,6 +358,9 @@ func _process(delta: float) -> void:
 		for maquina: Node3D in mundo.implementos:
 			if maquina.tipo==1 and preload("res://scripts/layout.gd").distancia(mundo.jogador.position,maquina.position)<5: abastecer_botao.visible = true
 	if aberto:
+		actualizar_grupo()
+		for i: int in range(3): descricoes_entregas[i].text = mundo.entregas.descricao(i,urgencia_entrega.selected)
+		historico_label.text = mundo.entregas.texto_historico()+"\n"+mundo.contrato.texto_historico()
 		var pessoa: Node3D = mundo.pessoas[trabalhadores.selected]
 		missao_label.text = mundo.missoes.resumo()+" · contratos %d/3" % mundo.contrato.activos()
 		if pessoa.servico.is_empty():
@@ -303,9 +373,22 @@ func _process(delta: float) -> void:
 Progresso: %d/%d · %s
 Orçamento reservado: %d MT · pago pelo trabalho: %d MT
 Saldo reembolsável: %d MT" % [plano.objectivo,plano.tarefa,int(plano.trator)+1,plano.realizado,plano.quantidade,pessoa.estado,plano.total,plano.pago,int(plano.total)-int(plano.pago)]
+		if not pessoa.servico.is_empty(): fila.text += "\nPrazo: %s · penalização por atraso: %d MT" % [mundo.calendario.restante(float(pessoa.servico.limite)-mundo.calendario.decorrido),int(pessoa.servico.penalidade)]
 		stock.text = mundo.resumo_stock()+"\nSementes: %d   Madeira: %d\n" % [mundo.ferramentas.sementes,mundo.ferramentas.madeira]
 		for maquina: Node3D in mundo.implementos:
 			if maquina.tipo==1: stock.text += "Semeadora: %d/300 · encher: %d MT\n" % [maquina.sementes,maquina.custo_abastecer()]
 		for i: int in range(3):
-			stock.text += "\nFábrica "+["A","B","C"][i]+": "
-			for c: int in range(4): stock.text += "%s %d MT  " % [preload("res://scripts/crop.gd").NOMES[c],mundo.economia.preco(i,c)]
+			stock.text += "\n"+mundo.entregas.EMPRESAS[i]+": "
+			for c: int in range(4):
+				if mundo.economia.aceita(i,c): stock.text += "%s %d MT  " % [preload("res://scripts/crop.gd").NOMES[c],mundo.economia.preco(i,c)]
+
+func actualizar_grupo() -> void:
+	mundo.equipa_grupo.centro = Vector2i(int(grupo_x.value),int(grupo_z.value))
+	grupo_proposta = mundo.equipa_grupo.orcamento(grupo_empresa.selected,int(grupo_numero.value),grupo_nivel.selected)
+	grupo_confirmar.disabled = grupo_proposta.is_empty()
+	if grupo_proposta.is_empty(): grupo_custo.text = "Aceite uma encomenda pendente. Equipa máxima: dez pessoas livres."
+	else:
+		grupo_custo.text = "%d pessoas · %d unidades · até %d parcelas\nPreparar → plantar → regar → colher → carregar camião\nTrabalho: %d MT · sementes: %d MT · coordenação: %d MT\nTOTAL MÁXIMO: %d MT · confirme antes de iniciar" % [grupo_proposta.pessoas,grupo_proposta.quantidade,grupo_proposta.parcelas,grupo_proposta.trabalho,grupo_proposta.materiais,grupo_proposta.coordenacao,grupo_proposta.total]
+		grupo_custo.text += "\nPrazo da encomenda: %s · multa única: %d MT" % [mundo.calendario.restante(float(grupo_proposta.limite)-mundo.calendario.decorrido),grupo_proposta.penalidade]
+	grupo_estado.text = "Encomenda seleccionada. Confirme o orçamento para começar." if not grupo_proposta.is_empty() and mundo.equipa_grupo.ultimo.begins_with("Aceite") else mundo.equipa_grupo.resumo()
+	for pessoa: Node3D in mundo.equipa_grupo.trabalhadores: grupo_estado.text += "\n%s · %s" % [pessoa.nome,pessoa.estado]

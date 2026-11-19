@@ -1,0 +1,53 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+
+OK · Início à frente da casa
+OK · Rig masculino completo
+OK · Agricultora seleccionável com rig partilhado
+OK · Animação e cesto de transporte
+OK · Repor pose limpa animação de trabalho
+OK · Semente seca não cresce ao saltar dias
+OK · Dois dias não completam crescimento
+OK · Três dias completos amadurecem cultura
+OK · Câmara livre bloqueia controlador do jogador
+OK · Bairros distribuídos e pelo menos dez prédios
+OK · Prédio de quarenta pisos
+OK · Tráfego e três criações com animais
+OK · Terreno da cidade nivelado
+OK · Empresa aceita apenas produtos próprios
+OK · Capacidade real do camião
+OK · Aceitar encomenda sem duplicar contrato
+OK · Entrar e conduzir camião
+OK · Condutor visível na cabine
+OK · Entrega física ao parar na garagem da fábrica
+OK · Encomenda concluída não paga duas vezes
+OK · Nova encomenda após conclusão
+OK · Orçamento variável para dez pessoas
+OK · Grupo confirmado com reserva única
+OK · Dez trabalhadores contratados de uma vez
+PROGRESSO GRUPO 10 trabalhadores · Preparar · camião 0/100
+Reserva 2120 MT · contabilizado 120 MT · sementes 50
+Prazo da encomenda: 7d 23h 58m · multa 285 MT pendentes 40
+PROGRESSO GRUPO 10 trabalhadores · Plantar · camião 0/100
+Reserva 2120 MT · contabilizado 863 MT · sementes 1
+Prazo da encomenda: 7d 13h 18m · multa 285 MT pendentes 0
+PROGRESSO GRUPO 10 trabalhadores · Plantar · camião 0/100
+Reserva 2120 MT · contabilizado 863 MT · sementes 1
+Prazo da encomenda: 7d 02h 38m · multa 285 MT pendentes 0
+ERROR: Grupo prepara, semeia, rega, espera, colhe e carrega sem intervenção nas tarefas
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] exigir (res://validation/comunidade/test.gd:6)
+       [1] executar (res://validation/comunidade/test.gd:72)
+PRESO Celina Etapa concluída · aguarda equipa (9.247455, -0.049537, -1.019767) { "tempo": 0, "manual": true }
+PRESO Tomás Etapa concluída · aguarda equipa (11.11925, -0.062416, -0.868731) { "tempo": 0, "manual": true }
+PRESO Rui Etapa concluída · aguarda equipa (10.18914, -0.056725, -0.835439) { "tempo": 0, "manual": true }
+PRESO Lídia Etapa concluída · aguarda equipa (11.09694, -0.055328, -2.172948) { "tempo": 0, "manual": true }
+PRESO Ana Etapa concluída · aguarda equipa (12.1346, -0.060467, -2.524968) { "tempo": 0, "manual": true }
+PRESO Afonso Etapa concluída · aguarda equipa (13.76909, -0.078415, -0.812232) { "tempo": 0, "manual": true }
+PRESO Bento · residente Etapa concluída · aguarda equipa (13.83724, -0.072535, -1.923684) { "tempo": 0, "manual": true }
+PRESO Fátima · residente Etapa concluída · aguarda equipa (14.83207, -0.079273, -1.894818) { "tempo": 0, "manual": true }
+PRESO Amina · residente Plantar · Milho (14.32802, -0.077837, -1.69772) { "tempo": 0, "manual": true, &"celula": (12, -4) }
+PRESO Sara · residente Etapa concluída · aguarda equipa (12.54177, -0.065538, -1.883024) { "tempo": 0, "manual": true }
+OK · Pagamento respeita máximo aprovado
+OK · Cancelamento repetido não duplica reembolso
+COMUNIDADE · FALHOU · falhas: 1

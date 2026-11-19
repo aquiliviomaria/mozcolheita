@@ -43,10 +43,19 @@ func _draw() -> void:
 	var fim: Vector2 = ponto(Vector3(96,0,78))
 	draw_rect(Rect2(canto,fim-canto),Color("b0b6a0"),false,1)
 	for p: Vector3 in Plano.PORTOES: marca(p,Color("8ed5a5"),3)
-	for area: Rect2 in [Plano.GALPAO,Plano.ARMAZEM]:
+	for area: Rect2 in [Plano.CASA,Plano.GALPAO,Plano.ARMAZEM]:
 		draw_rect(Rect2(ponto(Vector3(area.position.x,0,area.position.y)),area.size*size.x/alcance),Color("b9ac83"))
+	if mundo.comunidade!=null:
+		for trecho: Dictionary in mundo.comunidade.trocos: draw_line(ponto(trecho.a),ponto(trecho.b),Color("879187"),2)
+		for n: Node3D in mundo.comunidade.casas: marca(n.position,Color("c3b591"),1.8)
+		for n: Node3D in mundo.comunidade.edificios: marca(n.position,Color("9eb9b0"),3)
+	if mundo.guia_entrega!=null:
+		var anterior: Vector3 = centro
+		for p: Vector3 in mundo.guia_entrega.rota:
+			draw_line(ponto(anterior),ponto(p),Color("ffe17b"),2); anterior = p
 	for fabrica: Node3D in mundo.fabricas: marca(fabrica.global_position,Color("d9ac6a"),4)
 	for veiculo: Node3D in mundo.tratores: marca(veiculo.global_position,Color("80b8d2"),3)
+	if mundo.caminhao!=null: marca(mundo.caminhao.position,Color("f1c45c"),4)
 	for drone: Node3D in mundo.drones: marca(drone.global_position,Color("b5d5e2"),2)
 	for pessoa: Node3D in mundo.pessoas: marca(pessoa.global_position,Color("d5c785") if pessoa.contratado else Color("8fa98b"),1.6)
 	for c: Vector3 in preload("res://scripts/village.gd").CENTROS: marca(c,Color("b7b57d"),4)

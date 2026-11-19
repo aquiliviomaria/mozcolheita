@@ -49,5 +49,8 @@ func criar_fazenda(indice: int) -> void:
 		pessoa.rota.assign([centro+Vector3(-13,0,-12),centro+Vector3(13,0,-12),centro+Vector3(13,0,9),centro+Vector3(-13,0,9)])
 		mundo.add_child(pessoa)
 		mundo.pessoas.append(pessoa)
-	var caminho: Array[Vector3] = [Vector3(centro.x,0,92),centro+Vector3(23,0,20)]
+	var caminho: Array[Vector3]
+	if centro.x>96: caminho = [Vector3(122,0,centro.z),centro+Vector3(23,0,20)]
+	elif centro.x<-96: caminho = [Vector3(-122,0,centro.z),centro+Vector3(23,0,20)]
+	else: caminho = [Vector3(centro.x,0,-102 if centro.z<0 else 140),centro+Vector3(23,0,20)]
 	mundo.relevo.estrada(caminho)

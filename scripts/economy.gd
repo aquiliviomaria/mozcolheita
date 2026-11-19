@@ -12,11 +12,11 @@ func preco(fabrica: int, cultura: int) -> int:
 func vender(carga: Dictionary, fabrica: int) -> int:
 	if fabrica<0 or fabrica>2: return 0
 	var total: int = 0
-	for cultura: int in carga:
-		if cultura>=0 and cultura<4: total += maxi(0,int(carga[cultura]))*preco(fabrica,cultura)
+	for cultura: int in carga.keys():
+		if not aceita(fabrica,cultura): continue
+		total += maxi(0,int(carga[cultura]))*preco(fabrica,cultura); carga.erase(cultura)
 	if total<=0: return 0
 	mundo.saldo += total
-	carga.clear()
 	vendas += 1
 	mundo.avisar("Venda concluída · +%s" % formatar(total))
 	return total
@@ -36,3 +36,6 @@ static func formatar(valor: int) -> String:
 		algarismos = algarismos.left(algarismos.length()-3)
 	partes.insert(0,algarismos)
 	return ("-" if valor<0 else "")+".".join(partes)+" MT"
+
+static func aceita(fabrica: int,cultura: int) -> bool:
+	return cultura==fabrica or (fabrica==2 and cultura==3)

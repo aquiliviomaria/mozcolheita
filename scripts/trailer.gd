@@ -76,7 +76,8 @@ func transferir() -> int:
 	var plano: GDScript = preload("res://scripts/layout.gd")
 	for fabrica: Node3D in mundo.fabricas:
 		if plano.distancia(tractor.global_position,fabrica.global_position+Vector3(0,0,-8))<12:
-			var receita: int = mundo.economia.vender(carga,fabrica.numero); actualizar_carga(); return receita
+			var entregues: int = mundo.entregas.entregar(carga,fabrica.numero)
+			var receita: int = mundo.economia.vender(carga,fabrica.numero); actualizar_carga(); return receita+entregues
 	if plano.distancia(tractor.global_position,mundo.armazem.CENTRO)<10:
 		if not carga.is_empty():
 			var quantidade: int = total(); mundo.depositar(carga); actualizar_carga(); mundo.avisar("Carrinha descarregada no armazém."); return quantidade

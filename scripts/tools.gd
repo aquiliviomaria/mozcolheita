@@ -48,6 +48,7 @@ func chave_alvo() -> Vector2i:
 
 func usar() -> bool:
 	mundo.jogador.gesto = 1.0
+	mundo.jogador.animacao("watering" if actual==4 else "harvesting" if actual==0 else "planting")
 	var chave: Vector2i = chave_alvo()
 	match actual:
 		0: return mundo.terreno.trabalhar(chave,"colher",cultura)

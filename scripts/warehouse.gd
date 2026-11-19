@@ -12,6 +12,9 @@ var letreiro: Label3D
 
 func _ready() -> void:
 	position.y = mundo.altura(Vector3(32,0,37))
+	preload("res://scripts/architecture.gd").piso(mundo,self,Rect2(22,24,20,26))
+	for z: float in [30,44]:
+		var luz: OmniLight3D = OmniLight3D.new(); luz.position = Vector3(32,5,z); luz.omni_range = 15; luz.light_energy = 1.2; luz.light_color = Color("ffe6b2"); add_child(luz)
 	for x: float in [22,42]: mundo.caixa(self,Vector3(x,3.5,37),Vector3(0.35,7,26),Color("9c947f"),true)
 	mundo.caixa(self,Vector3(32,7.2,37),Vector3(21,0.3,27),Color("516e68"),true)
 	for z: float in [24,50]:
@@ -22,8 +25,9 @@ func _ready() -> void:
 		mundo.caixa(self,Vector3(32,6.4,z),Vector3(12.5,0.7,0.75),Color("324e45"))
 		for x: float in [25.9,38.1]: mundo.caixa(self,Vector3(x,3,z),Vector3(0.12,6,0.5),Color("64766b"))
 		for faixa: int in range(5): mundo.caixa(porta,Vector3(0,-2.4+faixa*1.2,-0.15),Vector3(11.8,0.04,0.03),Color("78968a"))
-	for x: float in [24.7,39.3]:
-		for z: float in [32,37,42]: caixas.append(mundo.caixa(self,Vector3(x,0.65,z),Vector3(2,1.3,2),Color("a88050")))
+	for i: int in range(4):
+		var caixa: Node3D = preload("res://scripts/produce_crate.gd").new(); caixa.mundo = mundo; caixa.cultura = i
+		caixa.position = Vector3(24.7 if i%2==0 else 39.3,0,32+(i/2)*9); add_child(caixa); caixas.append(caixa)
 	letreiro = mundo.placa(self,Vector3(32,7.9,24),"GARAGEM · ARMAZÉM\nCom colheita: deposita · Carrinha vazia: carrega")
 	letreiro.visibility_range_end = 50
 	letreiro.font_size = 40; letreiro.pixel_size = 0.008
@@ -42,6 +46,7 @@ func retirar() -> Dictionary:
 
 func actualizar(delta: float) -> void:
 	var actores: Array[Node3D] = [mundo.jogador]
+	if mundo.caminhao!=null: actores.append(mundo.caminhao)
 	actores.append_array(mundo.pessoas); actores.append_array(mundo.tratores); actores.append_array(mundo.carrinhas)
 	for porta: Node3D in portas:
 		var aberta: bool = false
@@ -60,9 +65,12 @@ func actualizar(delta: float) -> void:
 	if agora and not dentro and not mundo.sacola.is_empty():
 		receber(mundo.sacola); mundo.avisar("Colheita guardada. Saia e entre com uma carrinha para carregar.")
 	dentro = agora
-	for carrinha: Node3D in mundo.carrinhas:
+	var transportes: Array[Node3D] = []; transportes.append_array(mundo.carrinhas)
+	if mundo.caminhao!=null: transportes.append(mundo.caminhao)
+	for carrinha: Node3D in transportes:
 		var id: int = carrinha.get_instance_id()
-		var na_zona: bool = carrinha.tractor!=null and carrinha.tractor==mundo.trator_actual and ZONA.has_point(Vector2(carrinha.position.x,carrinha.position.z))
+		var conduzida: bool = mundo.trator_actual==carrinha if carrinha==mundo.caminhao else carrinha.tractor!=null and carrinha.tractor==mundo.trator_actual
+		var na_zona: bool = conduzida and ZONA.has_point(Vector2(carrinha.position.x,carrinha.position.z))
 		if na_zona and not bool(visitas.get(id,false)):
 			if carrinha.total()>0:
 				var unidades: int = carrinha.total(); receber(carrinha.carga); carrinha.actualizar_carga()
@@ -71,9 +79,7 @@ func actualizar(delta: float) -> void:
 				var unidades: int = carrinha.carregar(mundo.stock)
 				mundo.avisar("Carrinha carregada: %d unidades. C descarrega · Fábricas fora da quinta." % unidades)
 		visitas[id] = na_zona
-	var total: int = 0
-	for quantidade: int in mundo.stock.values(): total += quantidade
-	for i: int in range(caixas.size()): caixas[i].visible = total>i*20
+	for i: int in range(caixas.size()): caixas[i].actualizar(int(mundo.stock.get(i,0)))
 
 func _physics_process(delta: float) -> void:
 	if mundo.hud==null or mundo.pausado(): return

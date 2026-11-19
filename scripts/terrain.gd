@@ -1,6 +1,7 @@
 extends Node3D
 ## A semente seca não acumula tempo. Todas as ferramentas e máquinas usam trabalhar().
 const AREA: Rect2i = Rect2i(-92,-74,184,148)
+const DURACAO: float = preload("res://scripts/calendar.gd").CRESCIMENTO
 const SOLO: int = 0
 const LAVRADO: int = 1
 const SEMEADO: int = 2
@@ -105,10 +106,10 @@ func avancar(delta: float) -> void:
 	for chave: Vector2i in celulas:
 		var dados: Dictionary = celulas[chave]
 		if int(dados.estado) not in [REGADO,CRESCER]: continue
-		var etapa_anterior: int = int(float(dados.tempo)/30.0)
+		var etapa_anterior: int = int(float(dados.tempo)/(DURACAO/2.0))
 		dados.tempo = float(dados.tempo)+delta
-		dados.estado = PRONTO if float(dados.tempo)>=60.0 else CRESCER
-		if int(float(dados.tempo)/30.0)!=etapa_anterior or int(dados.estado)==PRONTO: pendente = true
+		dados.estado = PRONTO if float(dados.tempo)>=DURACAO else CRESCER
+		if int(float(dados.tempo)/(DURACAO/2.0))!=etapa_anterior or int(dados.estado)==PRONTO: pendente = true
 
 func _process(delta: float) -> void:
 	if not mundo.pausado(): avancar(delta)

@@ -16,7 +16,7 @@ var distancia_anterior: float = 7.5
 func _ready() -> void:
 	add_to_group("tratores_quinta")
 	collision_layer = 4
-	collision_mask = 1|2|4|8
+	collision_mask = 1|2|4|8|16
 	var colisor: CollisionShape3D = CollisionShape3D.new()
 	var forma: BoxShape3D = BoxShape3D.new()
 	forma.size = Vector3(1.7,1.5,3.0)
@@ -31,9 +31,9 @@ func _ready() -> void:
 	mundo.caixa(self,Vector3(0,1.23,0.65),Vector3(0.46,0.14,0.5),Color("303e40"))
 	mundo.caixa(self,Vector3(0,1.5,0.88),Vector3(0.46,0.48,0.12),Color("303e40"))
 	for lado: float in [-1.0,1.0]:
-		for z: float in [-0.05,1.2]: mundo.caixa(self,Vector3(lado*0.66,1.77,z),Vector3(0.055,1.55,0.055),Color("34464a"))
+		for z: float in [-0.05,1.2]: mundo.caixa(self,Vector3(lado*0.66,1.88,z),Vector3(0.055,1.8,0.055),Color("34464a"))
 		mundo.caixa(self,Vector3(lado*0.9,1.1,0.9),Vector3(0.45,0.12,1.3),cor)
-	mundo.caixa(self,Vector3(0,2.58,0.6),Vector3(1.7,0.12,1.8),cor.lightened(0.12))
+	mundo.caixa(self,Vector3(0,2.78,0.6),Vector3(1.7,0.12,1.8),cor.lightened(0.12))
 	var volante: MeshInstance3D = MeshInstance3D.new()
 	var aro: TorusMesh = TorusMesh.new()
 	aro.inner_radius = 0.18
@@ -126,7 +126,7 @@ func _physics_process(delta: float) -> void:
 		diferenca.y = 0
 		var angulo: float = atan2(-diferenca.x,-diferenca.z)+(PI if recuar else 0)
 		if diferenca.length()>0.1: rotation.y = lerp_angle(rotation.y,angulo,minf(1,delta*2))
-		rapidez = move_toward(rapidez,(minf(1.5 if recuar else 3.5,diferenca.length()*1.5)*(-1 if recuar else 1)) if diferenca.length()>0.7 else 0,delta*3)
+		rapidez = move_toward(rapidez,(minf(1.5 if recuar else 3.5,diferenca.length()*1.5)*(-1 if recuar else 1)) if diferenca.length()>0.35 else 0,delta*3)
 	else: rapidez = move_toward(rapidez,0,delta*6)
 	velocity = -global_basis.z*rapidez
 	velocity.y = -2.0

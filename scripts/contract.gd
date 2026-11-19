@@ -1,5 +1,6 @@
 extends Node
 ## A contratação só é efectivada depois da confirmação e dos três movimentos de mão.
+var historico: Array[Dictionary] = []
 var mundo: Node3D
 var activo: bool = false
 var pessoa: Node3D
@@ -32,6 +33,7 @@ var proposta: Dictionary = {}
 var centro_trabalho: Vector2i = Vector2i.ZERO
 
 func orcamento(tipo: int,quantidade: int,tractor: int,dificuldade: int,fabrica: int = 0) -> Dictionary:
+	if tipo==6 and not mundo.economia.aceita(fabrica,mundo.missoes.cultura()): return {}
 	var indice: int = TRABALHOS.find(tipo)
 	if indice<0 or quantidade<1 or quantidade>500 or tractor<0 or tractor>=3: return {}
 	var centro: Vector3 = Vector3(centro_trabalho.x,0,centro_trabalho.y)
@@ -45,7 +47,9 @@ func orcamento(tipo: int,quantidade: int,tractor: int,dificuldade: int,fabrica: 
 	var procura: float = 0.18*float(mundo.missoes.restante())/mundo.missoes.METAS[mundo.missoes.cultura()]
 	if tipo in [4,6]: procura *= 1.25
 	var extra_missao: int = ceili((base+tempo_estimado+extra_dificuldade)*procura)
-	return {"tipo":tipo,"tarefa":mundo.tarefas.NOMES[tipo],"quantidade":quantidade,"trator":tractor,"fabrica":clampi(fabrica,0,2),"cultura":mundo.missoes.cultura(),"missao":mundo.missoes.identificador(),"objectivo":mundo.missoes.titulo(),"area":Rect2i(floori(centro.x)-12,floori(centro.z)-12,24,24),"base":base,"tempo":tempo_estimado,"minutos":minutos,"dificuldade":extra_dificuldade,"nivel":dificuldade,"demanda":extra_missao,"total":base+tempo_estimado+extra_dificuldade+extra_missao}
+	var prazo: float = maxf(2400,minutos*120.0+300)/(1.0+clampi(dificuldade,0,2)*0.15)
+	var penalidade: int = maxi(10,ceili((base+tempo_estimado+extra_dificuldade+extra_missao)*(0.15+clampi(dificuldade,0,2)*0.10)))
+	return {"prazo":prazo,"penalidade":penalidade,"tipo":tipo,"tarefa":mundo.tarefas.NOMES[tipo],"quantidade":quantidade,"trator":tractor,"fabrica":clampi(fabrica,0,2),"cultura":mundo.missoes.cultura(),"missao":mundo.missoes.identificador(),"objectivo":mundo.missoes.titulo(),"area":Rect2i(floori(centro.x)-12,floori(centro.z)-12,24,24),"base":base,"tempo":tempo_estimado,"minutos":minutos,"dificuldade":extra_dificuldade,"nivel":dificuldade,"demanda":extra_missao,"total":base+tempo_estimado+extra_dificuldade+extra_missao}
 
 func activos() -> int:
 	var total: int = 0
@@ -54,7 +58,7 @@ func activos() -> int:
 	return total
 
 func iniciar(vizinho: Node3D) -> bool:
-	if activo or not vizinho.servico.is_empty() or mundo.trator_actual!=null or mundo.drone_actual!=null: return false
+	if activo or vizinho.grupo or not vizinho.servico.is_empty() or mundo.trator_actual!=null or mundo.drone_actual!=null: return false
 	if vizinho.global_position.distance_to(mundo.jogador.position)>3: mundo.avisar("Aproxime-se do trabalhador."); return false
 	if activos()>=3: mundo.avisar("Os três tractores já estão atribuídos."); return false
 	activo = true; pessoa = vizinho; pessoa.em_conversa = true; confirmado = false; proposta = {}; tempo = 0; espera = 0
@@ -80,7 +84,7 @@ func confirmar(plano: Dictionary = {}) -> bool:
 	# Reserva o máximo aprovado uma única vez; o trabalho não executado é reembolsado.
 	mundo.saldo -= int(proposta.total)
 	pessoa.servico = proposta.duplicate(true)
-	pessoa.servico.merge({"realizado":0,"pago":0,"pagamento_confirmado":true,"estado":"A assinar"})
+	pessoa.servico.merge({"realizado":0,"pago":0,"pagamento_confirmado":true,"estado":"A assinar","limite":mundo.calendario.decorrido+float(proposta.prazo),"avisado":false})
 	veiculo.atribuido = pessoa
 	confirmado = true; tempo = 0
 	mundo.hud.fechar_proposta()
@@ -89,6 +93,7 @@ func confirmar(plano: Dictionary = {}) -> bool:
 	return true
 
 func creditar(trabalhador: Node3D,quantidade: int) -> void:
+	verificar_prazos()
 	if trabalhador.servico.is_empty(): return
 	var plano: Dictionary = trabalhador.servico
 	var antes: int = int(plano.realizado)
@@ -118,6 +123,7 @@ func encerrar(trabalhador: Node3D,motivo: String) -> void:
 	desembarcar(trabalhador)
 	trabalhador.ultimo_servico = "%s · %s · %d/%d · pago %d MT · devolvido %d MT" % [motivo,plano.tarefa,plano.realizado,plano.quantidade,plano.pago,devolucao]
 	mundo.tarefas.limpar(trabalhador)
+	historico.append({"nome":trabalhador.nome,"tarefa":plano.tarefa,"estado":"Falhou" if motivo.begins_with("Prazo") else "Sucesso" if motivo=="Serviço concluído" else "Cancelado","quantidade":plano.quantidade,"realizado":plano.realizado,"penalidade":int(plano.penalidade) if motivo.begins_with("Prazo") else 0})
 	trabalhador.servico = {}; trabalhador.contratado = false; trabalhador.estado = motivo
 
 func terminar(assinado: bool) -> void:
@@ -168,3 +174,22 @@ func actualizar(delta: float) -> void:
 
 func _process(delta: float) -> void:
 	actualizar(delta)
+	if mundo.hud!=null and not mundo.pausado(): verificar_prazos()
+
+func verificar_prazos() -> void:
+	for trabalhador: Node3D in mundo.pessoas:
+		if trabalhador.servico.is_empty() or not trabalhador.servico.has("limite"): continue
+		var plano: Dictionary = trabalhador.servico
+		var restante: float = float(plano.limite)-mundo.calendario.decorrido
+		if restante<=0:
+			var multa: int = int(plano.penalidade)
+			if activo and pessoa==trabalhador: confirmado = false; terminar(false)
+			mundo.saldo -= multa; encerrar(trabalhador,"Prazo expirado · quebra de contrato")
+			mundo.avisar("CONTRATO VENCIDO · %s · penalização %d MT" % [trabalhador.nome,multa])
+		elif restante<=float(plano.prazo)*0.2 and not bool(plano.get("avisado",false)):
+			plano.avisado = true; mundo.avisar("Prazo de %s a terminar · %s" % [trabalhador.nome,mundo.calendario.restante(restante)])
+
+func texto_historico() -> String:
+	var texto: String = "SERVIÇOS · HISTÓRICO DA SESSÃO\n"
+	for item: Dictionary in historico: texto += "%s · %s · %s · %d/%d · multa %d MT\n" % [item.nome,item.tarefa,item.estado,item.realizado,item.quantidade,item.penalidade]
+	return texto

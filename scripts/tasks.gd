@@ -59,7 +59,7 @@ func ir(pessoa: Node3D,alvo: Vector3,delta: float,alcance: float = 0.7) -> bool:
 	if not pessoa.destino_actual.is_equal_approx(alvo): pessoa.planear(alvo)
 	if pessoa.percurso.is_empty(): veiculo.rapidez = 0; return preload("res://scripts/layout.gd").distancia(veiculo.position,alvo)<maxf(alcance,1.5)
 	veiculo.destino = pessoa.percurso[0]
-	if preload("res://scripts/layout.gd").distancia(veiculo.position,veiculo.destino)<1.5:
+	if preload("res://scripts/layout.gd").distancia(veiculo.position,veiculo.destino)<(maxf(0.6,alcance) if pessoa.percurso.size()==1 else 0.9):
 		pessoa.percurso.pop_front()
 		if pessoa.percurso.is_empty(): veiculo.rapidez = 0; veiculo.velocity = Vector3.ZERO; return true
 	return false
@@ -91,6 +91,7 @@ func actualizar(pessoa: Node3D,delta: float) -> void:
 			if not ir(pessoa,tarefa.alvo_tractor,delta,1.5): return
 		elif not ir(pessoa,alvo,delta): return
 		tarefa.tempo = float(tarefa.tempo)+delta
+		pessoa.animacao("watering" if tipo==2 else "harvesting" if tipo==4 else "planting")
 		pessoa.gesto = 0.75; pessoa.animar(delta,0,pessoa.veiculo!=null)
 		if float(tarefa.tempo)<2: return
 		var acao: String = {2:"regar",3:"semear",4:"colher",7:"lavrar"}[tipo]
@@ -120,13 +121,18 @@ func transportar(pessoa: Node3D,tarefa: Dictionary,delta: float) -> void:
 		origem[cultura] = int(origem[cultura])-quantidade
 		if int(origem[cultura])==0: origem.erase(cultura)
 		if reboque!=null: reboque.actualizar_carga()
+	if int(tarefa.tipo)==6 and not bool(tarefa.get("aproximou",false)):
+		if not ir(pessoa,Vector3(-60+int(tarefa.fabrica)*60,0,92),delta,1.2): return
+		tarefa.aproximou = true; pessoa.destino_actual = Vector3.INF; pessoa.percurso.clear()
 	var alvo: Vector3 = mundo.armazem.ENTREGA if int(tarefa.tipo)==5 else Vector3(-60+int(tarefa.fabrica)*60,0,102)
 	if not ir(pessoa,alvo,delta,2.5): return
 	var unidades: int = mini(restante,int(carga.get(cultura,0)))
 	if unidades<=0: return
 	var lote: Dictionary = {cultura:unidades}
 	if int(tarefa.tipo)==5: mundo.depositar(lote)
-	else: mundo.economia.vender(lote,int(tarefa.fabrica))
+	else:
+		mundo.entregas.entregar(lote,int(tarefa.fabrica)); mundo.economia.vender(lote,int(tarefa.fabrica))
+		if not lote.is_empty(): pessoa.estado = "Empresa não aceita este produto"; return
 	carga[cultura] = int(carga[cultura])-unidades
 	if int(carga[cultura])==0: carga.erase(cultura)
 	if reboque!=null: reboque.actualizar_carga()

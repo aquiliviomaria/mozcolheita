@@ -1,0 +1,27 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+
+OK · L muda para 18:00 sem criar novo dia
+OK · Noite escura e sol apagado
+OK · Segundo L passa para manhã do dia seguinte
+OK · Novo dia com céu azul, sol e canto de galo
+OK · L funciona também na câmara livre
+OK · Avançar com L respeita multa e prazo de contrato
+CONTAGENS · casas 55 · prédios 10 · pessoas 46
+OK · Seis garagens de fábricas fora da quinta
+OK · Mais casas e prédios distribuídos
+OK · Mais moradores, camiões e tractores nas ruas
+OK · Árvores, pedras e riacho com quatro pontes
+OK · Seta escolhe fábrica compatível com tomate
+OK · Rota inclui portão e ruas até à garagem
+OK · Rede de ruas ligada à fábrica (-60.0, -0.330579, 110.0)
+OK · Rede de ruas ligada à fábrica (0.0, -0.347388, 110.0)
+OK · Rede de ruas ligada à fábrica (60.0, -0.578979, 110.0)
+OK · Rede de ruas ligada à fábrica (-245.0, -3.612085, -45.0)
+OK · Rede de ruas ligada à fábrica (-70.0, 0.254004, 225.0)
+OK · Rede de ruas ligada à fábrica (300.0, -0.550964, 225.0)
+OK · Encomenda activa tem prioridade sobre venda mais próxima
+OK · Sem mercadoria não há seta de entrega
+OK · Porta da casa e corredor deixam entrar fisicamente
+OK · Parar na filial vende produto correcto e preserva os restantes
+OK · Portão da fábrica abre ao camião
+MUNDO VIVO · PASSOU · 0 falhas
