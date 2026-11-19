@@ -1,0 +1,40 @@
+MOZCOLHEITA — PASTA PRINCIPAL
+Abra project.godot e prima F5, ou execute ./Jogar.sh.
+Clique Começar. Homem por defeito; capital de 500.000 MT.
+Quinta ampliada, seis portões. Nenhuma parcela vem preparada.
+
+WASD mover | Shift correr | Rato câmara | Roda/+/- zoom
+1 mãos | 2 martelo | 3 serrote | 4 enxada | 5 regador | 6 semeadora
+K kit; roda dentro do kit escolhe ferramentas. Clique/Espaço usa.
+H gestão por separadores; escolha a cultura em Culturas.
+Preparar → semear → regar → crescer (60 s) → colher.
+Sementes secas NÃO crescem. Alterne culturas para conservar o solo.
+
+E interagir / entrar-sair de tractor parado / conversar / confirmar contrato.
+G acoplar-soltar equipamento; sinal verde indica engate disponível.
+W+T: turbo do tractor. Espaço no tractor liga a máquina. F pilota/recolhe drone.
+No drone: WASD mover, Espaço subir, Ctrl descer, R irrigar.
+Há três carrinhas. G engata; C ou Espaço transfere carga com tractor parado.
+No campo carrega a sacola; no armazém descarrega ou recolhe stock se vazia;
+na fachada de uma fábrica vende a carga. Capacidade 120 unidades.
+
+NPC: E abre proposta. Escolha tarefa, quantidade, parcela, tractor e orçamento.
+Confirme o pagamento antes do aperto de mão; a tarefa inicia automaticamente.
+Máximo três contratos, um por tractor. Preço varia por trabalho/tempo/dificuldade/missão.
+Reserva o máximo aprovado; cancelar devolve a parte não executada.
+H → Equipa mostra tarefa, progresso, pagamento e cancelamento.
+Missão inicial: produzir 500 tomates. Colheita do funcionário fica na sua carga.
+Sacola: entrar no armazém deposita; E recolhe; E na fábrica vende.
+Tab liberta/captura cursor. Esc fecha/cancela ou abre menu.
+Minimapa sempre no canto inferior direito; logótipo no canto superior.
+
+O progresso ainda não é guardado. Consulte README.md.
+
+GARAGEM: duas portas automáticas, passagem de um lado ao outro.
+Entre a pé com colheita para guardar. As portas fecham ao afastar-se.
+Carrinha carregada: entra e descarrega. Saia e volte vazia para carregar stock.
+O excedente acima de 120 unidades fica guardado. Três fábricas fora da quinta, a sul.
+B junto à semeadora/engatada: enche a 2 MT por semente; depósito próprio de 300.
+H → Mercado também reabastece semeadoras dos funcionários.
+Funcionários procuram e engatam equipamentos disponíveis; sem equipamento usam enxada.
+Os comandos do veículo ficam sempre visíveis durante a condução.

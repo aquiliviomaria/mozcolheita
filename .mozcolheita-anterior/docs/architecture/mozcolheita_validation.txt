@@ -1,0 +1,24 @@
+MozColheita — validação em Godot 4.6 stable, Linux x86_64
+
+verify_guided.tscn: PASS
+verify_visual_overhaul.tscn: PASS
+verify_gameplay.tscn: PASS
+verify_mozcolheita.tscn: PASS em modo headless e em Forward+ / Vulkan.
+
+Renderização gráfica verificada em Intel UHD Graphics 620.
+Verificados: interface, condutor sentado, equipamento de rega acoplado,
+solo com sulcos, drone e seu HUD. Não foi feito benchmark de FPS.
+
+Cobertura: seis sementes/fases, conservação de produtos, encomendas,
+fome/morte/recomeço, veículos/carrinha/garagem, chapéu permanente,
+acoplamento e troca dos três equipamentos, rega e consumo de litros,
+câmara do drone e regresso, cercas e colisão, rotas de 12 NPCs em 6 parcelas,
+gravação/carregamento e destruição da cena sem erros de script.
+
+As gravações pessoais não foram sobrescritas. Os testes usam espaços
+9876, 9877 e 9878 apenas se não existirem e removem-nos após a execução.
+O diretório user:// continua no local original do OpenAcre.
+
+Avisos do motor observados: API antiga de interpolação usada por Terrain3D;
+aviso benigno de câmara interpolada na entrada em veículo; mensagens
+OpDPdxCoarse do controlador Vulkan Intel. Nenhum erro de GDScript nos testes finais.

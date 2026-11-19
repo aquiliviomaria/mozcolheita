@@ -1,0 +1,18 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 24.3.3 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 19.1.5, 256 bits)
+
+CAPTURA · inicio · selecção: true · [P: (420.0, 180.0), S: (440.0, 440.0)]
+CAPTURA · jogo · selecção: false · [P: (420.0, 180.0), S: (440.0, 440.0)]
+CAPTURA · cultivo · selecção: false · [P: (420.0, 180.0), S: (440.0, 440.0)]
+CAPTURA · culturas-detalhe · selecção: false · [P: (420.0, 180.0), S: (440.0, 440.0)]
+CAPTURA · kit · selecção: false · [P: (420.0, 180.0), S: (440.0, 440.0)]
+CAPTURA · painel · selecção: false · [P: (420.0, 180.0), S: (440.0, 440.0)]
+CAPTURA · quinta · selecção: false · [P: (420.0, 180.0), S: (440.0, 440.0)]
+CAPTURA · vizinhas · selecção: false · [P: (420.0, 180.0), S: (440.0, 440.0)]
+CAPTURA · condutor · selecção: false · [P: (420.0, 180.0), S: (440.0, 440.0)]
+CAPTURA · carrinha · selecção: false · [P: (420.0, 180.0), S: (440.0, 440.0)]
+CAPTURA · orcamento · selecção: false · [P: (420.0, 180.0), S: (440.0, 440.0)]
+CAPTURA · contrato · selecção: false · [P: (420.0, 180.0), S: (440.0, 440.0)]
+CAPTURA · equipa-contrato · selecção: false · [P: (420.0, 180.0), S: (440.0, 440.0)]

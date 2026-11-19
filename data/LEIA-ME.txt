@@ -1,0 +1,7 @@
+RELEVO ORIGINAL DO MOZCOLHEITA
+Origem: mapas height_map das regiões guardadas em Assets/TerrainAssets/ da versão anterior, preservada em .mozcolheita-anterior/.
+Conversão única para evitar dependência de Terrain3D no jogo actual.
+Área: 800 x 800 metros, 401 x 401 amostras, passo 2 m.
+Coordenadas antigas da origem actual: X=105, Z=126; altura base=30.1007080078125.
+Formato little endian: MOZH (4 bytes), versão uint32, tamanho uint32, cinco float32 (passo, início, altura base, origem X, origem Z); seguem tamanho*tamanho float32 por linhas Z/X.
+Leitura e colisão: scripts/landscape.gd. Fora das regiões originais existentes, mantêm-se as alturas vazias dos mapas de origem.

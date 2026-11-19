@@ -1,0 +1,75 @@
+OPENACRE — HUD E APRESENTAÇÃO AGRÍCOLA (GODOT 4.6)
+
+DADOS E REGRAS
+Scripts/farm/CropCatalog.gd
+  Catálogo de seis culturas: IDs estáveis, nomes, rendimentos, cores,
+  altura e duração. "generic" das gravações anteriores corresponde a trigo.
+  A duração normal mantém-se em 240 minutos simulados, ou 4 minutos reais.
+Scripts/farm/FarmData.gd + FarmTileData.gd
+  Estado autoritativo das parcelas, crescimento e colheita. Nenhuma malha
+  modifica o inventário ou determina se uma cultura pode ser colhida.
+Scripts/farm/ProduceInventory.gd
+  Tipos de produtos dentro dos totais de alimentos já existentes. Move os
+  produtos com a carga e impede criar unidades ao transferir ou entregar.
+Scripts/farm/NeighborOrders.gd
+  Uma encomenda por fazenda, aceitação, entrega, consumo de produtos e
+  recompensa. Todos os valores ficam na mesma gravação do jogador.
+
+APRESENTAÇÃO
+Scripts/ui/farming/ModernFarmHUD.gd
+  Topo: saúde, alimentação, energia, água, relógio, dinheiro e sementes.
+  Esquerda: seis sementes com ícones desenhados, miniatura 3D e ferramentas.
+  Direita: missão, encomenda, contexto, veículo e orientação local.
+  A vista recebe snapshots; emite escolhas, sem alterar as parcelas.
+Scripts/ui/farming/FarmTheme.gd + CropIcon.gd + LocalCompass.gd
+  Tema partilhado, ícones sem ficheiros de imagem e referências locais.
+Scripts/presentation/MeshWorkshop.gd
+  Agrupa primitivas por material em ArrayMesh, evitando um nó por folha.
+Scripts/presentation/CropVisualFactory.gd
+  Malhas partilhadas por cultura/fase, mais modelos dos produtos colhidos.
+Scripts/farm/CropNode.gd
+  Vista de uma planta; actualiza por mudança de fase, sem recriar a geometria
+  em cada frame. Mostra [R] e um anel perto das culturas prontas.
+Scripts/presentation/BatchedCropField.gd
+  Campos com 160 ou mais plantas carregadas passam a MultiMesh, agrupadas
+  por cultura e fase. A assinatura do conjunto evita reconstruções inúteis.
+  Os indicadores de colheita são limitados às oito plantas próximas.
+Scripts/presentation/ModularHuman.gd
+  Personagem articulado, paleta modular, caminhada, trabalho, condução,
+  respiração, piscar de olhos e orientação da cabeça.
+Scripts/presentation/ModernTractor.gd
+  Carroçaria, cabine, rodas animadas e faróis. Mantém a física GEVP existente.
+Scripts/presentation/FarmFeedback.gd
+  Partículas locais, pequeno som sintetizado, produto 3D e texto flutuante.
+
+ORQUESTRAÇÃO E SINAIS
+Scripts/guided/FarmGuide.gd liga os comandos à simulação e publica snapshots.
+A sua vizinhança é um filho com processo pausável e ciclo de vida explícito.
+EventBus.farm_hud_updated(snapshot)
+EventBus.seed_selection_changed(crop_id)
+EventBus.farm_action_feedback(action, position, crop_id, amount)
+EventBus.neighbor_dialogue_requested(farm_index)
+A interface emite seed_requested, tool_requested, dialogue_action_requested.
+
+PERSISTÊNCIA
+selected_seed, tool, produce, warehouse_produce, van_produce, orders, money
+ficam em PlayerData.guide e são guardados pelo SaveManager existente.
+A grelha exacta mantém crop_type, altura, fase temporal e duração individual.
+As gravações antigas continuam válidas; não é necessário apagar progresso.
+
+EXPANDIR
+1. Acrescentar a definição e o ID em CropCatalog.
+2. Acrescentar um construtor visual em CropVisualFactory e o ícone CropIcon.
+3. Acrescentar uma encomenda em NeighborOrders se necessário.
+4. Para novos personagens, alterar variant/paleta ou as peças de ModularHuman.
+5. A física, a economia e os efeitos não precisam de depender das malhas.
+
+VALIDAÇÃO
+./Jogar.sh res://Scripts/tests/verify_visual_overhaul.tscn
+./Jogar.sh --headless res://Scripts/tests/verify_visual_overhaul.tscn
+./Jogar.sh --headless res://Scripts/tests/verify_guided.tscn
+./Jogar.sh --headless res://Scripts/tests/verify_gameplay.tscn
+A validação nova usa apenas o espaço 9877, se ainda não existir, e remove-o
+no fim. A validação anterior usa o espaço 9876 com o mesmo cuidado.
+A cena presentation_showcase.tscn é um estúdio separado para revisão visual,
+não substitui a cena principal nem o terreno do jogo.

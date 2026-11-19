@@ -1,0 +1,139 @@
+MOZCOLHEITA — TECHNOLOGY MODULES
+
+Composition
+FarmGuide owns FarmTechnology under its pausable world node.
+FarmTechnology composes IrrigationDrone and ModernFences, and installs
+TractorEquipment in the streamed vehicle.truck view. Equipment is recreated
+when the vehicle streams back in. Authoritative state stays in PlayerData.guide.
+
+Data
+FarmData owns tilled/seeded tiles and moisture. irrigate(grid, litres) returns
+absorbed litres, never invents tiles and rejects ripe crops. At >=80 moisture,
+harvest_crop adds one produce unit. Base growth remains 240 game minutes.
+Existing exact farm JSON already serializes moisture/nutrients.
+PlayerData.guide.machinery stores selected equipment, attached flag, tank and
+three world-space dock locations. Lowered/active reset on load for safe resumption.
+PlayerData.guide.drone stores water and battery; flight itself is transient.
+PlayerData.guide.modern_fences stores pairs of three-component world endpoints.
+SaveManager already serializes this dictionary; no slot format migration required.
+The public name is MozColheita. Custom user directory retains the original
+~/.local/share/godot/app_userdata/OpenAcre path for existing saves.
+
+Presentation
+EquipmentVisuals builds visual-only three-point attachments; no extra rigid
+constraint is added to the original GEVP drivetrain. The old physical hitch and
+trailer remain functional through Z/X/C/G. Mounting modern equipment rejects an
+occupied legacy three-point hitch. P/V/B are reserved for modern equipment.
+SoilFurrows binds/rebinds FarmData.tile_updated and batches nearby ridges in two
+MultiMeshes (dry/wet); it reconstructs after a load and supplements Terrain3D
+runtime painting. Crop growth stages retain cached meshes and batch rendering.
+ModularHuman provides the permanent woven straw hat, articulated walk/work and
+seated poses; Vehicle3D refresh_driver_visual shows a matching clone in the cab,
+while the original on-foot physics body remains disabled through the seat controller.
+ModernFences validates endpoints, protects access, creates static collision and
+shares material caches. Its ghost mesh rebuilds only when its snapped position changes.
+RuralVegetation shares one acacia mesh across 18 static trunks so the saw can
+identify and remove individual trees. Felled IDs restore through the load signal.
+Continuous human contours and curved mouldboards are indexed before merging
+with primitive meshes; mixing unindexed and indexed surfaces otherwise drops faces.
+
+Input and camera
+FarmGuide.blocks_gameplay blocks normal controls during remote drone flight.
+IrrigationDrone owns its flight camera, returns the Terrain3D camera on landing,
+consumes battery and spray water, and auto-returns at zero battery or player death.
+Fence mode preserves walking/look controls but intercepts farm actions/clicks.
+Input handling in Vehicle3D offers keys to TractorEquipment before legacy hitches.
+All HUD descriptions derive from current technology state rather than hardcoded
+instructions that would stay visible when controls no longer apply.
+
+Signals
+FarmData.tile_updated drives soil/crop presentation, including moisture refresh.
+TractorEquipment.equipment_changed, IrrigationDrone.flight_changed and
+ModernFences.fence_changed are available to future UI/audio/achievement modules.
+Existing EventBus.farm_hud_updated drives the current unified HUD snapshots.
+
+Neighbour parcels
+Three owners have three main farms and three satellite parcels. Twelve articulated
+workers/drivers use closed routes on those parcels. Production/gifts/orders keep
+using the existing owner simulation; their display fields do not mutate player soil.
+
+Validation (Godot 4.6)
+--headless --path . res://Scripts/tests/verify_mozcolheita.tscn
+--headless --path . res://Scripts/tests/verify_visual_overhaul.tscn
+--headless --path . res://Scripts/tests/verify_gameplay.tscn
+--headless --path . res://Scripts/tests/verify_guided.tscn
+Omit --headless for real-main-scene tractor/drone screenshots in /tmp.
+The technology test checks input, mounting, seed/resource conservation, cameras,
+fence placement/removal, save/load, owner routes and scene teardown.
+The technology test uses disposable slot 9878 only if it does not exist.
+verify_production.tscn uses slot 9879 and covers wages, crop rotation, mission
+rewards, tool selection, wood/greenhouse construction and restoring these systems.
+
+Suggested future expansions (not implemented here)
+Wet/dry seasons and rainfall/evaporation; cooperative contracts;
+variable market prices; drone mapping
+of moisture and nutrient deficits; production goals measured by crop mass.
+
+Production and employment
+FarmGuide composes ProductionMissions, WorkerEmployment and HandToolActions.
+FarmWorker delegates hired workers to WorkerEmployment before its neighbour route.
+Contracts use stable owner/route IDs and persist assigned plot, paid wages and tasks.
+A worker reserves one of 24 cells in its assigned plot, travels, performs three
+seconds of work, then charges 8 MT only after a successful mutation through FarmData.
+Planting consumes seeds; harvesting uses ProduceInventory and returns two seeds.
+No funds means waiting. The interaction dialogue reassigns or dismisses staff.
+ProductionMissions records action totals and permanent reward claims; irrigation
+counts only crossings of 80% moisture. Direct save hydration never adds progress.
+HandToolActions owns wood/greenhouse data and rebuilds geometry after loading.
+Tree IDs are compared as integers because JSON restores number arrays as floats.
+RuralAmbience loops an original synthesised rural soundscape with quieter nights.
+
+Rotation
+FarmTileData stores last_family and rotation_streak alongside existing nutrients.
+FarmData.harvest_crop applies a same-family penalty, a different-family bonus
+when soil health allows, and a low-nutrient penalty, bounded to one product minimum.
+Harvest changes soil health and preserves family history across replanting.
+Exact tile JSON version 2 adds optional history fields; version 1 rows still load.
+The contextual HUD shows soil health and a crop recommendation.
+
+HUD and tools
+VitalIcon draws vector status rings with small numbers instead of long life bars.
+The right column hides its local map during vehicle/drone operation to fit controls.
+CouplingIndicator is a shared green distance-gated 3D beacon for all three machines
+and the drone. The drone camera accounts for its larger 3.3 m rotor footprint.
+Mouse wheel and 7/8/9 select hoe/saw/hammer on foot; Ctrl+wheel retains camera zoom.
+1-6 keep crop selection, and 7-9 select machinery when driving. The player's Tool
+inventory and FarmGuide selection stay in sync. Hand tools attach to the wrist.
+
+Verified 2026-11-16 with Godot 4.6 stable: production, technology, visual-overhaul,
+gameplay and guided suites all passed. Character studio and real-scene tractor/
+drone captures were rendered and reviewed. Review images are in docs/Assets/
+MozColheita-characters-review.png and MozColheita-hud-review.png.
+
+Polish and capital — 2026-11-17
+ModularHuman now uses narrower overlapping sleeves, restrained facial details,
+seven-head adult proportions, four skin tones and mild stature/build variation.
+Immutable meshes are shared by appearance; seated bodies retain consistent scale.
+ModernTractor has a lower footwell to accommodate the driver's legs.
+TractorEquipment.can_couple uses the same 7 m, stopped-vehicle and free-hitch
+conditions as mounting. Shared green beacons include an animated ring.
+ModernFarmHUD shows a separate persistent operating-controls card for driving
+or flying. FarmGuide snapshots explicitly identify tractor and drone operation.
+Employee reassignment resets action timers. Irrigation only advances missions
+when moisture crosses 80%; partial watering still earns its normal task wage.
+Low-health rotation recommendations no longer promise an unavailable yield bonus.
+
+PlayerData.INITIAL_CAPITAL is 500,000 MT. New farms record the credit immediately.
+SaveManager delegates guide restoration to PlayerData.restore_guide: old saves
+without startup_capital_received receive 500,000 MT plus their old balance.
+The persisted receipt prevents another grant after spending and saving/loading.
+FarmTheme.money displays the full amount using Portuguese thousands grouping.
+Production regression covers new/old balances, no duplicate credit, HUD formatting,
+coupling availability, persistent drone controls and employee timer/progress fixes.
+
+Verified 2026-11-17 with Godot 4.6 stable: production, technology and crop/visual-
+overhaul integration suites passed. Updated character, cab and HUD studio captures
+were rendered and inspected. Side columns scroll and reserve operating-controls
+space instead of overlapping the footer. Review images are under docs/Assets/:
+MozColheita-characters-review.png, MozColheita-driver-review.png,
+MozColheita-hud-review.png and MozColheita-controls-review.png.

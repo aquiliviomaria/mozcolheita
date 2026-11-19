@@ -1,0 +1,18 @@
+Godot 4.6 — revisão visual e contratos
+V1–V7: arranque headless sem erros/avisos.
+Regressão de sistemas: PASSOU.
+Ciclo físico de cinco contratos agrícolas e logísticos: PASSOU.
+Tractor do funcionário e carrinha em movimento real: PASSOU.
+Orçamento: tarefa obrigatória, custos variáveis, saldo, reservas únicas, máximo 3 trabalhadores, reembolsos e missão sem duplicação: PASSOU.
+Renderização: menus, culturas, personagens, minimapa, carrinha e orçamento verificados por imagem.
+Mesa/llvmpipe reportou apenas V-Sync não suportado na captura gráfica.
+
+V8–V10 — logística, contratos, navegação e abastecimento (18/11/2026)
+Godot 4.6 estável. Arranque das fases aprovado sem erros.
+Sistemas, percurso/ciclo completo e condução física: PASSOU.
+Logística: PASSOU. Três carrinhas/fábricas; portas fecham e conservam stock;
+capacidade/excedente; carga automática, descarga e nova entrada sem duplicação;
+tractor atravessa fisicamente duas portas; sementes próprias e custos exactos;
+pose após contrato; funcionário procura/engata/trabalha; peão contorna obstáculo;
+W+T excede velocidade normal. Capturas revistas em preview/.
+Renderização Mesa: apenas aviso de V-Sync não suportado pelo controlador.

@@ -1,0 +1,124 @@
+MOZCOLHEITA — GUIA DE JOGO
+Godot 4.6 · Agricultura e sobrevivência em ambiente rural moçambicano
+Baseado no projecto OpenAcre. A pasta e as gravações antigas foram preservadas.
+
+ABRIR
+Execute ./Jogar.sh para jogar ou ./AbrirGodot.sh para abrir no editor.
+Os scripts preferem a versão Godot 4.6 instalada em ~/.local/share/openacre-tools.
+Esc abre o menu de pausa para guardar/carregar. F1 mostra todos os comandos.
+
+PRIMEIRA COLHEITA
+1. Junto à casa, entre na horta sinalizada (x98–112 / z119–133).
+2. Olhe para o chão próximo. O marcador indica a parcela. H usa a enxada.
+3. Escolha: 1 tomate, 2 milho, 3 alface, 4 cenoura, 5 batata, 6 trigo.
+4. Prima I sobre terra preparada. Cada parcela consome uma semente.
+5. Acompanhe o crescimento; são aproximadamente 4 minutos reais de jogo activo.
+   T perto da casa descansa quatro horas do jogo e repõe sementes.
+6. Quando aparecer [R], a planta está pronta. R colhe e guarda os alimentos.
+   Os seis tipos ficam discriminados no inventário; +2 sementes por parcela colhida.
+7. J come. K bebe junto ao poço. Cuide da energia, hidratação e saúde.
+   Esgotar saúde permite recomeçar em casa, mantendo as culturas e objectivos.
+
+PRODUÇÃO COM O TRACTOR
+A machamba maior mede 48 × 22 m (x72–120 / z92–114), entre marcos brancos.
+O equipamento está na estação ao lado da garagem (x132–144 / z151).
+F entra/sai do veículo; o condutor permanece visível, sentado e com chapéu de palha.
+WASD conduz; Espaço trava; Y liga/desliga os faróis.
+7 selecciona a CHARRUA. 8 selecciona a SEMEADORA. 9 selecciona a REGA.
+P acopla o equipamento seleccionado, com o tractor parado a menos de 7 metros.
+V baixa/levanta. B liga/desliga. Trabalhe a velocidade moderada.
+A charrua abre três linhas; sulcos castanhos indicam o solo trabalhado.
+A semeadora planta a cultura escolhida com 1–6 em três linhas de solo preparado.
+I também liga/desliga a semeadora baixada. Não planta por cima de culturas existentes.
+A rega cobre cinco linhas; o tanque leva 300 L. Funciona também com o tractor parado.
+K reabastece o tanque junto à estação ou ao poço.
+Para trocar equipamento: pare, P desacopla e deixa-o nessa posição, 7/8/9 escolhe,
+aproxime-se do equipamento pretendido, P acopla, V baixa e B liga.
+Z/X/C/G continuam disponíveis para os engates antigos e o reboque.
+
+REGA E SOLO
+A água absorvida aumenta a humidade da parcela. Solo húmido fica mais escuro.
+A rega não consome água em terra não cultivada ou em solo já saturado.
+Culturas regadas antes de amadurecer (humidade >=80%) rendem +1 produto na colheita.
+O crescimento base continua a demorar quatro minutos; a água não é ainda obrigatória.
+Clima e evaporação ficam para uma expansão futura.
+Rotação: tomate/batata partilham família; milho/trigo também. Repetir família
+reduz o rendimento em 1 e retira 12 pontos ao solo. Alternar recupera 8 pontos
+e dá +1 produto se o solo tiver pelo menos 35% de nutrientes. Abaixo de 25%,
+há outra penalização de 1; a colheita nunca rende menos de 1 produto.
+A recomendação de rotação e a saúde do solo aparecem ao apontar para a parcela.
+
+DRONE DE REGA
+Saia do veículo e prima F8 para lançar o drone. F8 ou Esc regressa ao agricultor.
+WASD voa; Q desce; E sobe; rato orienta a câmara. Espaço liga/desliga a rega.
+A operação terrestre fica bloqueada enquanto controla o drone.
+A reserva é 40 L; a bateria diminui em voo e regressa automaticamente ao esgotar.
+A pulverização consome água mesmo fora de culturas. Água e bateria aparecem no HUD.
+K, a pé junto à estação, reabastece o drone. O drone não precisa de ser comprado.
+Altitude de operação: 3–20 m; raio de voo: 150 m em redor da casa.
+
+CERCAS MODERNAS
+A pé, N inicia/termina o modo de construção. Continua a poder andar e olhar.
+Olhe para o chão a menos de 10 m. Clique marca o primeiro poste;
+outro clique constrói a secção e permite continuar uma linha.
+Cada secção mede 1,5–8 m, com postes metálicos e três travessas.
+Verde: colocação válida. Vermelho: inválida. Botão direito cancela o poste iniciado.
+Delete remove uma secção próxima do ponto para o qual está a olhar.
+São permitidas até 256 secções na área da sua machamba, sem bloquear casa,
+poço, estação, garagem ou veículos. Não há custo de construção nesta versão.
+Cercas têm colisão; são reconstruídas ao carregar uma gravação.
+
+ARMAZÉM, CARRINHA E VIZINHOS
+M mostra as seis machambas e os edifícios. L guarda e U retira 5 alimentos por vez.
+Armazém: x87 / z145, capacidade 200. Carrinha: capacidade 30, F conduz.
+Garagem do tractor: x122 / z151. Trave e saia; o HUD confirma o estacionamento.
+Aurora (38/75), Vale Verde (210/60), Boa Colheita (212/208),
+Do Rio (25/210), Da Acácia (235/130) e Do Planalto (90/35).
+Os vizinhos trabalham e conduzem nos seus terrenos. F conversa com eles.
+Pode aceitar encomendas e entregar os produtos pedidos para receber meticais.
+As parcelas adicionais pertencem aos mesmos três agricultores; as tarefas são
+partilhadas por proprietário e não pagam duas vezes. Há provisões diárias.
+
+INTERFACE E PERSONAGENS
+O troca personagem, acabamento do tractor e sensibilidade do rato.
+Todos os personagens jogáveis usam chapéu de palha permanentemente.
+Tab liberta/captura o cursor para clicar nas sementes/ferramentas.
+F2 oculta/mostra a interface. Roda troca ferramentas; Ctrl+roda ajusta o zoom.
+7 enxada, 8 serrote, 9 martelo (a pé). Clique usa a ferramenta seleccionada.
+Serrote: aproxime-se de um tronco e clique 3 vezes para receber 6 madeira.
+Martelo: clique inicia cercas; N termina. Fora do modo cercas, G constrói
+uma estufa na horta por 12 madeira. Q/E ajustam a altura da câmara.
+O HUD organiza necessidades e relógio no topo, sementes à esquerda,
+objectivos, interacções, equipamento e localização à direita.
+
+LIMITE ACTUAL DOS VISUAIS
+Personagens, equipamento e vegetação são modelos procedurais originais, com
+materiais simples e animação articulada. Não são personagens fotorrealistas.
+Os vizinhos mantêm os seus ciclos; funcionários contratados trabalham na sua machamba.
+
+TRABALHADORES E MISSÕES
+F junto a um vizinho abre a conversa. «Contratar» atribui um funcionário à horta
+ou ao campo de produção, alternadamente. Precisa de pelo menos 8 MT disponíveis.
+Cada tarefa concluída custa 8 MT: preparar, semear, regar ou colher. O funcionário
+caminha até à parcela, trabalha durante 3 segundos e recebe só quando conclui.
+Sem saldo ou sementes, aguarda sem cobrar. A sementeira usa as suas sementes;
+a colheita vai para o seu bolso. A rega manual do trabalhador usa o abastecimento local.
+F junto ao funcionário permite mudar parcela ou dispensar sem custo adicional.
+Cada funcionário cuida de 24 células no início da parcela que lhe foi atribuída.
+As missões de produção surgem à direita com contagem, objectivo e recompensa:
+12 terras abertas (24 MT), 12 sementeiras (30 MT), 12 parcelas regadas até 80%
+(24 MT), 10 colheitas (40 MT) e contratar um funcionário (16 MT).
+Cada recompensa é paga uma única vez. Contratos, pagamentos, missões, árvores
+cortadas, madeira, estufas e histórico de rotação ficam na gravação.
+O som ambiente original inclui vento, insectos e aves distantes.
+
+CAPITAL INICIAL
+Recebe 500.000 MT ao iniciar uma fazenda. Gravações anteriores recebem o mesmo
+crédito uma única vez, somado ao saldo existente, quando são carregadas.
+O recibo fica guardado: gastar e voltar a carregar não repõe o dinheiro.
+O saldo completo aparece no topo com separadores de milhares.
+
+PAINEL DE OPERAÇÃO
+Ao conduzir ou pilotar o drone, os comandos ficam no canto inferior direito.
+O sinal verde de acoplamento só aparece quando o tractor está parado, o engate
+está livre e a máquina se encontra a até 7 m do tractor.
