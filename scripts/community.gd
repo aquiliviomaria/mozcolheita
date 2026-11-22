@@ -22,11 +22,7 @@ func via(pontos: Array[Vector3],largura: float = 9,asfalto: bool = true) -> void
 	var malha: BoxMesh = BoxMesh.new(); malha.size = Vector3(0.13,0.015,3); lote.multimesh.mesh = malha; lote.multimesh.instance_count = marcas.size(); lote.material_override = mundo.material(Color("dddbc1")); add_child(lote)
 	for i: int in range(marcas.size()): lote.multimesh.set_instance_transform(i,marcas[i])
 func _ready() -> void:
-	via([Vector3(-122,0,-102),Vector3(122,0,-102),Vector3(122,0,140),Vector3(-122,0,140),Vector3(-122,0,-102)])
-	for x: float in [132,205,270,345]: via([Vector3(x,0,-100),Vector3(x,0,140)])
-	for z: float in [-100,20,140]: via([Vector3(122,0,z),Vector3(350,0,z)])
-	via([Vector3(-325,0,92),Vector3(350,0,92)])
-	via([Vector3(-300,0,-70),Vector3(-300,0,140),Vector3(-122,0,140)])
+	for rua: Dictionary in preload("res://scripts/road_network.gd").cidade(): via(rua.pontos,rua.largura,rua.asfalto)
 	for i: int in range(6):
 		predio(Vector3(163+(i%3)*70,0,-48+(i/3)*110),[10,20,40][i%3])
 	for i: int in range(7): casa(Vector3(-95+i*27,0,-134),i)
@@ -44,16 +40,6 @@ func _ready() -> void:
 	for i: int in range(3): criacao(i)
 	for i: int in range(3):
 		var fabrica: Node3D = preload("res://scripts/factory.gd").new(); fabrica.mundo = mundo; fabrica.numero = i; fabrica.local_filial = preload("res://scripts/industrial_sites.gd").FILIAIS[i]; mundo.add_child(fabrica); mundo.fabricas.append(fabrica)
-	for fabrica: Node3D in mundo.fabricas:
-		var p: Vector3 = fabrica.position
-		var x: float = -300 if p.x < -180 else -122 if p.x<0 else 270 if p.x<270 else 345
-		var z: float = -102 if p.z<0 else 140
-		via([Vector3(x,0,z),Vector3(x,0,p.z-46),Vector3(p.x,0,p.z-46),Vector3(p.x,0,p.z)],10)
-	via([Vector3(-300,0,92),Vector3(-174,0,92),Vector3(-174,0,-28),Vector3(-205,0,-28),Vector3(-205,0,25)],10)
-	via([Vector3(-205,0,57),Vector3(-205,0,92)],10)
-	for portao: Vector3 in preload("res://scripts/layout.gd").PORTOES:
-		var fora: Vector3 = Vector3(portao.x,0,140 if portao.z>0 else -102) if portao.z!=0 else Vector3(signf(portao.x)*122,0,portao.z)
-		via([portao,fora],10)
 
 func casa(local: Vector3,indice: int) -> void:
 	var n: Node3D = Node3D.new(); n.position = local; n.position.y = mundo.altura(local); add_child(n); casas.append(n)

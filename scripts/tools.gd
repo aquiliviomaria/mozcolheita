@@ -15,6 +15,8 @@ func _ready() -> void:
 		var arvore: Node3D = Node3D.new()
 		add_child(arvore)
 		arvore.position = Vector3(72 if indice%2==0 else -74,0,-50+indice*12)
+		# Mantém as árvores cortáveis fora do novo armazém e da sua entrada.
+		if preload("res://scripts/industrial_sites.gd").AREA_ARMAZEM.grow(5).has_point(Vector2(arvore.position.x,arvore.position.z)): arvore.position.x = 88
 		arvore.position.y = mundo.altura(arvore.position)
 		arvore.set_meta("golpes",0)
 		mundo.caixa(arvore,Vector3(0,1.3,0),Vector3(0.28,2.6,0.28),Color("795737"),true)

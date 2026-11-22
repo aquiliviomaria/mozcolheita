@@ -15,7 +15,8 @@ AVANÇAR TEMPO OU DORMIR TAMBÉM AVANÇA PRAZOS E PODE APLICAR MULTAS.
 CASA DE DOIS PISOS
 Sala e cozinha no rés-do-chão. Quarto e casa de banho no piso superior.
 Suba pelas escadas ou use E junto ao elevador para chamar e entrar.
-Dentro do elevador: 1 rés-do-chão, 2 quarto, E sair sem viajar.
+Dentro do elevador: WASD andar, 1 rés-do-chão, 2 quarto, E abrir.
+Ao chegar pode ficar na cabine ou sair a pé. Portas de vidro.
 As portas fecham antes de mover e abrem ao chegar. Sensor impede fecho sobre pessoas.
 A porta da casa abre por proximidade.
 E na cama, de dia: senta. E sai da cama.
@@ -47,7 +48,8 @@ F assume/devolve drone; operador segura comando nas duas mãos | WASD voa | Espa
 V activa câmara livre; WASD move, Q/E altera altura, V regressa.
 
 ARMAZÉM E ENTREGAS
-Centro logístico fora da quinta: (-205, 25), com segurança e cancela.
+Armazém dentro da quinta: (52, 40), sem segurança nem cancela.
+Seguranças e cancelas existem apenas nas fábricas onde vende produtos.
 Entre carregado para guardar. Saia e volte vazio para escolher produto e quantidade.
 Depois escolha sede/filial de destino; siga a seta até à garagem.
 Stock excedente fica no armazém. Três carrinhas: 120 unidades; camião: 500.

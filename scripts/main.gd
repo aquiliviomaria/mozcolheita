@@ -307,7 +307,12 @@ func interagir() -> void:
 	if casa!=null and casa.vida_domestica.interagir(): return
 	for fabrica: Node3D in fabricas:
 		if fabrica.perto(): entregas.entregar(sacola,fabrica.numero); economia.vender(sacola,fabrica.numero); return
-	if armazem!=null and armazem.perto(): armazem.solicitar_carga(); return
+	if armazem!=null and armazem.perto():
+		# Estacionar junto ao armazém não pode impedir voltar a entrar no veículo.
+		var transporte: CharacterBody3D = trator_proximo()
+		if transporte!=null: transporte.entrar()
+		else: armazem.solicitar_carga()
+		return
 	var pessoa: Node3D = pessoa_proxima()
 	if pessoa!=null:
 		if not pessoa.contratado: contrato.iniciar(pessoa)
@@ -357,7 +362,7 @@ func dica() -> String:
 		return "G · Acoplar "+maquina.NOMES[maquina.tipo]+"   E · Sair" if maquina!=null else "WASD · Conduzir   E · Sair do tractor"
 	for fabrica: Node3D in fabricas:
 		if fabrica.perto(): return "E · Vender carga à fábrica "+["A","B","C"][fabrica.numero]
-	if armazem!=null and armazem.perto(): return "E · Escolher produto e quantidade   M · Missões"
+	if armazem!=null and armazem.perto(): return "E · Entrar no veículo" if trator_proximo()!=null else "E · Escolher produto e quantidade   M · Missões"
 	if pessoa_proxima()!=null: return "E · Conversar / contratar"
 	if trator_proximo()!=null: return "E · Entrar no tractor"
 	if ferramentas==null: return ""

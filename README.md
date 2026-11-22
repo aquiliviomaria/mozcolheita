@@ -107,9 +107,9 @@ Dormir recupera energia, até 15 de vida e consome 8 de alimentação. **Sono av
 
 O duche tem cortina animada com pregas e laterais opacas. Com **C**, a água pára, a cortina abre para receber o cônjuge e volta a fechar antes de retomar o banho. A cortina fica aberta depois da saída; a higiene só recupera enquanto a água corre.
 
-O elevador tem cabine iluminada, corrimãos, painel de botões, indicador de piso e portas duplas na cabine e nos dois patamares. Se estiver noutro piso, vem vazio para receber o jogador. **Só viaja com todas as portas fechadas**; um sensor impede o fecho sobre uma personagem no limiar. Ao chegar, abre e o jogador sai no patamar. As portas do piso sem cabine permanecem fechadas.
+O elevador tem cabine iluminada, corrimãos, painel de botões, indicador de piso e portas duplas na cabine e nos dois patamares. Se estiver noutro piso, vem vazio para receber o jogador. **Só viaja com todas as portas fechadas**; um sensor impede o fecho sobre uma personagem no limiar. As portas são de **vidro transparente com caixilho metálico**. Dentro da cabine, **WASD permite andar livremente**, incluindo durante a viagem, sem recentrar a personagem. Ao chegar, abre e o jogador pode permanecer ou sair a pé pelo patamar; 1/2 escolhem o piso e E abre a saída. As portas do piso sem cabine permanecem fechadas.
 
-![Elevador com cabine iluminada, botões e portas duplas](preview/elevador/cabine-aberta.png)
+![Elevador com portas de vidro e cabine iluminada](preview/acessos/elevador-vidro.png)
 
 A porta da casa abre por proximidade, de ambos os lados. Os tectos de betão mantêm-se presentes na câmara normal. A câmara livre e capturas de enquadramento permitem cortes visuais para mostrar os interiores, mantendo as colisões. Mobília inclui cama de casal, almofadas, sofá de dois lugares, mesas, cadeiras, armário, estantes, bancada e frigorífico decorativos.
 
@@ -138,7 +138,7 @@ Um **indicador verde** assinala o equipamento disponível. Aproxima o tractor, p
 
 Cada semeadora tem depósito de **300 sementes**. **B** repõe as sementes em falta a **2 MT por unidade**; H → Mercado permite abastecer máquinas dos funcionários. Contratos individuais não compram sementes silenciosamente.
 
-O **centro logístico fica fora da quinta**, em **(-205, 25)**, e mede **50 × 64 m**, com 12 m de altura, duas portas de carga, estantes e caixas abertas que mostram os produtos e quantidades. A entrada tem segurança, posto de vigilância e cancela física com sinalização. O acesso liga-se à rede de estradas. O antigo galpão também foi afastado para um anexo em **(-250, 41)**; as máquinas continuam disponíveis no parque da quinta.
+O **armazém de produção fica dentro da quinta**, em **(52, 40)**, e mede **36 × 32 m**, com 7 m de altura, duas portas de carga, estantes e caixas abertas que mostram os produtos e quantidades. O acesso é livre, **sem segurança nem cancela**: estes existem apenas nas fábricas onde se vende a produção. Há acessos para camiões pelo portão leste e pelo portão sul de (60, 78). O anexo exterior em **(-250, 41)** permanece como edifício de apoio; as máquinas continuam no parque da quinta.
 
 1. Entrar com colheita deposita os produtos no stock. Sair conserva o que ficou guardado.
 2. Uma nova entrada com transporte vazio abre a escolha de **produto e quantidade**. Também podes usar E a pé ou X com transporte parado junto ao armazém.
@@ -225,7 +225,7 @@ Mapa finito de **800 × 800 m**, com relevo suave, **seis quintas vizinhas**, **
 
 Cada morador recebe uma residência; os casais das quintas têm lugares separados na entrada e no descanso. Estas rotinas são de ambiente e alteram algumas plantas locais visualmente; não geram mercadoria, salários ou progressos nas missões do jogador. Contratos e conversas interrompem a rotina e recolhem as ferramentas.
 
-Casas da comunidade e átrios dos prédios têm portas automáticas; os andares altos são cenário. O trânsito segue circuitos no centro das estradas, pára perante obstáculos e não executa ultrapassagens.
+Casas da comunidade e átrios dos prédios têm portas automáticas; os andares altos são cenário. As vias de asfalto e terra são niveladas no mapa de alturas **antes** de criar a malha e a colisão do terreno, com transição suave nas bermas; não sobem montanhas. O relevo suave permanece fora das vias. O trânsito segue circuitos no centro das estradas, pára perante obstáculos e não executa ultrapassagens.
 
 **Cinco opções de corpo** no menu e em H → Família: médio, alto, baixo, robusto e magro. A escolha é guardada e mantém-se nas poses domésticas e nos veículos. A comunidade inclui crianças, adultos e idosos, com alturas, volumes, roupas e tons de pele diferentes; os idosos têm cabelo grisalho e traços próprios. As crianças não são contratáveis. Duas pessoas fazem actividades de manutenção de ambiente junto à quinta; a produção efectiva continua a depender do jogador ou dos contratos.
 
@@ -272,7 +272,7 @@ Não são necessários plugins nativos. `main.tscn` inicia a composição dos si
 | Arte e entradas dos veículos | `vehicle_art.gd`, `vehicle_lights.gd`, `input_drive.gd`, `drone_remote.gd` |
 | Economia e objectivos | `economy.gd`, `missions.gd`, `deliveries.gd`, `logistics_ui.gd` |
 | Trabalhadores | `npc.gd`, `contract.gd`, `crew.gd`, `tasks.gd`, `navigation.gd` |
-| Comunidade e acessos | `community.gd`, `world_details.gd`, `traffic.gd`, `residence.gd`, `layout.gd` |
+| Comunidade e acessos | `community.gd`, `world_details.gd`, `traffic.gd`, `residence.gd`, `layout.gd`, `road_network.gd` |
 | Armazém e empresas | `warehouse.gd`, `factory.gd`, `industrial_sites.gd`, `industrial_gate.gd`, `industrial_art.gd`, `produce_crate.gd` |
 | Interface | `hud.gd`, `driving_hud.gd`, `minimap.gd`, `delivery_route.gd` |
 | Persistência | `persistence.gd` |
@@ -302,6 +302,7 @@ Executa os comandos a partir da raiz. Os testes alteram a sessão de teste; test
 # Casa de dois pisos, família, corpos e veículos de dois lugares
 ./Jogar.sh --headless --script validation/familia/test.gd
 ./Jogar.sh --headless --script validation/elevador/test.gd
+./Jogar.sh --headless --script validation/acessos/test.gd
 
 # Centro logístico, contratos em dobro e escolha de carga
 ./Jogar.sh --headless --script validation/logistica_v2/test.gd

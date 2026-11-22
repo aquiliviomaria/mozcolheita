@@ -1,9 +1,9 @@
 extends Node3D
-## Centro logístico afastado: descarga por entrada; carregamento escolhido pelo jogador.
+## Armazém da quinta: acesso livre, descarga e carregamento escolhido pelo jogador.
 const SITES: GDScript = preload("res://scripts/industrial_sites.gd")
 const CENTRO: Vector3 = SITES.ARMAZEM
-const ENTREGA: Vector3 = SITES.ARMAZEM+Vector3(0,0,-48)
-const ZONA: Rect2 = Rect2(-215,5,20,34)
+const ENTREGA: Vector3 = SITES.ARMAZEM+Vector3(0,0,-22)
+const ZONA: Rect2 = Rect2(46,30,12,20)
 var mundo: Node3D
 var dentro: bool = false
 var portas: Array[Node3D] = []
@@ -12,22 +12,21 @@ var caixas: Array[Node3D] = []
 var letreiro: Label3D
 func _ready() -> void:
 	position = CENTRO; position.y = mundo.altura(position)
-	preload("res://scripts/architecture.gd").piso(mundo,self,Rect2(-25,-32,50,64))
-	for x: float in [-25,25]: mundo.caixa(self,Vector3(x,6,0),Vector3(0.4,12,64),Color("9caa9b"),true)
-	mundo.caixa(self,Vector3(0,12.1,0),Vector3(51,0.3,65),Color("345b53"),true)
-	for z: float in [-32,32]:
-		for x: float in [-16,16]: mundo.caixa(self,Vector3(x,6,z),Vector3(18,12,0.4),Color("9caa9b"),true)
-		mundo.caixa(self,Vector3(0,10,z),Vector3(14,4,0.4),Color("9caa9b"),true)
-		var porta: MeshInstance3D = mundo.caixa(self,Vector3(0,4,z),Vector3(14,8,0.22),Color("45685d"),true); porta.set_meta("abertura",0.0); portas.append(porta)
-	for x: float in [-18,18]:
-		for z: float in [-18,0,18]:
-			mundo.caixa(self,Vector3(x,1.5,z),Vector3(8,3,6),Color("94754e"),true)
+	preload("res://scripts/architecture.gd").piso(mundo,self,Rect2(-18,-16,36,32))
+	for x: float in [-18,18]: mundo.caixa(self,Vector3(x,3.5,0),Vector3(0.4,7,32),Color("9caa9b"),true)
+	mundo.caixa(self,Vector3(0,7.1,0),Vector3(37,0.3,33),Color("345b53"),true)
+	for z: float in [-16,16]:
+		for x: float in [-12,12]: mundo.caixa(self,Vector3(x,3.5,z),Vector3(12,7,0.4),Color("9caa9b"),true)
+		mundo.caixa(self,Vector3(0,6.5,z),Vector3(12,1,0.4),Color("9caa9b"),true)
+		var porta: MeshInstance3D = mundo.caixa(self,Vector3(0,3,z),Vector3(12,6,0.22),Color("45685d"),true); porta.set_meta("abertura",0.0); portas.append(porta)
+	for x: float in [-14,14]:
+		for z: float in [-10,0,10]:
+			mundo.caixa(self,Vector3(x,1.5,z),Vector3(5,3,5),Color("94754e"),true)
 	for i: int in range(4):
-		var caixa: Node3D = preload("res://scripts/produce_crate.gd").new(); caixa.mundo = mundo; caixa.cultura = i; caixa.position = Vector3(-11 if i%2==0 else 11,0,-10+(i/2)*20); add_child(caixa); caixas.append(caixa)
-	for z: float in [-20,0,20]:
-		var luz: OmniLight3D = OmniLight3D.new(); luz.position = Vector3(0,8,z); luz.omni_range = 26; luz.light_energy = 1.3; luz.shadow_enabled = false; luz.distance_fade_enabled = true; luz.distance_fade_begin = 65; add_child(luz)
-	letreiro = mundo.placa(self,Vector3(0,13,-32),"MOZCOLHEITA · CENTRO LOGÍSTICO"); letreiro.visibility_range_end = 100; letreiro.font_size = 48; letreiro.pixel_size = 0.035
-	var cancela: Node3D = preload("res://scripts/industrial_gate.gd").new(); cancela.mundo = mundo; cancela.position = Vector3(0,0,-45); add_child(cancela)
+		var caixa: Node3D = preload("res://scripts/produce_crate.gd").new(); caixa.mundo = mundo; caixa.cultura = i; caixa.position = Vector3(-9 if i%2==0 else 9,0,-7+(i/2)*14); add_child(caixa); caixas.append(caixa)
+	for z: float in [-10,0,10]:
+		var luz: OmniLight3D = OmniLight3D.new(); luz.position = Vector3(0,5.5,z); luz.omni_range = 26; luz.light_energy = 1.3; luz.shadow_enabled = false; luz.distance_fade_enabled = true; luz.distance_fade_begin = 65; add_child(luz)
+	letreiro = mundo.placa(self,Vector3(0,8,-16),"ARMAZÉM DA QUINTA"); letreiro.visibility_range_end = 100; letreiro.font_size = 48; letreiro.pixel_size = 0.035
 	preload("res://scripts/industrial_art.gd").compactar(self,portas)
 func perto() -> bool:
 	return preload("res://scripts/layout.gd").distancia(mundo.jogador.global_position,ENTREGA)<10 or ZONA.has_point(Vector2(mundo.jogador.position.x,mundo.jogador.position.z))
@@ -48,7 +47,7 @@ func actualizar(delta: float) -> void:
 			var p: Vector3 = to_local(actor.global_position)
 			if absf(p.x)<11 and absf(p.z-porta.position.z)<19: aberta = true; break
 		var abertura: float = move_toward(float(porta.get_meta("abertura")),1.0 if aberta else 0.0,delta*1.5); porta.set_meta("abertura",abertura)
-		var h: float = lerpf(8.0,0.12,abertura); porta.mesh.size.y = h; porta.position.y = 8-h/2
+		var h: float = lerpf(6.0,0.12,abertura); porta.mesh.size.y = h; porta.position.y = 6-h/2
 		var colisor: CollisionShape3D = porta.get_child(0).get_child(0); colisor.shape.size.y = h
 	var agora: bool = mundo.trator_actual==null and mundo.drone_actual==null and ZONA.has_point(Vector2(mundo.jogador.position.x,mundo.jogador.position.z))
 	if agora and not dentro:

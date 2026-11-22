@@ -21,7 +21,7 @@ static func junto_portao(p: Vector3, margem: float = 18.0) -> bool:
 static func reservado(p: Vector3) -> bool:
 	var ponto: Vector2 = Vector2(p.x,p.z)
 	if not dentro(p) or absf(p.x)>92 or absf(p.z)>74 or junto_portao(p): return true
-	for area: Rect2 in [CASA.grow(3),GALPAO.grow(3),ARMAZEM.grow(3),Rect2(-58,14,32,52),Rect2(-75,-45,30,24),Rect2(-5,-23,30,10),Rect2(-23,49,28,13),Rect2(44,12,12,13)]:
+	for area: Rect2 in [CASA.grow(3),GALPAO.grow(3),ARMAZEM.grow(3),Rect2(-58,14,32,52),Rect2(-75,-45,30,24),Rect2(-5,-23,30,10),Rect2(-23,49,28,13),Rect2(44,12,12,13),Rect2(48,14,38,8),Rect2(78,-4,8,26),Rect2(48,54,8,15),Rect2(48,61,16,8)]:
 		if area.has_point(ponto): return true
 	return false
 

@@ -149,6 +149,8 @@ func aplicar_pose_cama() -> void:
 
 func _physics_process(delta: float) -> void:
 	if mundo == null: return
+	if mundo.casa!=null and mundo.casa.elevador!=null and mundo.casa.elevador.permite_andar() and not mundo.pausado():
+		mundo.casa.elevador.andar(delta); return
 	if bloqueado or mundo.bloqueia_jogador():
 		velocity = Vector3.ZERO
 		if mundo.trator_actual==null: animar(delta,0.0)

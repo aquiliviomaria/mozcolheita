@@ -26,13 +26,7 @@ func _ready() -> void:
 	reservar(preload("res://scripts/industrial_sites.gd").GALPAO,Vector2(40,35))
 	for p: Vector3 in preload("res://scripts/village.gd").CENTROS: reservar(p,Vector2(95,95))
 	var cidade: Node3D = mundo.comunidade
-	via([Vector3(-350,0,-240),Vector3(350,0,-240)],9)
-	via([Vector3(-350,0,245),Vector3(350,0,245)],9)
-	via([Vector3(-350,0,-240),Vector3(-350,0,245)],8)
-	via([Vector3(350,0,-240),Vector3(350,0,245)],8)
-	for x: float in [-300,-122,132,270]:
-		via([Vector3(x,0,-350),Vector3(x,0,-102)],8)
-		via([Vector3(x,0,140),Vector3(x,0,350)],7,false)
+	for rua: Dictionary in preload("res://scripts/road_network.gd").exterior(): via(rua.pontos,rua.largura,rua.asfalto)
 	for i: int in range(4):
 		var p: Vector3 = [Vector3(-265,0,-205),Vector3(-160,0,282),Vector3(310,0,-198),Vector3(310,0,294)][i]
 		if livre(p,18):

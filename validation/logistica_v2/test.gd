@@ -13,7 +13,7 @@ func executar() -> void:
 	for p: Node3D in mundo.pessoas: p.set_physics_process(false)
 	mundo.familia.set_physics_process(false)
 	exigir(mundo.pessoas.size()==46 and mundo.fabricas.size()==6,"Comunidade e seis fábricas preservadas")
-	exigir(mundo.armazem.position.distance_to(mundo.casa.position)>180,"Armazém afastado da quinta e da casa")
+	exigir(preload("res://scripts/layout.gd").dentro(mundo.armazem.position),"Armazém de produção dentro da quinta")
 	for f: Node3D in mundo.fabricas: exigir(not preload("res://scripts/layout.gd").dentro(f.position) and f.position.distance_to(mundo.casa.position)>120,"Fábrica industrial afastada")
 	# A escolha de carga é atómica, respeita stock, produto e capacidade.
 	var ui: CanvasLayer = mundo.central_logistica
@@ -46,6 +46,8 @@ func executar() -> void:
 	# Cancela física abre com aproximação; segurança não aumenta lista de contratáveis.
 	var cancela: Node3D
 	for n: Node in mundo.armazem.get_children():
+		exigir(n.get_script()!=load("res://scripts/industrial_gate.gd"),"Armazém da quinta sem cancela nem segurança")
+	for n: Node in mundo.fabricas[0].get_children():
 		if n.get_script()==load("res://scripts/industrial_gate.gd"): cancela = n
 	mundo.jogador.position = cancela.global_position+Vector3(0,0,-12); mundo.camera._process(1)
 	for i: int in range(100): cancela._physics_process(1.0/60)

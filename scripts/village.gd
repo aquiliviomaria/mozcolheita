@@ -1,15 +1,12 @@
 extends Node3D
 ## Machambas afastadas com culturas em lotes e trabalhadores independentes da grelha principal.
-const CENTROS: Array[Vector3] = [Vector3(-190,0,-120),Vector3(205,0,-155),Vector3(210,0,175),Vector3(-215,0,165),Vector3(-40,0,-260),Vector3(35,0,275)]
+const CENTROS: Array[Vector3] = preload("res://scripts/road_network.gd").QUINTAS
 const NOMES: Array[String] = ["Aurora","Vale Verde","Boa Colheita","Do Rio","Da Acácia","Do Planalto"]
 var mundo: Node3D
 var campos: Array[MultiMeshInstance3D] = []
 
 func _ready() -> void:
-	var estrada_principal: Array[Vector3] = [Vector3(-250,0,92),Vector3(250,0,92)]
-	mundo.relevo.estrada(estrada_principal)
-	var acesso: Array[Vector3] = [Vector3(0,0,77),Vector3(0,0,92)]
-	mundo.relevo.estrada(acesso)
+	for rua: Dictionary in preload("res://scripts/road_network.gd").quintas(): mundo.relevo.estrada(rua.pontos,rua.largura)
 	for indice: int in range(CENTROS.size()): criar_fazenda(indice)
 
 func criar_fazenda(indice: int) -> void:
@@ -58,8 +55,3 @@ func criar_fazenda(indice: int) -> void:
 		pessoa.rota.assign([centro+Vector3(-13,0,-12),centro+Vector3(13,0,-12),centro+Vector3(13,0,9),centro+Vector3(-13,0,9)])
 		mundo.add_child(pessoa)
 		mundo.pessoas.append(pessoa)
-	var caminho: Array[Vector3]
-	if centro.x>96: caminho = [Vector3(122,0,centro.z),centro+Vector3(23,0,20)]
-	elif centro.x<-96: caminho = [Vector3(-122,0,centro.z),centro+Vector3(23,0,20)]
-	else: caminho = [Vector3(centro.x,0,-102 if centro.z<0 else 140),centro+Vector3(23,0,20)]
-	mundo.relevo.estrada(caminho)

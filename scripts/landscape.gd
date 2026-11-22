@@ -35,11 +35,41 @@ func _ready() -> void:
 			var px: float = inicio+x*passo; var pz: float = inicio+z*passo
 			var nivel: float = smoothstep(115,145,px)*(1.0-smoothstep(140,170,pz))*smoothstep(-130,-100,pz)
 			dados[z*tamanho+x] = lerpf(dados[z*tamanho+x]*0.12,0,nivel)
+	nivelar_vias()
 	criar_material()
 	criar_colisao()
 	for z: int in range(8):
 		for x: int in range(8): criar_bloco(x*50,z*50)
 	# A vegetação exterior é distribuída após os bairros em world_details.gd.
+
+func nivelar_vias() -> void:
+	# Terra, malha e colisão partilham os mesmos dados: nenhuma estrada flutua sobre montanhas.
+	var rede: GDScript = preload("res://scripts/road_network.gd")
+	var vias: Array[Dictionary] = rede.cidade(); vias.append_array(rede.exterior()); vias.append_array(rede.quintas())
+	for via: Dictionary in vias:
+		var pontos: Array[Vector3] = via.pontos
+		for i: int in range(pontos.size()-1): nivelar_trecho(pontos[i],pontos[i+1],float(via.largura)/2+passo)
+	# O pavimento e os acessos industriais também ficam ao nível da via.
+	var locais: Array[Vector3] = []; locais.append_array(preload("res://scripts/industrial_sites.gd").FABRICAS); locais.append_array(preload("res://scripts/industrial_sites.gd").FILIAIS)
+	for p: Vector3 in locais: nivelar_area(Rect2(p.x-26,p.z-48,52,78))
+	nivelar_area(preload("res://scripts/industrial_sites.gd").AREA_ARMAZEM.grow(2))
+func nivelar_area(area: Rect2) -> void:
+	for z: int in range(maxi(0,floori((area.position.y-inicio)/passo)-4),mini(tamanho,ceili((area.end.y-inicio)/passo)+5)):
+		for x: int in range(maxi(0,floori((area.position.x-inicio)/passo)-4),mini(tamanho,ceili((area.end.x-inicio)/passo)+5)):
+			var p: Vector2 = Vector2(inicio+x*passo,inicio+z*passo)
+			var d: float = p.distance_to(p.clamp(area.position,area.end))
+			dados[z*tamanho+x] *= smoothstep(0,8,d)
+func nivelar_trecho(a3: Vector3,b3: Vector3,raio: float) -> void:
+	var a: Vector2 = Vector2(a3.x,a3.z); var b: Vector2 = Vector2(b3.x,b3.z)
+	var eixo: Vector2 = b-a
+	if eixo.length_squared()<0.01: return
+	var margem: float = raio+8
+	var minimo: Vector2 = a.min(b)-Vector2.ONE*margem; var maximo: Vector2 = a.max(b)+Vector2.ONE*margem
+	for z: int in range(maxi(0,floori((minimo.y-inicio)/passo)),mini(tamanho,ceili((maximo.y-inicio)/passo)+1)):
+		for x: int in range(maxi(0,floori((minimo.x-inicio)/passo)),mini(tamanho,ceili((maximo.x-inicio)/passo)+1)):
+			var p: Vector2 = Vector2(inicio+x*passo,inicio+z*passo)
+			var distancia: float = p.distance_to(a+eixo*clampf((p-a).dot(eixo)/eixo.length_squared(),0,1))
+			dados[z*tamanho+x] *= smoothstep(raio,raio+8,distancia)
 
 func ruido_periodico(ruido: FastNoiseLite,x: float,z: float,escala: float) -> float:
 	var u: float = x/255.0
