@@ -45,9 +45,6 @@ static func construir(c: Node3D) -> void:
 	for x: float in [10.2,11.8]:
 		caixa(c,Vector3(x,8.2,-8.7),Vector3(0.08,2,0.08),"a2b3b6",false)
 		caixa(c,Vector3(x,9.15,-8.3),Vector3(0.5,0.09,0.6),"a2b3b6",false)
-	# Elevador aberto com plataforma móvel e acesso por ambos os pisos.
-	c.elevador = Node3D.new(); c.elevador.name = "Elevador"; c.elevador.position = Vector3(-5,0.64,-5); c.add_child(c.elevador)
-	c.mundo.caixa(c.elevador,Vector3(0,-0.15,0),Vector3(3.8,0.3,3.8),Color("697d7a"),true)
+	# Caixa de escadas do elevador e cabine com portas próprias.
 	for x: float in [-7,-3]: caixa(c,Vector3(x,5,-5),Vector3(0.12,9,4),"697d7a")
 	caixa(c,Vector3(-5,5,-7),Vector3(4,9,0.12),"697d7a")
-	for y: float in [1.3,6.3]: caixa(c,Vector3(-5,y,-2.9),Vector3(4,0.15,0.12),"d6b85b")

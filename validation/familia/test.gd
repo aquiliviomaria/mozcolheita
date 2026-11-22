@@ -33,10 +33,14 @@ func executar() -> void:
 	Engine.time_scale = 1
 	mundo.casa._process(0); exigir(mundo.casa.telhado[0].visible,"Tecto de betão presente na câmara normal")
 	colocar(lar.ELEVADOR); tecla(KEY_E)
-	for i: int in range(130): lar._physics_process(1.0/60)
+	for i: int in range(420):
+		if mundo.casa.elevador.fase=="pronto": tecla(KEY_2 if mundo.casa.elevador.piso==0 else KEY_1)
+		lar._physics_process(1.0/60)
 	exigir(lar.estado=="" and absf(mundo.casa.to_local(mundo.jogador.position).y-5.64)<0.01,"Elevador sobe e deixa passageiro no patamar")
 	tecla(KEY_E)
-	for i: int in range(130): lar._physics_process(1.0/60)
+	for i: int in range(420):
+		if mundo.casa.elevador.fase=="pronto": tecla(KEY_2 if mundo.casa.elevador.piso==0 else KEY_1)
+		lar._physics_process(1.0/60)
 	exigir(lar.estado=="" and absf(mundo.casa.to_local(mundo.jogador.position).y-0.64)<0.01,"Elevador desce ao rés-do-chão")
 	colocar(lar.CAMA); mundo.calendario.decorrido = 100; tecla(KEY_E)
 	exigir(lar.estado=="cama_dia","De dia E senta na cama")

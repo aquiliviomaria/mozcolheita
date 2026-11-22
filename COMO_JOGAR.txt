@@ -14,7 +14,10 @@ AVANÇAR TEMPO OU DORMIR TAMBÉM AVANÇA PRAZOS E PODE APLICAR MULTAS.
 
 CASA DE DOIS PISOS
 Sala e cozinha no rés-do-chão. Quarto e casa de banho no piso superior.
-Suba pelas escadas ou use E junto ao elevador. A porta abre por proximidade.
+Suba pelas escadas ou use E junto ao elevador para chamar e entrar.
+Dentro do elevador: 1 rés-do-chão, 2 quarto, E sair sem viajar.
+As portas fecham antes de mover e abrem ao chegar. Sensor impede fecho sobre pessoas.
+A porta da casa abre por proximidade.
 E na cama, de dia: senta. E sai da cama.
 E na cama, à noite: dorme com o cônjuge e acorda às 06:00. E sai da cama.
 E junto à mesa: senta. E novamente: come com animação e alimento na mão.

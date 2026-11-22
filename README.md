@@ -21,9 +21,11 @@ O projecto combina aprendizagem sobre agricultura e gestão com desafios de prod
 - [Missões, empresas e contratação](#missões-empresas-e-contratação)
 - [Controlos](#controlos)
 - [Mundo e personagens](#mundo-e-personagens)
+- [Telejornal MOZTV](#telejornal-moztv)
 - [Guardar e continuar](#guardar-e-continuar)
 - [Organização técnica](#organização-técnica)
 - [Verificar e contribuir](#verificar-e-contribuir)
+- [Ficheiros e Git](#ficheiros-e-git)
 - [Limitações e próximos passos](#limitações-e-próximos-passos)
 
 ## Começar a jogar
@@ -64,7 +66,8 @@ Para uma primeira experiência, prepara poucos canteiros e completa um ciclo int
 | Organizar uma equipa | Distribuir tarefas ou contratar até dez pessoas para produzir e carregar uma encomenda. |
 | Planear uma entrega | Gerir capacidade, carregar produtos e seguir a rota até à garagem da empresa certa. |
 | Melhorar resultados | Rodar culturas, cuidar do solo e construir reputação com as empresas para obter melhores ofertas. |
-| Criar uma rotina | Trabalhar na quinta, regressar à casa, comer à mesa e dormir até amanhecer. |
+| Criar uma rotina | Trabalhar na quinta, viajar com companhia, comer à mesa, assistir ao telejornal e dormir até amanhecer. |
+| Acompanhar a comunidade | Ver vizinhos a plantar e regar, moradores nos quintais e notícias sobre a tua produção. |
 | Explorar | Visitar os arredores, quintas vizinhas, bairros, estradas e riacho, de dia ou à noite. |
 
 O desafio está nas escolhas: trabalhar sozinho ou pagar ajuda, vender já ou reservar para uma encomenda, aceitar urgência ou produzir com mais margem. A meta de produção recompensa colheitas efectivas; as entregas acrescentam objectivos com consequências financeiras.
@@ -94,7 +97,7 @@ A casa principal tem **dois pisos**, varanda coberta e lajes de betão. O logót
 | Roupeiro + E | Alterna quatro conjuntos de roupa, conservados na gravação. |
 | Duche + E | Entra, fecha a cortina de pano opaco e só depois liga a água. E pára a água, abre a cortina para sair e repõe a roupa anterior. |
 | Sanita + E | Usa sentado; E termina. |
-| Elevador + E | Sobe ou desce, com plataforma animada e saída no patamar. |
+| Elevador + E | Chama a cabine e entra quando as portas abrem. Dentro: 1 rés-do-chão, 2 piso do quarto, E sai sem viajar. |
 | C durante uma actividade | Convida o cônjuge para a mesa, sofá, cama ou duche. Dormir à noite reúne o casal automaticamente. |
 
 A mesa começa com **quatro refeições**. Depois usa um produto da sacola ou do armazém. Cada refeição recupera até 35 de alimentação, 30 de energia e 10 de vida; não há consumo quando as necessidades já estão completas nem duplicação por premir repetidamente durante a animação. A refeição é partilhada visualmente com a companhia presente. Fora da mesa, J mantém a alimentação por produtos consigo ou junto ao armazém.
@@ -103,7 +106,11 @@ Dormir recupera energia, até 15 de vida e consome 8 de alimentação. **Sono av
 
 O duche tem cortina animada com pregas e laterais opacas. Com **C**, a água pára, a cortina abre para receber o cônjuge e volta a fechar antes de retomar o banho. A cortina fica aberta depois da saída; a higiene só recupera enquanto a água corre.
 
-A porta abre por proximidade, de ambos os lados. Os tectos de betão mantêm-se presentes na câmara normal. A câmara livre e capturas de enquadramento permitem cortes visuais para mostrar os interiores, mantendo as colisões. Mobília inclui cama de casal, almofadas, sofá de dois lugares, mesas, cadeiras, armário, estantes, bancada e frigorífico decorativos.
+O elevador tem cabine iluminada, corrimãos, painel de botões, indicador de piso e portas duplas na cabine e nos dois patamares. Se estiver noutro piso, vem vazio para receber o jogador. **Só viaja com todas as portas fechadas**; um sensor impede o fecho sobre uma personagem no limiar. Ao chegar, abre e o jogador sai no patamar. As portas do piso sem cabine permanecem fechadas.
+
+![Elevador com cabine iluminada, botões e portas duplas](preview/elevador/cabine-aberta.png)
+
+A porta da casa abre por proximidade, de ambos os lados. Os tectos de betão mantêm-se presentes na câmara normal. A câmara livre e capturas de enquadramento permitem cortes visuais para mostrar os interiores, mantendo as colisões. Mobília inclui cama de casal, almofadas, sofá de dois lugares, mesas, cadeiras, armário, estantes, bancada e frigorífico decorativos.
 
 ### Companhia familiar
 
@@ -189,6 +196,8 @@ O pagamento varia com tarefa, quantidade, dificuldade e procura. A proposta disc
 | F5 / F9 | Guardar / retomar a quinta. |
 | Tab / Esc | Cursor / fechar painel, cancelar proposta ou abrir menu. À mesa, Esc levanta. |
 
+**Na casa:** E levanta da cama depois de acordar; de dia, a cama serve para sentar. No duche, E pede a saída com abertura da cortina; C convida a companhia. No sofá, Espaço liga/desliga a TV.
+
 Martelo constrói/repara cercas; serrote corta as árvores interactivas; enxada prepara solo. Estufas construíveis ainda não estão implementadas.
 
 Há suporte parcial a comando reconhecido pelo Godot para condução/drone; a interface mostra as teclas do teclado. Não há validação com hardware de comando físico e a deslocação a pé continua a utilizar teclado/rato.
@@ -204,6 +213,20 @@ Casas da comunidade e átrios dos prédios têm portas automáticas; os andares 
 **Cinco opções de corpo** no menu e em H → Família: médio, alto, baixo, robusto e magro. A escolha é guardada e mantém-se nas poses domésticas e nos veículos. A comunidade inclui crianças, adultos e idosos, com alturas, volumes, roupas e tons de pele diferentes; os idosos têm cabelo grisalho e traços próprios. As crianças não são contratáveis. Duas pessoas fazem actividades de manutenção de ambiente junto à quinta; a produção efectiva continua a depender do jogador ou dos contratos.
 
 Agricultor e agricultora seguem o estilo do logótipo: pele castanha, roupa creme e verde, bandeira de Moçambique e botas. O agricultor usa chapéu de palha; a agricultora tem lenço, brincos e tecido inspirado na capulana. Partilham controlador e rig, com animações procedurais de caminhada, corrida, plantio, rega, colheita, transporte, condução e interacções domésticas. Há ambiente sonoro rural e conversas simples entre NPCs/jogador.
+
+![Vizinho a regar na sua quinta](preview/rotinas/vizinho-a-regar.png)
+
+## Telejornal MOZTV
+
+A MOZTV tem **12 notícias**, misturadas em cada edição, que mudam automaticamente a cada **sete segundos**. Uma notícia só se repete depois de passarem todas as outras; o sistema evita repetir a última na edição seguinte e alterna temas quando possível. Há jogos, cultura, agricultura, economia e comunidade. O painel do estúdio muda com o assunto e a apresentadora continua animada.
+
+A cobertura do **GTA VI** trata dos recordes de vendas e reconhecimento da crítica divulgados pela Take-Two, música, rádios, lugares e protagonistas. As notícias externas foram verificadas em **22/11/2026** e identificam a fonte; não são anúncios de um lançamento futuro. Fontes: [Take-Two — comunicado de resultados do GTA VI](https://www.sec.gov/Archives/edgar/data/946581/000162828026075217/exhibit9918k.htm), [Rockstar Games](https://www.rockstargames.com/VI) e [Newswire](https://www.rockstargames.com/newswire?tag=vi).
+
+Os boletins da própria partida são **dinâmicos**: mostram quantidades reais no armazém, encomendas activas, entregas concluídas, trabalhadores contratados e actividade diurna/nocturna. Os dados mudam enquanto o jogador joga. As notícias externas ficam no catálogo local e não são actualizadas automaticamente pela Internet. O telejornal conserva o ponto em que ficou ao desligar/ligar a TV durante a sessão.
+
+![Telejornal com cobertura dos feitos do GTA VI](preview/rotinas/televisao-gta-vi.png)
+
+![Notícias com dados da produção da partida](preview/rotinas/televisao-comunidade.png)
 
 ## Guardar e continuar
 
@@ -224,7 +247,7 @@ Não são necessários plugins nativos. `main.tscn` inicia a composição dos si
 | Composição e interacções | `main.gd`, `player.gd`, `camera.gd` |
 | Agricultura | `terrain.gd`, `crop.gd`, `tools.gd`, `farm_feedback.gd` |
 | Calendário e necessidades | `calendar.gd`, `daylight.gd`, `vitals.gd` |
-| Casa e família | `farmhouse.gd`, `house_architecture.gd`, `house_interior.gd`, `home_life.gd`, `family.gd` |
+| Casa e família | `farmhouse.gd`, `house_architecture.gd`, `house_interior.gd`, `home_life.gd`, `family.gd`, `house_elevator.gd` |
 | Cortina e sequência do duche | `shower_curtain.gd` |
 | Rotinas da comunidade | `community_routine.gd`, `npc.gd` |
 | Televisão | `television.gd`, `tv_program.gd`, `tv_news.gd` |
@@ -237,7 +260,7 @@ Não são necessários plugins nativos. `main.tscn` inicia a composição dos si
 | Interface | `hud.gd`, `driving_hud.gd`, `minimap.gd`, `delivery_route.gd` |
 | Persistência | `persistence.gd` |
 
-`icons/` contém os ícones SVG; `MozColheita-icon.png` é a identidade do projecto. `validation/` reúne testes e registos; `preview/` reúne capturas. A pasta `.mozcolheita-anterior/` conserva uma versão anterior e não é a implementação activa.
+`icons/` contém os ícones SVG; `MozColheita-icon.png` é a identidade do projecto. `validation/` reúne testes e registos; `preview/` reúne capturas. Quando presente, `.mozcolheita-anterior/` é uma cópia de uma versão anterior; o projecto activo é o `project.godot` da raiz.
 
 Culturas e decoração usam MultiMesh; malhas/materiais são partilhados sempre que possível. Os efeitos agrícolas reutilizam pequenas reservas de partículas/texto, e actores distantes têm visibilidade limitada. A navegação combina percursos globais e desvio local. Faróis não projectam sombras e têm atenuação por distância.
 
@@ -261,27 +284,32 @@ Executa os comandos a partir da raiz. Os testes alteram a sessão de teste; test
 
 # Casa de dois pisos, família, corpos e veículos de dois lugares
 ./Jogar.sh --headless --script validation/familia/test.gd
+./Jogar.sh --headless --script validation/elevador/test.gd
+
+# Rotinas dos moradores e telejornal dinâmico
+./Jogar.sh --headless --script validation/rotinas/test.gd
+./Jogar.sh --headless --script validation/telejornal/test.gd
 ```
 
-Os registos da funcionalidade doméstica ficam em `validation/familia/`. Para reproduzir as capturas é necessário um ambiente gráfico:
+Cada teste escreve o resultado no terminal e termina com código de saída zero quando passa. Podes guardar o terminal num `.log` local; estes registos são ignorados pelo Git. Os scripts de teste permanecem versionados. Para reproduzir as capturas é necessário um ambiente gráfico:
 
 ```sh
 ./Jogar.sh --script validation/familia/capture.gd
+./Jogar.sh --script validation/familia/capture_cama.gd
+./Jogar.sh --script validation/familia/capture_duche.gd
+./Jogar.sh --script validation/elevador/capture.gd
+./Jogar.sh --script validation/rotinas/capture.gd
 ```
 
 Ao alterar um sistema: mantém GDScript tipado, usa as acções comuns do terreno/economia/calendário, preserva a compatibilidade da gravação, executa as verificações relevantes e actualiza esta documentação. Para elementos visuais, revê capturas do jogo além do arranque headless.
 
-### Notícias na televisão
+## Ficheiros e Git
 
-A MOZTV tem **12 notícias**, misturadas em cada edição, que mudam automaticamente a cada **sete segundos**. Uma notícia só se repete depois de passarem todas as outras; o sistema evita repetir a última na edição seguinte e alterna temas quando possível. Há jogos, cultura, agricultura, economia e comunidade. O painel do estúdio muda com o assunto e a apresentadora continua animada.
+O `.gitignore` exclui caches do Godot (`.godot/`, `.mono/`), exportações e builds locais, logs, ficheiros temporários, gravações `.mozsave` com as suas cópias e configuração privada local. A cópia antiga `.mozcolheita-anterior/` e a pasta local `.kombai/` também ficam excluídas de novas adições.
 
-A cobertura do **GTA VI** trata dos recordes de vendas e reconhecimento da crítica divulgados pela Take-Two, música, rádios, lugares e protagonistas. As notícias externas foram verificadas em **22/11/2026** e identificam a fonte; não são anúncios de um lançamento futuro. Fontes: [Take-Two — comunicado de resultados do GTA VI](https://www.sec.gov/Archives/edgar/data/946581/000162828026075217/exhibit9918k.htm), [Rockstar Games](https://www.rockstargames.com/VI) e [Newswire](https://www.rockstargames.com/newswire?tag=vi).
+Mantém no repositório os scripts, cenas, shaders, dados do terreno, ícones, logótipo, testes e imagens de documentação em `preview/`. Os ficheiros **`.uid`** dos scripts/shaders e **`.import`** dos assets podem ser versionados: guardam identidades e configurações de importação, enquanto o conteúdo processado fica na cache `.godot/`. Referências: [UIDs no Godot](https://godotengine.org/article/uid-changes-coming-to-godot-4-4/) e [processo de importação](https://docs.godotengine.org/en/stable/tutorials/assets_pipeline/import_process.html).
 
-Os boletins da própria partida são **dinâmicos**: mostram quantidades reais no armazém, encomendas activas, entregas concluídas, trabalhadores contratados e actividade diurna/nocturna. Os dados mudam enquanto o jogador joga. As notícias externas ficam no catálogo local e não são actualizadas automaticamente pela Internet. O telejornal conserva o ponto em que ficou ao desligar/ligar a TV durante a sessão.
-
-Verificação do telejornal: `./Jogar.sh --headless --script validation/telejornal/test.gd`.
-
-Validação destas alterações: `./Jogar.sh --headless --script validation/rotinas/test.gd`. Capturas em `preview/rotinas/`, relatório em [RELATORIO_COMUNIDADE_VIVA.md](RELATORIO_COMUNIDADE_VIVA.md).
+O `.gitignore` aplica-se a ficheiros ainda não versionados. Logs e cópias antigas já acompanhados pelo Git continuam no índice até uma remoção explícita; alterar a regra não apaga esses ficheiros. Ao rever um commit, verifica `git status --short` e `git diff --check`.
 
 ## Limitações e próximos passos
 
@@ -291,15 +319,9 @@ Guardar depende da composição actual do mapa; futuras mudanças de entidades p
 
 Possíveis expansões **ainda não implementadas**: eventos sazonais, histórias e relações com vizinhos, festivais, melhoramentos compráveis para a quinta, culinária com receitas e estufas construíveis. O README descreve acima o que existe; estas ideias não são funcionalidades disponíveis.
 
-### Relatórios e histórico técnico
+## Guia e licença
 
-- [Casa de dois pisos, família e variedade de personagens](RELATORIO_FAMILIA.md)
-- [Vida na casa: sono, refeições e janelas](RELATORIO_VIDA_CASA.md)
-- [Entrada da casa e varanda descoberta](RELATORIO_CASA_ABERTA.md)
-- [Tela simples, varanda e iluminação](RELATORIO_TELA_SIMPLES.md)
-- [Gravação, feedback agrícola e encomendas](RELATORIO_DIVERSAO.md)
-- [Mundo vivo e veículos](RELATORIO_MUNDO_VIVO.md)
-- [Comunidade, entregas e grupos](RELATORIO_COMUNIDADE.md)
 - [Guia rápido dos controlos](COMO_JOGAR.txt)
+- [Licença GNU GPL v3](LICENSE)
 
-Os relatórios registam as fases em que foram escritos; este README reúne o comportamento actual. O repositório inclui o texto da **GNU GPL v3** em [LICENSE](LICENSE).
+Este README concentra a documentação actual do projecto.

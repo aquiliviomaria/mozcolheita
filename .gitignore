@@ -1,16 +1,42 @@
-# Godot 4+ specific ignores
+# Godot: caches e ficheiros regenerados localmente
 .godot/
+.mono/
 /android/
-**/*.lnk
 
-# Addons policy:
-# - Track source/config/resources for reproducibility
-# - Ignore heavy native binaries/build artifacts
+# Exportações e compilações locais
+/build/
+/dist/
+/export/
+/exports/
+**/exported/
+.export-to-txt.*
 
-# Keep source by default
-!addons/**/
+# Gravações locais e resultados de execução/testes
+*.mozsave
+*.mozsave.*
+*.log
+*.tmp
+*.temp
 
-# Ignore common heavy/binary artifact types inside addons
+# Cópia antiga do projecto e ferramentas locais
+/.mozcolheita-anterior/
+/.kombai/
+
+# Sistema operativo e ficheiros temporários dos editores
+.DS_Store
+Thumbs.db
+desktop.ini
+*.lnk
+*.swp
+*.swo
+*~
+
+# Configuração privada local; exemplos podem ser partilhados
+.env
+.env.*
+!.env.example
+
+# Addons: conservar código/configuração; excluir binários e builds locais
 addons/**/*.dll
 addons/**/*.so
 addons/**/*.dylib
@@ -24,8 +50,6 @@ addons/**/*.bin
 addons/**/*.bc
 addons/**/*.zip
 addons/**/*.7z
-
-# Ignore native/build output folders often shipped with addons
 addons/**/android/
 addons/**/ios/
 addons/**/linux/
@@ -36,21 +60,5 @@ addons/**/build/
 addons/**/bin/
 addons/**/.build/
 
-# Explicitly keep common addon source/config/resources
-!addons/**/*.gd
-!addons/**/*.gdshader
-!addons/**/*.gdextension
-!addons/**/*.cfg
-!addons/**/*.tres
-!addons/**/*.res
-!addons/**/README.md
-!addons/**/LICENSE*
-
-Assets/*.png
-*.png.import
-*.glb.import
-
-*.uid
-
-**/exported
-.export-to-txt.*
+# Os assets originais, *.uid, *.import, testes e capturas de documentação
+# fazem parte do projecto e devem poder ser versionados.

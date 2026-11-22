@@ -30,7 +30,6 @@ var agua: CPUParticles3D
 var duche: Node3D
 var televisao: Node3D
 var a_comer: float = 0
-var elevador_destino: float = 0
 var aviso_cama: Label3D
 var aviso_mesa: Label3D
 func _ready() -> void:
@@ -40,7 +39,7 @@ func _ready() -> void:
 		for i: int in range(3):
 			var fruto: MeshInstance3D = MeshInstance3D.new(); fruto.mesh = preload("res://scripts/produce_mesh.gd").modelo(0 if i==0 else 3); fruto.position = Vector3(x-0.3+i*0.3,0.15,0); comida.add_child(fruto)
 		mundo.caixa(comida,Vector3(x,0.14,-0.65),Vector3(0.18,0.28,0.18),Color("729a9b"))
-	for spec: Dictionary in [{"p":CAMA,"t":"E · Cama"},{"p":MESA,"t":"E · Sentar / comer"},{"p":SOFA,"t":"E · Sofá e televisão"},{"p":ROUPEIRO,"t":"E · Trocar roupa"},{"p":DUCHE,"t":"E · Tomar banho"},{"p":SANITA,"t":"E · Usar sanita"},{"p":ELEVADOR,"t":"E · Subir no elevador"},{"p":ELEVADOR+Vector3.UP*5,"t":"E · Descer no elevador"}]:
+	for spec: Dictionary in [{"p":CAMA,"t":"E · Cama"},{"p":MESA,"t":"E · Sentar / comer"},{"p":SOFA,"t":"E · Sofá e televisão"},{"p":ROUPEIRO,"t":"E · Trocar roupa"},{"p":DUCHE,"t":"E · Tomar banho"},{"p":SANITA,"t":"E · Usar sanita"},{"p":ELEVADOR,"t":"E · Chamar / entrar no elevador"},{"p":ELEVADOR+Vector3.UP*5,"t":"E · Chamar / entrar no elevador"}]:
 		var l: Label3D = mundo.placa(casa,spec.p+Vector3.UP*1.8,spec.t); l.visibility_range_end = 16; l.set_meta("ponto",spec.p); avisos.append(l)
 	aviso_cama = avisos[0]; aviso_mesa = avisos[1]
 	var camada: CanvasLayer = CanvasLayer.new(); camada.layer = 30; add_child(camada)
@@ -48,6 +47,7 @@ func _ready() -> void:
 	agua = CPUParticles3D.new(); agua.name = "AguaDuche"; agua.position = Vector3(11,8.8,-7); agua.amount = 64; agua.lifetime = 0.7; agua.direction = Vector3.DOWN; agua.spread = 8; agua.initial_velocity_min = 3; agua.initial_velocity_max = 4; agua.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX; agua.emission_box_extents = Vector3(1.2,0,0.6); agua.gravity = Vector3(0,-5,0)
 	var gota: BoxMesh = BoxMesh.new(); gota.size = Vector3(0.025,0.16,0.025); gota.material = mundo.material(Color("83c9dd")); agua.mesh = gota; agua.emitting = false; casa.add_child(agua); casa.piso_superior.append(agua)
 	duche = preload("res://scripts/shower_curtain.gd").new(); duche.lar = self; duche.mundo = mundo; duche.casa = casa; casa.add_child(duche)
+	casa.elevador = preload("res://scripts/house_elevator.gd").new(); casa.elevador.mundo = mundo; casa.elevador.casa = casa; casa.elevador.lar = self; casa.add_child(casa.elevador)
 	televisao = preload("res://scripts/television.gd").new(); televisao.mundo = mundo; televisao.position = Vector3(-7,3.1,0.4); casa.add_child(televisao)
 func ocupado() -> bool: return not estado.is_empty()
 func noite() -> bool: return fmod(mundo.calendario.decorrido,DIA)>=DIA/2
@@ -76,7 +76,7 @@ func interagir() -> bool:
 	if perto(SANITA): iniciar("sanita"); posar(Vector3(6,5.64,-7),true); mundo.avisar("E terminar"); return true
 	for piso: int in range(2):
 		if perto(ELEVADOR+Vector3.UP*piso*5):
-			iniciar("elevador"); elevador_destino = 5.64 if piso==0 else 0.64; casa.elevador.position.y = 0.64+piso*5; mundo.jogador.position = casa.to_global(Vector3(-5,casa.elevador.position.y,-5)); return true
+			iniciar("elevador"); casa.elevador.iniciar(piso); return true
 	return false
 func iniciar(novo: String) -> void:
 	retorno = mundo.jogador.global_position; visual_anterior = mundo.jogador.visual.transform; camada_anterior = mundo.jogador.collision_layer; ferramenta_visivel = mundo.ferramentas.vista.visible
@@ -89,6 +89,7 @@ func posar(p: Vector3,virar: bool) -> void:
 func levantar() -> void:
 	if not ocupado(): return
 	var anterior: String = estado
+	if anterior=="elevador": casa.elevador.terminar()
 	if anterior=="banho": duche.cancelar(); mudar_roupa(roupa_anterior)
 	estado = ""; cortina.color.a = 0; a_comer = 0; agua.emitting = false; televisao.ligada = false
 	if is_instance_valid(alimento_mao): alimento_mao.queue_free()
@@ -124,7 +125,12 @@ func entrada(evento: InputEvent) -> void:
 	if evento.physical_keycode==KEY_C and familia()!=null: familia().chamar(actividade()); return
 	if evento.physical_keycode==KEY_F9: mundo.partida.carregar(); return
 	if evento.physical_keycode==KEY_F5: mundo.partida.guardar(); return
-	if estado in ["dormindo","elevador"]: return
+	if estado=="elevador":
+		if evento.physical_keycode==KEY_1: casa.elevador.seleccionar(0)
+		elif evento.physical_keycode==KEY_2: casa.elevador.seleccionar(1)
+		elif evento.physical_keycode in [KEY_E,KEY_ESCAPE]: casa.elevador.sair()
+		return
+	if estado=="dormindo": return
 	if estado=="banho" and evento.physical_keycode in [KEY_E,KEY_W,KEY_A,KEY_S,KEY_D,KEY_ESCAPE]: duche.pedir_saida(); return
 	if evento.physical_keycode==KEY_SPACE and estado=="televisao": televisao.ligada = not televisao.ligada; return
 	if evento.physical_keycode==KEY_E:
@@ -142,10 +148,7 @@ func comecar_intro() -> void:
 	if familia()!=null: familia().colocar_actividade("cama")
 func _physics_process(delta: float) -> void:
 	if mundo.hud==null or mundo.pausado(): return
-	if estado=="elevador":
-		casa.elevador.position.y = move_toward(casa.elevador.position.y,elevador_destino,delta*2.5)
-		mundo.jogador.position = casa.to_global(Vector3(-5,casa.elevador.position.y,-5))
-		if is_equal_approx(casa.elevador.position.y,elevador_destino): retorno = casa.to_global(Vector3(-5,elevador_destino,-1.8)); levantar()
+	if estado=="elevador": casa.elevador.actualizar(delta)
 func _process(delta: float) -> void:
 	if mundo.jogador==null or mundo.hud==null: return
 	for l: Label3D in avisos: l.visible = not ocupado() and not mundo.pausado() and perto(l.get_meta("ponto"))
