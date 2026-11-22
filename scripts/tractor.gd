@@ -4,6 +4,9 @@ var mundo: Node3D
 var numero: int = 0
 var rapidez: float = 0.0
 var implemento: Node3D
+var passageiro: Node3D
+var assento_condutor: Vector3 = Vector3(0,0.45,0.6)
+var assento_passageiro: Vector3 = Vector3(0.95,0.45,0.6)
 var trabalhador: Node3D
 var rodas: Array[Node3D] = []
 var ocupado: bool = false
@@ -15,6 +18,7 @@ var distancia_anterior: float = 7.5
 
 func _ready() -> void:
 	add_to_group("tratores_quinta")
+	preload("res://scripts/vehicle_lights.gd").instalar(self,mundo,"tractor")
 	collision_layer = 4
 	collision_mask = 1|2|4|8|16
 	var colisor: CollisionShape3D = CollisionShape3D.new()
@@ -31,9 +35,11 @@ func _ready() -> void:
 	mundo.caixa(self,Vector3(0,1.23,0.65),Vector3(0.46,0.14,0.5),Color("303e40"))
 	mundo.caixa(self,Vector3(0,1.5,0.88),Vector3(0.46,0.48,0.12),Color("303e40"))
 	for lado: float in [-1.0,1.0]:
-		for z: float in [-0.05,1.2]: mundo.caixa(self,Vector3(lado*0.66,1.88,z),Vector3(0.055,1.8,0.055),Color("34464a"))
+		for z: float in [-0.05,1.2]: mundo.caixa(self,Vector3(lado*0.66,2,z),Vector3(0.055,2,0.055),Color("34464a"))
 		mundo.caixa(self,Vector3(lado*0.9,1.1,0.9),Vector3(0.45,0.12,1.3),cor)
-	mundo.caixa(self,Vector3(0,2.78,0.6),Vector3(1.7,0.12,1.8),cor.lightened(0.12))
+	mundo.caixa(self,Vector3(0.4,3.0,0.6),Vector3(2.7,0.12,1.8),cor.lightened(0.12))
+	mundo.caixa(self,Vector3(0.95,1.23,0.65),Vector3(0.46,0.14,0.5),Color("303e40"))
+	mundo.caixa(self,Vector3(0.95,1.5,0.88),Vector3(0.46,0.48,0.12),Color("303e40"))
 	var volante: MeshInstance3D = MeshInstance3D.new()
 	var aro: TorusMesh = TorusMesh.new()
 	aro.inner_radius = 0.18
@@ -67,7 +73,7 @@ func entrar() -> bool:
 	mundo.jogador.collision_layer = 0
 	mundo.jogador.hide()
 	mundo.jogador.visual.reparent(self)
-	mundo.jogador.visual.transform = Transform3D(Basis.IDENTITY,Vector3(0,0.45,0.6))
+	mundo.jogador.visual.transform = Transform3D(Basis.IDENTITY,assento_condutor)
 	mundo.ferramentas.vista.hide()
 	mundo.camera.alvo = self
 	inclinacao_anterior = mundo.camera.inclinacao
@@ -94,6 +100,7 @@ func sair() -> bool:
 	mundo.camera.alvo = mundo.jogador
 	mundo.camera.inclinacao = inclinacao_anterior
 	mundo.camera.distancia = distancia_anterior
+	if mundo.familia!=null and mundo.familia.veiculo==self: mundo.familia.desembarcar()
 	mundo.trator_actual = null
 	ocupado = false
 	if implemento!=null: implemento.activo = false
@@ -116,10 +123,12 @@ func engatar() -> bool:
 func _physics_process(delta: float) -> void:
 	var anterior_transform: Transform3D = global_transform
 	if mundo.trator_actual==self and not mundo.pausado():
-		var acelerador: float = float(Input.is_physical_key_pressed(KEY_W))-float(Input.is_physical_key_pressed(KEY_S))
-		var turbo: bool = acelerador>0 and Input.is_physical_key_pressed(KEY_T)
+		var controlo: GDScript = preload("res://scripts/input_drive.gd")
+		var acelerador: float = controlo.acelerador()-controlo.recuar()
+		var turbo: bool = acelerador>0 and controlo.turbo()
 		rapidez = move_toward(rapidez,acelerador*(12.0 if turbo else 6.0),delta*(8 if turbo else 4))
-		var direccao: float = float(Input.is_physical_key_pressed(KEY_A))-float(Input.is_physical_key_pressed(KEY_D))
+		if controlo.travao(): rapidez = move_toward(rapidez,0,delta*24)
+		var direccao: float = controlo.direccao()
 		rotation.y += direccao*delta*rapidez*0.25
 	elif trabalhador!=null and not mundo.pausado():
 		var diferenca: Vector3 = destino-global_position

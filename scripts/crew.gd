@@ -17,7 +17,7 @@ var centro: Vector2i = Vector2i(12,0)
 func livres() -> Array[Node3D]:
 	var resultado: Array[Node3D] = []
 	for pessoa: Node3D in mundo.pessoas:
-		if not pessoa.contratado and not pessoa.grupo and not pessoa.em_conversa and pessoa.servico.is_empty(): resultado.append(pessoa)
+		if pessoa.idade!="crianca" and not pessoa.contratado and not pessoa.grupo and not pessoa.em_conversa and pessoa.servico.is_empty(): resultado.append(pessoa)
 	resultado.sort_custom(func(a: Node3D,b: Node3D) -> bool: return a.position.distance_squared_to(mundo.jogador.position)<b.position.distance_squared_to(mundo.jogador.position))
 	return resultado
 func orcamento(fabrica: int,pessoas: int,dificuldade: int = 0) -> Dictionary:

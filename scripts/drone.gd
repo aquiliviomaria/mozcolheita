@@ -14,6 +14,7 @@ var sinal: MeshInstance3D
 
 func _ready() -> void:
 	origem = position
+	preload("res://scripts/vehicle_lights.gd").instalar(self,mundo,"drone")
 	corpo = StaticBody3D.new(); corpo.collision_layer = 8; add_child(corpo)
 	var colisao: CollisionShape3D = CollisionShape3D.new(); var forma: BoxShape3D = BoxShape3D.new()
 	forma.size = Vector3(2.1,0.5,2.0); colisao.shape = forma; corpo.add_child(colisao)
@@ -82,9 +83,10 @@ func irrigar() -> int:
 func _physics_process(delta: float) -> void:
 	sinal.visible = disponivel()
 	if not voando or mundo.pausado(): return
-	var entrada: Vector3 = Vector3(float(Input.is_physical_key_pressed(KEY_D))-float(Input.is_physical_key_pressed(KEY_A)),0,float(Input.is_physical_key_pressed(KEY_S))-float(Input.is_physical_key_pressed(KEY_W)))
+	var controlo: GDScript = preload("res://scripts/input_drive.gd")
+	var entrada: Vector3 = Vector3(clampf(float(Input.is_physical_key_pressed(KEY_D))-float(Input.is_physical_key_pressed(KEY_A))+controlo.eixo(JOY_AXIS_LEFT_X),-1,1),0,clampf(float(Input.is_physical_key_pressed(KEY_S))-float(Input.is_physical_key_pressed(KEY_W))+controlo.eixo(JOY_AXIS_LEFT_Y),-1,1))
 	entrada = Basis(Vector3.UP,mundo.camera_giro())*entrada.limit_length(1)
-	entrada.y = float(Input.is_physical_key_pressed(KEY_SPACE))-float(Input.is_physical_key_pressed(KEY_CTRL))
+	entrada.y = clampf(float(Input.is_physical_key_pressed(KEY_SPACE))-float(Input.is_physical_key_pressed(KEY_CTRL))+float(controlo.botao(JOY_BUTTON_A))-float(controlo.botao(JOY_BUTTON_B)),-1,1)
 	position += entrada*delta*7.0
 	position.x = clampf(position.x,-370,370)
 	position.z = clampf(position.z,-370,370)

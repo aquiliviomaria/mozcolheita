@@ -31,6 +31,10 @@ func _unhandled_input(evento: InputEvent) -> void:
 		if evento.physical_keycode in [KEY_MINUS,KEY_KP_SUBTRACT]: distancia = minf(15.0,distancia+0.6)
 
 func _process(delta: float) -> void:
+	if not mundo.pausado() and not enquadramento:
+		var controlo: GDScript = preload("res://scripts/input_drive.gd")
+		giro -= controlo.eixo(JOY_AXIS_RIGHT_X)*delta*2
+		inclinacao = clampf(inclinacao-controlo.eixo(JOY_AXIS_RIGHT_Y)*delta*1.5,-1.25,-0.12)
 	if livre:
 		var entrada: Vector3 = Vector3(float(Input.is_physical_key_pressed(KEY_D))-float(Input.is_physical_key_pressed(KEY_A)),float(Input.is_physical_key_pressed(KEY_E))-float(Input.is_physical_key_pressed(KEY_Q)),float(Input.is_physical_key_pressed(KEY_S))-float(Input.is_physical_key_pressed(KEY_W)))
 		camara.rotation = Vector3(inclinacao,giro,0)

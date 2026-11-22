@@ -4,7 +4,7 @@ const METADE: Vector2 = Vector2(96,78)
 const PORTOES: Array[Vector3] = [Vector3(0,0,78),Vector3(60,0,78),Vector3(0,0,-78),Vector3(-60,0,-78),Vector3(96,0,0),Vector3(-96,0,0)]
 const LARGURA_PORTAO: float = 12.0
 const GALPAO: Rect2 = Rect2(-57,29,30,22)
-const CASA: Rect2 = Rect2(-21,-60,26,23)
+const CASA: Rect2 = Rect2(-26,-64,36,37)
 const ARMAZEM: Rect2 = Rect2(22,24,20,26)
 
 static func distancia(a: Vector3,b: Vector3) -> float:

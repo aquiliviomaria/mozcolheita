@@ -58,6 +58,7 @@ func activos() -> int:
 	return total
 
 func iniciar(vizinho: Node3D) -> bool:
+	if vizinho.idade=="crianca": vizinho.dizer("Bom dia! Estou a passear com a família."); return false
 	if activo or vizinho.grupo or not vizinho.servico.is_empty() or mundo.trator_actual!=null or mundo.drone_actual!=null: return false
 	if vizinho.global_position.distance_to(mundo.jogador.position)>3: mundo.avisar("Aproxime-se do trabalhador."); return false
 	if activos()>=3: mundo.avisar("Os três tractores já estão atribuídos."); return false

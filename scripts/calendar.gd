@@ -19,11 +19,8 @@ func hora() -> String:
 func saltar(dias: int = 1) -> void:
 	if mundo.contrato.activo: return
 	var segundos: float = clampi(dias,1,3)*SEGUNDOS_DIA
-	avancar(segundos)
-	mundo.terreno.avancar(segundos)
+	avancar_simulacao(segundos)
 	mundo.avisar("%s · calendário e crescimento avançados." % hora())
-	if mundo.entregas!=null: mundo.entregas.verificar_prazos()
-	if mundo.contrato!=null: mundo.contrato.verificar_prazos()
 func avancar(segundos: float) -> void:
 	decorrido += segundos
 	mundo.relogio += segundos
@@ -38,9 +35,7 @@ func proximo_periodo() -> void:
 	# L alterna 18:00 e 06:00; nunca recua nem ignora prazos.
 	var meio_dia: float = SEGUNDOS_DIA*0.5
 	var segundos: float = (floorf(decorrido/meio_dia)+1)*meio_dia-decorrido
-	avancar(segundos)
-	mundo.terreno.avancar(segundos)
-	mundo.entregas.verificar_prazos(); mundo.contrato.verificar_prazos()
+	avancar_simulacao(segundos)
 	mundo.avisar("%s · %s" % [hora(),"Bom dia!" if fmod(decorrido,SEGUNDOS_DIA)<meio_dia else "Anoiteceu."])
 
 func _process(delta: float) -> void:
@@ -55,3 +50,9 @@ func alternar_velocidade() -> void:
 func restante(segundos: float) -> String:
 	var minutos: int = maxi(0,ceili(segundos/SEGUNDOS_DIA*1440))
 	return "%dd %02dh %02dm" % [minutos/1440,(minutos%1440)/60,minutos%60]
+
+func avancar_simulacao(segundos: float) -> void:
+	# Sono e atalhos avançam o mesmo relógio, culturas e consequências contratuais.
+	if segundos<=0: return
+	avancar(segundos); mundo.terreno.avancar(segundos)
+	mundo.entregas.verificar_prazos(); mundo.contrato.verificar_prazos()

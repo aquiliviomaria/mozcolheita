@@ -1,0 +1,13 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+
+OK · Acção válida com feedback: lavrar
+OK · Acção válida com feedback: semear
+OK · Acção válida com feedback: regar
+OK · Colheita real continua a produzir
+OK · Efeitos acompanham as quatro acções sem duplicar produção
+OK · Acção inválida não produz recompensa nem efeito
+OK · Limite de frequência impede ruído nas máquinas de várias linhas
+OK · Efeitos reutilizam um conjunto limitado
+OK · Trabalho distante não cria sons nem texto junto ao jogador
+OK · Textos temporários desaparecem
+FEEDBACK · PASSOU · 0 falhas

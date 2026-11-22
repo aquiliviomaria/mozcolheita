@@ -1,26 +1,42 @@
 extends Node3D
-## Casa principal com alpendre, logótipo e ponto de partida à frente da porta.
+## Casa de dois pisos; arquitectura, interiores e actividades em módulos separados.
 const LOCAL: Vector3 = Vector3(-8,0,-51)
-const INICIO: Vector3 = Vector3(-8,0,-37)
+const INICIO: Vector3 = Vector3(-8,0,-29)
 var mundo: Node3D
+var porta: Node3D
+var abertura: float = 0
+var telhado: Array[Node3D] = []
+var piso_superior: Array[Node3D] = []
+var vida_domestica: Node
+var luz_interior: OmniLight3D
+var luz_quarto: OmniLight3D
+var elevador: Node3D
 func _ready() -> void:
 	position = LOCAL; position.y = mundo.altura(position)
-	mundo.caixa(self,Vector3(0,0.18,0),Vector3(25,0.36,19),Color("b3a080"),true)
-	mundo.caixa(self,Vector3(0,3.4,1),Vector3(22,6.4,14),Color("f2dfb4"),true)
-	# Telhado de duas águas com beirais e varanda orientada para o campo.
-	for lado: float in [-1,1]:
-		var telha: Node3D = mundo.caixa(self,Vector3(lado*5.8,7.1,1),Vector3(12.2,0.24,16),Color("b95836")); telha.rotation.z = -lado*0.22
-	mundo.caixa(self,Vector3(0,4.5,9),Vector3(24,0.18,5),Color("c66d42"))
-	for x: float in [-10,-5,5,10]: mundo.caixa(self,Vector3(x,2.4,10.7),Vector3(0.27,4.5,0.27),Color("f8e9cb"),true)
-	mundo.caixa(self,Vector3(0,1.8,8.06),Vector3(2.5,3.2,0.08),Color("14532d"))
-	mundo.caixa(self,Vector3(0.85,1.7,8.15),Vector3(0.1,0.1,0.08),Color("e0b55c"))
-	for x: float in [-7,-3.7,3.7,7]:
-		mundo.caixa(self,Vector3(x,2.8,8.06),Vector3(2.2,2.3,0.10),Color("568b91"))
-		for lado: float in [-1,1]: mundo.caixa(self,Vector3(x+lado*1.26,2.8,8.1),Vector3(0.34,2.5,0.08),Color("238b45"))
-		mundo.caixa(self,Vector3(x,2.8,8.16),Vector3(0.06,2.3,0.05),Color("f8e9cb"))
-	var logo: Sprite3D = Sprite3D.new(); logo.texture = preload("res://MozColheita-icon.png"); logo.pixel_size = 0.0026; logo.position = Vector3(0,5.45,8.2); add_child(logo)
-	mundo.placa(self,Vector3(0,8.5,8),"MOZCOLHEITA · CASA PRINCIPAL").visibility_range_end = 60
-	for x: float in [-12,12]:
-		mundo.caixa(self,Vector3(x,0.7,9),Vector3(1.3,1.1,1.3),Color("b3633d"))
-		var folhas: SphereMesh = SphereMesh.new(); folhas.radius = 0.8; folhas.height = 1.3
-		var vista: MeshInstance3D = MeshInstance3D.new(); vista.mesh = folhas; vista.position = Vector3(x,1.6,9); vista.material_override = mundo.material(Color("238b45")); add_child(vista)
+	preload("res://scripts/house_architecture.gd").construir(self)
+	preload("res://scripts/house_interior.gd").construir(self)
+	vida_domestica = preload("res://scripts/home_life.gd").new(); vida_domestica.mundo = mundo; vida_domestica.casa = self; add_child(vida_domestica)
+	luz_interior = lampada(Vector3(0,4,2)); luz_quarto = lampada(Vector3(8,9,4))
+func lampada(p: Vector3) -> OmniLight3D:
+	var l: OmniLight3D = OmniLight3D.new(); l.position = p; l.light_color = Color("ffe4b5"); l.omni_range = 18; l.light_energy = 0.1; l.distance_fade_enabled = true; l.distance_fade_begin = 45; add_child(l); return l
+func dentro(p: Vector3) -> bool:
+	var local: Vector3 = to_local(p)
+	return absf(local.x)<15.8 and local.z>-10.8 and local.z<10.8 and local.y>0.4 and local.y<10.8
+func _process(delta: float) -> void:
+	if not is_instance_valid(mundo.jogador): return
+	var local: Vector3 = to_local(mundo.jogador.global_position)
+	var perto: bool = Vector2(local.x,local.z-11.22).length()<5 and local.y<4
+	if mundo.familia!=null and mundo.familia.veiculo==null:
+		var parceiro: Vector3 = to_local(mundo.familia.pessoa.global_position)
+		perto = perto or (Vector2(parceiro.x,parceiro.z-11.22).length()<5 and parceiro.y<4)
+	if not mundo.pausado(): abertura = move_toward(abertura,1.0 if perto else 0.0,delta*2.5)
+	porta.rotation.y = -abertura*PI*0.6
+	if mundo.luz_diaria!=null:
+		luz_interior.light_energy = lerpf(0.9,0.08,mundo.luz_diaria.luminosidade); luz_quarto.light_energy = luz_interior.light_energy
+	var interior: bool = dentro(mundo.jogador.global_position)
+	var corte: bool = mundo.camera!=null and (mundo.camera.enquadramento or mundo.camera.livre)
+	for n: Node3D in telhado: n.visible = not (interior and corte)
+	for n: Node3D in piso_superior: n.visible = not (interior and corte) or local.y>4.6
+func vidro(p: Vector3,tamanho: Vector3) -> Node3D:
+	var janela: MeshInstance3D = mundo.caixa(self,p,tamanho,Color("a0cfdf"),true); janela.name = "JanelaTransparente"
+	var mat: StandardMaterial3D = StandardMaterial3D.new(); mat.albedo_color = Color(0.63,0.81,0.87,0.14); mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA; mat.roughness = 0.15; mat.cull_mode = BaseMaterial3D.CULL_DISABLED; janela.material_override = mat; return janela

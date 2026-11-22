@@ -1,57 +1,82 @@
-MOZCOLHEITA — PASTA PRINCIPAL
-Abra project.godot e prima F5, ou execute ./Jogar.sh.
-Seleccione agricultor ou agricultora e Começar. Saldo: 500.000 MT.
-Começa à frente da casa principal com o logótipo MozColheita.
+MOZCOLHEITA — GUIA RÁPIDO
+Abra project.godot na pasta principal e execute, ou use ./Jogar.sh.
+Saldo inicial: 500.000 MT. Uma nova sessão começa deitado na cama com o cônjuge; acorda de manhã e E levanta.
+Escolha agricultor/agricultora e corpo médio, alto, baixo, robusto ou magro.
 
-WASD mover | Shift correr | Rato câmara | Roda/+/- zoom
-1 mãos | 2 martelo | 3 serrote | 4 enxada | 5 regador | 6 semeadora
-K kit | Clique/Espaço usa | H gestão | Tab cursor | Esc menu
+MOVIMENTO E QUINTA
+WASD anda | Shift corre | Rato olha | Roda/+/- zoom
+K abre kit | 1 mãos | 2 martelo | 3 serrote | 4 enxada | 5 regador | 6 semeadora
+Clique/Espaço usa ferramenta. H abre gestão. Tab cursor. Esc menu.
 Preparar → semear → regar → crescer TRÊS DIAS → colher.
-Sementes secas não crescem. Um dia = dez minutos reais em velocidade normal.
-V: câmara livre; WASD move, Q/E sobe/desce, V regressa.
-Botões +1 dia e Tempo ×1/12: avanço de calendário e aceleração da simulação.
-SALTAR DIAS TAMBÉM AVANÇA OS PRAZOS E PODE APLICAR MULTAS.
+Sementes secas não crescem. Alterne culturas para cuidar do solo.
+L alterna noite e manhã; o novo dia toca o galo.
+AVANÇAR TEMPO OU DORMIR TAMBÉM AVANÇA PRAZOS E PODE APLICAR MULTAS.
 
-E interagir/entrar-sair de veículo parado/conversar.
-G engatar-soltar equipamento; sinal verde mostra disponibilidade.
-Espaço no tractor liga máquina. W+T turbo.
-B abastece semeadora próxima/engatada: depósito de 300, 2 MT/semente.
-F drone | Espaço subir | Ctrl descer | R irrigar.
-Três carrinhas (120 unidades) e um camião (500 unidades).
-C transfere carga com veículo parado.
+CASA DE DOIS PISOS
+Sala e cozinha no rés-do-chão. Quarto e casa de banho no piso superior.
+Suba pelas escadas ou use E junto ao elevador. A porta abre por proximidade.
+E na cama, de dia: senta. E sai da cama.
+E na cama, à noite: dorme com o cônjuge e acorda às 06:00. E sai da cama.
+E junto à mesa: senta. E novamente: come com animação e alimento na mão.
+WASD/Esc levanta da mesa. Quatro refeições iniciais; depois usa produtos reais.
+E no sofá: liga televisão. Espaço liga/desliga; E/WASD/Esc levanta.
+E no roupeiro: alterna quatro conjuntos de roupa.
+E no duche: banho com água e recuperação de higiene. E termina.
+E na sanita: usa. E termina.
+J come um produto da sacola ou do stock junto ao armazém.
+Vida: corações. Alimentação: talheres (100 = saciado). Energia: raio.
 
-GARAGEM: duas portas automáticas. Entre com colheita para guardar.
-Saia e volte com carrinha/camião vazio para carregar o stock.
-Excedentes ficam guardados; caixas abertas mostram produto e quantidade.
+FAMÍLIA E PERSONAGENS
+C chama companhia para a actividade ou para o segundo lugar do veículo parado.
+Agricultor tem esposa; agricultora tem marido por predefinição.
+H → Família permite escolher companheira ou companheiro, e alterar o corpo.
+Na cama à noite, o cônjuge acompanha automaticamente. Nas outras actividades use C.
+Há crianças, adultos e idosos, com alturas e corpos diferentes.
+Crianças passeiam/conversam e não são funcionários contratáveis.
 
-H → ENTREGAS: escolha urgência e reveja prazo, recompensa e multa antes de aceitar.
-Normal 8 dias | Prioritária 6 dias | Urgente 4 dias.
-Mais urgência aumenta recompensa e multa. Aviso nos últimos 20%.
-Tomates do Zambeze: tomate, a sul/esquerda (-60,110).
-Moageira Nhamatanda: milho, a sul/centro (0,110).
-Hortícolas Maputo: couve/cenoura, a sul/direita (60,110).
-Conduza o camião e pare dentro da garagem da empresa para entregar.
-Quantidade completa a tempo: pagamento e bónus.
-Falta de quantidade no prazo: quebra de contrato, multa automática única.
-H → HISTÓRICO mostra sucessos e falhas. Uma multa pode deixar o saldo negativo.
+VEÍCULOS E EQUIPAMENTOS
+E entra/sai do veículo parado. WASD conduz. W+T turbo. Ctrl trava.
+Três tractores, um camião e dois automóveis familiares têm dois lugares.
+G engata/solta implemento ou carrinha. Indicador verde mostra disponibilidade.
+Espaço no tractor liga/desliga a máquina. X transfere carga (substitui C).
+B abastece semeadora próxima/engatada: depósito de 300, 2 MT por semente.
+F assume/devolve drone | WASD voa | Espaço sobe | Ctrl desce | R irriga.
+V activa câmara livre; WASD move, Q/E altera altura, V regressa.
 
-H → GRUPO: aceite uma encomenda, escolha 1–10 trabalhadores e a parcela.
-Estacione o camião com espaço; confirme o orçamento antes de iniciar.
-A equipa prepara, planta, rega, espera, colhe e carrega. Excedentes vão ao armazém.
-Usa até três tractores livres e trabalho manual. O jogador faz a entrega final.
-Cancelar a equipa não cancela a encomenda nem o prazo.
-E junto de um NPC define contrato individual com tarefa, prazo e multa.
-H → EQUIPA acompanha esses serviços; até três tractores exclusivos.
+ARMAZÉM E ENTREGAS
+Entre carregado para guardar. Saia e volte vazio com carrinha/camião para carregar.
+Stock excedente fica no armazém. Três carrinhas: 120 unidades; camião: 500.
+H → Entregas: escolha tamanho/urgência; reveja prazo, recompensa e multa.
+Tomates do Zambeze compra tomate; Moageira Nhamatanda milho; Hortícolas Maputo couve/cenoura.
+Com mercadoria compatível, seta e minimapa guiam à empresa.
+Entre na garagem da fábrica e pare para entregar.
+Quantidade completa a tempo paga bónus e melhora reputação.
+Falhar prazo aplica multa única e fica registado em H → Histórico.
 
-O progresso e o histórico ainda não são guardados. Consulte README.md e
-RELATORIO_COMUNIDADE.md para ficheiros alterados, verificações e limitações.
+CONTRATAÇÃO
+E junto de um adulto: tarefa, quantidade, parcela e orçamento obrigatórios.
+H → Grupo: 1–10 pessoas para uma encomenda; confirme o orçamento e prepare o camião.
+Equipa prepara, planta, rega, espera, colhe e carrega; jogador conduz a entrega final.
+Usa até três tractores disponíveis; restantes trabalham manualmente.
+Cancelar equipa devolve reserva não executada, mas não cancela encomenda nem prazo.
 
-MUNDO VIVO
-L: passar para a noite (18:00), depois para o novo dia (06:00), com canto de galo.
-L também funciona na câmara livre. +1 dia salta um dia completo.
-Os prazos e o crescimento avançam com o relógio.
-Com produtos transportados, siga a seta dourada e a rota no minimapa.
-Entre na garagem da fábrica e pare: entrega/venda automática dos produtos aceites.
-Há seis garagens (três empresas com filiais).
-Portas de casas e átrios dos prédios abrem ao aproximar-se; só o rés-do-chão é acessível.
-Novos bairros, ruas asfaltadas e de terra, quintas cercadas, moradores, tractores e riacho.
+GRAVAÇÃO
+F5 guarda. F9 retoma. Grava automaticamente a cada minuto activo e ao sair normalmente.
+Ficheiro: user://quinta.mozsave, com cópia .bak. A retoma é feita a pé.
+Corpo, roupa, preferência de companhia, refeições e automóveis ficam guardados.
+Leia README.md para documentação completa, arquitectura, testes e limitações.
+
+DUCHE COM CORTINA
+E junto do duche: entra, fecha o pano e liga a água.
+C chama o cônjuge; abre para entrar e fecha antes de voltar a ligar a água.
+E termina: água pára, cortina abre, saem e o pano fica aberto.
+
+COMUNIDADE VIVA E TELEVISÃO
+Moradores passeiam, cuidam dos quintais e regressam a casa à noite.
+Nas seis quintas, vizinhos preparam, semeiam, regam e colhem em ciclos de ambiente.
+As actividades dos vizinhos não transferem produtos para a tua quinta.
+E no sofá liga a MOZTV: 12 notícias de jogos, cultura, agricultura e comunidade.
+Muda de notícia a cada sete segundos, sem repetir até esgotar a edição.
+Notícias da quinta acompanham stock, entregas e empregos reais da partida.
+GTA VI: feitos, recordes e música, com fontes verificadas em 22/11/2026.
+Espaço liga/desliga; E/WASD/Esc sai do sofá. Notícias locais, sem ligação à Internet.

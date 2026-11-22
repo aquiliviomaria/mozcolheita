@@ -33,10 +33,8 @@ func _ready() -> void:
 	for i: int in range(5): casa(Vector3(-155,0,-62+i*32),i+7); casa(Vector3(-326,0,-50+i*34),i+12)
 	for i: int in range(12):
 		var carro: CharacterBody3D = preload("res://scripts/traffic.gd").new(); carro.mundo = mundo; carro.tipo = i%3
-		var esquerda: float = [136.0,209.0,274.0][i%3]; var direita: float = [201.0,266.0,341.0][i%3]
-		var topo: float = 24 if i%3==1 else -96; var fundo: float = 16 if i%3==0 else 136
-		var rota: Array[Vector3] = [Vector3(esquerda+(i/3)*(direita-esquerda)/4,0,topo),Vector3(direita,0,topo),Vector3(direita,0,fundo),Vector3(esquerda,0,fundo),Vector3(esquerda,0,topo)]
-		carro.rota = rota; add_child(carro); trafego.append(carro)
+		# Circuito comum no mesmo sentido: evita encontros frontais no eixo da via.
+		carro.rota = percurso_rectangular(132,345,-100,140,i,12); add_child(carro); trafego.append(carro)
 	for i: int in range(8):
 		var pessoa: Node3D = preload("res://scripts/npc.gd").new(); pessoa.mundo = mundo; pessoa.numero = 20+i; pessoa.nome = ["Amélia","Celso","Berta","Ernesto","Sofia","Júlio","Nádia","Mário"][i]; pessoa.mulher = i%2==0
 		var x: float = [128.0,196.0,278.0,350.0][i%4]; var z: float = -60 if i<4 else 40
@@ -118,3 +116,12 @@ func _process(delta: float) -> void:
 	for i: int in range(animais.size()):
 		var animal: Node3D = animais[i]; var inicio: Vector3 = animal.get_meta("inicio")
 		animal.position = inicio+Vector3(sin(tempo*0.18+i)*1.3,0,cos(tempo*0.18+i)*1.3); animal.position.y = mundo.altura(animal.position); animal.rotation.y = -tempo*0.18-i
+
+func percurso_rectangular(esquerda: float,direita: float,topo: float,fundo: float,indice: int,total: int) -> Array[Vector3]:
+	# Todos os segmentos seguem o eixo real da estrada; início distribuído pelo perímetro.
+	var cantos: Array[Vector3] = [Vector3(esquerda,0,topo),Vector3(direita,0,topo),Vector3(direita,0,fundo),Vector3(esquerda,0,fundo)]
+	var fase: float = float(indice)*4.0/total
+	var lado: int = floori(fase)%4
+	var pontos: Array[Vector3] = [cantos[lado].lerp(cantos[(lado+1)%4],fmod(fase,1.0))]
+	for passo: int in range(1,5): pontos.append(cantos[(lado+passo)%4])
+	return pontos

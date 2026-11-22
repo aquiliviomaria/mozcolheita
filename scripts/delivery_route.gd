@@ -11,7 +11,7 @@ func _ready() -> void:
 	texto = Label.new(); texto.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	texto.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT); texto.position = Vector2(410,96); texto.size = Vector2(460,60)
 	texto.add_theme_color_override("font_color",Color("fff2ac")); texto.add_theme_color_override("font_shadow_color",Color.BLACK); texto.add_theme_constant_override("shadow_outline_size",5); add_child(texto)
-	seta = Node3D.new(); mundo.add_child.call_deferred(seta)
+	seta = Node3D.new(); seta.scale = Vector3.ONE*0.45; mundo.add_child.call_deferred(seta)
 	mundo.caixa(seta,Vector3(0,0,0.3),Vector3(0.3,0.14,1.5),Color("fbd64c"))
 	for lado: float in [-1,1]:
 		var asa: Node3D = mundo.caixa(seta,Vector3(lado*0.35,0,-0.25),Vector3(0.22,0.14,1.05),Color("fbd64c")); asa.rotation.y = lado*0.75
@@ -96,7 +96,7 @@ func _process(delta: float) -> void:
 		intervalo = 1
 		destino = escolher_destino(carga_actual(),origem)
 		actualizar_rota(origem)
-	var activo: bool = destino!=null and not mundo.hud.selecao.visible and not mundo.hud.aberto
+	var activo: bool = destino!=null and mundo.drone_actual==null and not mundo.camera.livre and not mundo.hud.selecao.visible and not mundo.hud.aberto
 	texto.visible = activo; seta.visible = activo and not mundo.camera.livre
 	if not activo: return
 	var proximo: Vector3 = rota[0] if not rota.is_empty() else destino.position

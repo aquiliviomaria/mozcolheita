@@ -4,6 +4,12 @@ static var esfera_partilhada: SphereMesh
 static var cubo_partilhado: BoxMesh
 var mundo: Node3D
 var mulher: bool = false
+var deitado: bool = false
+var lado_cama: int = 1
+var roupa: int = 0
+var idade: String = "adulto"
+var perfil: int = 0
+const PERFIS: Array[String] = ["Médio","Alto","Baixo","Robusto","Magro"]
 var aparencia: int = 0
 var saia: MeshInstance3D
 var cesto: Node3D
@@ -74,11 +80,17 @@ func contorno(pai: Node3D, aneis: Array[Vector3], cor: Color) -> MeshInstance3D:
 
 func criar_avatar() -> void:
 	preload("res://scripts/avatar.gd").construir(self)
+	visual.scale = escala_corpo()
 
 func animacao(acao: String,duracao: float = 1.2) -> void:
 	acao_animacao = acao; tempo_acao = duracao
 
+func escala_corpo() -> Vector3:
+	var e: Vector3 = [Vector3.ONE,Vector3(0.98,1.12,0.98),Vector3(1,0.88,1),Vector3(1.23,1,1.17),Vector3(0.84,1.04,0.88)][clampi(perfil,0,4)]
+	return e*(0.66 if idade=="crianca" else 0.95 if idade=="idoso" else 1.0)
+
 func animar(delta: float, andamento: float, sentado: bool = false) -> void:
+	visual.scale = escala_corpo()
 	fase += delta*(12.0 if andamento>5 else 8.0)
 	rosto.position.y = sin(fase*0.25)*0.006 if not sentado else 0.0
 	tempo_acao = maxf(0,tempo_acao-delta)
@@ -107,6 +119,21 @@ func animar(delta: float, andamento: float, sentado: bool = false) -> void:
 		acao_animacao = "carrying"
 	if is_instance_valid(cesto): cesto.visible = transportar
 
+	if deitado: aplicar_pose_cama()
+
+func deitar(lado: int) -> void:
+	deitado = true; lado_cama = lado; animar(0,0)
+
+func aplicar_pose_cama() -> void:
+	# Frente do avatar (-Z) aponta para cima; cabeça (+Y) fica na cabeceira (+Z).
+	visual.position = Vector3.ZERO; visual.rotation = Vector3(PI/2,0,0)
+	for i: int in range(2):
+		pernas[i].rotation = Vector3.ZERO; joelhos[i].rotation = Vector3.ZERO
+		bracos[i].rotation = Vector3(0.05,0,0); cotovelos[i].rotation = Vector3(0.1,0,0)
+	var interior: int = 1 if lado_cama>0 else 0
+	bracos[interior].rotation = Vector3(0.05,0,lado_cama*1.05)
+	cotovelos[interior].rotation = Vector3(0.18,0,lado_cama*0.35)
+	cesto.hide()
 
 func _physics_process(delta: float) -> void:
 	if mundo == null: return
@@ -127,5 +154,6 @@ func _physics_process(delta: float) -> void:
 	animar(delta,Vector2(velocity.x,velocity.z).length())
 
 func repor_pose() -> void:
+	deitado = false
 	gesto = 0; tempo_acao = 0; acao_animacao = "idle"
 	animar(0,0)

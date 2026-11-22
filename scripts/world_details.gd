@@ -57,10 +57,7 @@ func _ready() -> void:
 	for i: int in range(6): melhorar_quinta(i)
 	for i: int in range(8):
 		var carro: CharacterBody3D = preload("res://scripts/traffic.gd").new(); carro.mundo = mundo; carro.tipo = 2 if i<5 else 1
-		var esquerda: bool = i%2==0
-		var x: float = -347 if esquerda else 347; var outro: float = -126 if esquerda else 128
-		var topo: float = -237 if i<4 else 144; var fundo: float = -106 if i<4 else 241
-		carro.rota.assign([Vector3(x,0,topo+(fundo-topo)*(i%4)/4),Vector3(x,0,fundo),Vector3(outro,0,fundo),Vector3(outro,0,topo),Vector3(x,0,topo)])
+		carro.rota = cidade.percurso_rectangular(-350,350,-240,245,i,8)
 		cidade.add_child(carro); cidade.trafego.append(carro)
 	criar_riacho(); decorar()
 func via(pontos: Array[Vector3],largura: float = 9,asfalto: bool = true) -> void:

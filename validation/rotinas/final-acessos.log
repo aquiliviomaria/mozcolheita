@@ -1,0 +1,13 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+
+OK · 40 moradores com rotinas, 12 agricultores nas seis quintas
+OK · Residências distintas para 28 moradores e seis casais agricultores
+OK · Ciclo de preparar, semear, regar e colher com avanço entre pontos
+OK · Vizinhos não alteram saldo nem produtos do jogador
+OK · Regador com água durante tarefa de rega
+OK · Rotina suspende ferramentas e água para contrato/conversa
+OK · Agricultor desloca-se fisicamente na machamba
+OK · Morador entra pela porta e descansa em casa à noite
+OK · Amanhecer retoma percurso pelo acesso frontal
+OK · Televisão tem boletim GTA VI com fonte e data
+ROTINAS E TV · PASSOU · 0 falhas

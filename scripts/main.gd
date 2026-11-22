@@ -7,6 +7,7 @@ const Camara: GDScript = preload("res://scripts/camera.gd")
 const Terreno: GDScript = preload("res://scripts/terrain.gd")
 const Cerca: GDScript = preload("res://scripts/fence.gd")
 const Hud: GDScript = preload("res://scripts/hud.gd")
+var carros: Array[CharacterBody3D] = []
 var tratores: Array[CharacterBody3D] = []
 var implementos: Array[Node3D] = []
 var carrinhas: Array[Node3D] = []
@@ -21,6 +22,7 @@ var fabricas: Array[Node3D] = []
 var economia: Node
 var pessoas: Array[Node3D] = []
 var stock: Dictionary = {}
+var familia: Node3D
 var saldo: int = 500_000
 var ferramentas: Node3D
 var sacola: Dictionary = {}
@@ -41,6 +43,10 @@ var comunidade: Node3D
 var mundo_vivo: Node3D
 var guia_entrega: CanvasLayer
 var luz_diaria: Node
+var vitais: Node
+var painel_conducao: Control
+var feedback: Node3D
+var partida: Node
 var casa: Node3D
 var relogio: float = 0.0
 var materiais: Dictionary = {}
@@ -159,8 +165,17 @@ func _ready() -> void:
 	equipa_grupo = sistema(preload("res://scripts/crew.gd"))
 	comunidade = sistema(preload("res://scripts/community.gd")) as Node3D
 	mundo_vivo = sistema(preload("res://scripts/world_details.gd")) as Node3D
+	criar_rotinas_comunidade()
+	vitais = sistema(preload("res://scripts/vitals.gd"))
+	feedback = sistema(preload("res://scripts/farm_feedback.gd")) as Node3D
+	familia = sistema(preload("res://scripts/family.gd")) as Node3D
+	for i: int in range(2):
+		var carro: CharacterBody3D = preload("res://scripts/car.gd").new(); carro.mundo = self; carro.numero = i; carro.position = Vector3(14+i*6,altura(Vector3(14+i*6,0,-28))+0.05,-28); add_child(carro); carros.append(carro)
+	partida = sistema(preload("res://scripts/persistence.gd"))
 	hud = sistema(Hud) as CanvasLayer
+	get_tree().auto_accept_quit = false
 	guia_entrega = sistema(preload("res://scripts/delivery_route.gd")) as CanvasLayer
+	painel_conducao = preload("res://scripts/driving_hud.gd").new(); painel_conducao.mundo = self; hud.raiz.add_child(painel_conducao)
 	if "--capturar-logistica" in OS.get_cmdline_user_args(): capturar_logistica.call_deferred()
 	if "--teste-logistica" in OS.get_cmdline_user_args(): testar_logistica.call_deferred()
 	if "--teste" in OS.get_cmdline_user_args(): testar.call_deferred()
@@ -168,6 +183,26 @@ func _ready() -> void:
 	if "--capturar-condutor" in OS.get_cmdline_user_args(): capturar_condutor.call_deferred()
 	if "--teste-percurso" in OS.get_cmdline_user_args(): testar_percurso.call_deferred()
 	if "--teste-veiculos" in OS.get_cmdline_user_args(): testar_veiculos.call_deferred()
+
+func criar_rotinas_comunidade() -> void:
+	var casas_usadas: Array[Vector2] = []
+	for centro: Vector3 in preload("res://scripts/village.gd").CENTROS: casas_usadas.append(Vector2(centro.x-10,centro.z-34))
+	for pessoa: Node3D in pessoas:
+		# Mantém os candidatos da quinta disponíveis; os moradores recebem uma casa real.
+		if pessoa.numero<6: continue
+		var lar: Vector3 = pessoa.position
+		var quinta: int = -1
+		if pessoa.numero<18:
+			quinta = (pessoa.numero-6)/2
+			lar = preload("res://scripts/village.gd").CENTROS[quinta]+Vector3(-10,0,-34)
+		else:
+			var distancia: float = INF
+			for residencia: Node3D in comunidade.casas:
+				if not casas_usadas.has(Vector2(residencia.position.x,residencia.position.z)) and residencia.position.distance_squared_to(pessoa.position)<distancia:
+					distancia = residencia.position.distance_squared_to(pessoa.position); lar = residencia.position
+			casas_usadas.append(Vector2(lar.x,lar.z))
+		pessoa.rotina = preload("res://scripts/community_routine.gd").new()
+		pessoa.rotina.configurar(pessoa,lar,quinta)
 
 func altura(ponto: Vector3) -> float:
 	return relevo.altura(ponto) if relevo!=null else 0.0
@@ -228,6 +263,9 @@ func criar_pessoas() -> void:
 		pessoa.position.y = altura(pessoa.position)+0.05
 		pessoa.rota.assign([Vector3(-24+indice*2,0,92+indice*1.2),Vector3(24-indice*2,0,92+indice*1.2)])
 		if indice%2==1: pessoa.rota.append(Vector3(8+indice*2,0,5+indice*3))
+		if indice>=4:
+			pessoa.position = Vector3(32+(indice-4)*7,0,-44); pessoa.vizinho = true
+			pessoa.rota.assign([pessoa.position,pessoa.position+Vector3(0,0,7)])
 		pessoa.position.y = altura(pessoa.position)+0.1
 		add_child(pessoa)
 		pessoas.append(pessoa)
@@ -254,7 +292,7 @@ func retirar_stock() -> Dictionary:
 
 func trator_proximo() -> CharacterBody3D:
 	if caminhao!=null and not caminhao.ocupado and caminhao.position.distance_to(jogador.position)<4: return caminhao
-	for veiculo: CharacterBody3D in tratores:
+	for veiculo: CharacterBody3D in tratores+carros:
 		if veiculo.global_position.distance_to(jogador.global_position)<3.0 and not veiculo.ocupado and veiculo.atribuido==null: return veiculo
 	return null
 
@@ -263,6 +301,7 @@ func interagir() -> void:
 	if trator_actual!=null:
 		if not trator_actual.sair(): avisar("Pare antes de sair do tractor.")
 		return
+	if casa!=null and casa.vida_domestica.interagir(): return
 	for fabrica: Node3D in fabricas:
 		if fabrica.perto(): entregas.entregar(sacola,fabrica.numero); economia.vender(sacola,fabrica.numero); return
 	if armazem!=null and armazem.perto():
@@ -288,7 +327,7 @@ func accionar() -> void:
 	else: ferramentas.usar()
 
 func bloqueia_jogador() -> bool:
-	return pausado() or (camera!=null and camera.livre) or trator_actual!=null or drone_actual!=null or (contrato!=null and contrato.activo)
+	return (casa!=null and casa.vida_domestica!=null and casa.vida_domestica.ocupado()) or pausado() or (camera!=null and camera.livre) or trator_actual!=null or drone_actual!=null or (contrato!=null and contrato.activo)
 
 func camera_giro() -> float:
 	return float(camera.giro) if is_instance_valid(camera) else 0.0
@@ -313,7 +352,7 @@ func dica() -> String:
 	if aviso_tempo>0: return aviso
 	if drone_proximo()!=null: return "F · Controlar drone"
 	if trator_actual!=null:
-		if trator_actual.implemento!=null and trator_actual.implemento.is_in_group("reboques"): return "Carrinha %d/120 · C carregar/entregar · G soltar · E sair" % trator_actual.implemento.total()
+		if trator_actual.implemento!=null and trator_actual.implemento.is_in_group("reboques"): return "Carrinha %d/120 · X carregar/entregar · G soltar · E sair" % trator_actual.implemento.total()
 		if trator_actual.implemento!=null: return "WASD · Conduzir   E · Sair   G · Desacoplar   Espaço · "+("Parar" if trator_actual.implemento.activo else "Trabalhar")
 		var maquina: Node3D = trator_actual.candidato()
 		return "G · Acoplar "+maquina.NOMES[maquina.tipo]+"   E · Sair" if maquina!=null else "WASD · Conduzir   E · Sair do tractor"
@@ -330,7 +369,7 @@ func dica() -> String:
 	return ""
 
 func ajuda() -> String:
-	return "MOZCOLHEITA · H fecha\nWASD andar · Shift correr · Rato olhar · Roda/+/- zoom\nL dia/noite e nova manhã · V câmara livre · +1 dia no topo\nK kit · 1–6 ferramentas · Clique/Espaço usar\nE conversar/entrar/sair/entregar · G engatar · Espaço no tractor liga máquina\nF pilota/devolve drone · Espaço/Ctrl sobem/descem · R irrigação\nLavrar → semear → regar → crescer (3 dias) → colher\nFuncionários: tarefa e orçamento obrigatórios · máximo três contratos\nSaldo: %s · Sementes: %d · Madeira: %d" % [preload("res://scripts/economy.gd").formatar(saldo),ferramentas.sementes,ferramentas.madeira]
+	return "MOZCOLHEITA · H fecha\nWASD andar · Shift correr · Rato olhar · Roda/+/- zoom\nL dia/noite e nova manhã · V câmara livre · J comer · F5 guardar · F9 retomar\nK kit · 1–6 ferramentas · Clique/Espaço usar\nE conversar/entrar/sair/entregar · G engatar · Espaço no tractor liga máquina\nF pilota/devolve drone · Espaço/Ctrl sobem/descem · R irrigação\nLavrar → semear → regar → crescer (3 dias) → colher\nFuncionários: tarefa e orçamento obrigatórios · máximo três contratos\nSaldo: %s · Sementes: %d · Madeira: %d" % [preload("res://scripts/economy.gd").formatar(saldo),ferramentas.sementes,ferramentas.madeira]
 
 func resumo_stock() -> String:
 	var texto: String = "PRODUTOS · consigo / armazém\n"
@@ -352,16 +391,38 @@ func _input(evento: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 
 func _unhandled_input(evento: InputEvent) -> void:
-	if hud==null or hud.selecao.visible: return
+	if hud==null: return
+	if hud.selecao.visible:
+		if evento is InputEventKey and evento.pressed and not evento.echo and evento.physical_keycode==KEY_F9: partida.carregar()
+		return
+	if casa!=null and casa.vida_domestica.ocupado():
+		casa.vida_domestica.entrada(evento); return
+	if evento is InputEventJoypadButton and evento.pressed:
+		if evento.button_index==JOY_BUTTON_START: hud.alternar(); return
+		if pausado(): return
+		if drone_actual!=null:
+			if evento.button_index==JOY_BUTTON_X: alternar_drone()
+			if evento.button_index==JOY_BUTTON_Y: drone_actual.irrigando = not drone_actual.irrigando
+		elif trator_actual!=null:
+			if evento.button_index==JOY_BUTTON_A: interagir()
+			if evento.button_index==JOY_BUTTON_X: trator_actual.engatar()
+			if evento.button_index==JOY_BUTTON_B: accionar()
+			if evento.button_index==JOY_BUTTON_Y and trator_actual==caminhao: caminhao.transferir()
+			elif evento.button_index==JOY_BUTTON_Y and trator_actual!=null and trator_actual.implemento!=null and trator_actual.implemento.is_in_group("reboques"): trator_actual.implemento.transferir()
+		elif evento.button_index==JOY_BUTTON_A: interagir()
 	if evento is InputEventKey and evento.pressed and not evento.echo:
+		if evento.physical_keycode==KEY_C and not pausado() and not contrato.activo: familia.chamar()
+		if evento.physical_keycode==KEY_J: vitais.comer()
+		if evento.physical_keycode == KEY_F5: partida.guardar()
+		if evento.physical_keycode == KEY_F9: partida.carregar()
 		if evento.physical_keycode == KEY_L and not pausado(): calendario.proximo_periodo()
 		if evento.physical_keycode == KEY_V and not pausado(): camera.alternar_livre()
-		if camera.livre and evento.physical_keycode not in [KEY_V,KEY_L,KEY_H,KEY_ESCAPE,KEY_TAB]: return
+		if camera.livre and evento.physical_keycode not in [KEY_V,KEY_L,KEY_H,KEY_ESCAPE,KEY_TAB,KEY_F5,KEY_F9]: return
 		if evento.physical_keycode == KEY_TAB: alternar_cursor()
 		if evento.physical_keycode == KEY_H and not contrato.activo: hud.alternar()
 		if evento.physical_keycode == KEY_K and trator_actual==null and drone_actual==null and not contrato.activo: hud.alternar_kit()
-		if evento.physical_keycode == KEY_C and trator_actual==caminhao and not pausado(): caminhao.transferir()
-		if evento.physical_keycode == KEY_C and trator_actual!=null and trator_actual.implemento!=null and trator_actual.implemento.is_in_group("reboques") and not pausado(): trator_actual.implemento.transferir()
+		if evento.physical_keycode == KEY_X and trator_actual==caminhao and not pausado(): caminhao.transferir()
+		if evento.physical_keycode == KEY_X and trator_actual!=null and trator_actual.implemento!=null and trator_actual.implemento.is_in_group("reboques") and not pausado(): trator_actual.implemento.transferir()
 		if evento.physical_keycode == KEY_B and not pausado() and not contrato.activo: reabastecer()
 		if evento.physical_keycode == KEY_R and drone_actual!=null and not pausado(): drone_actual.irrigando = not drone_actual.irrigando
 		if evento.physical_keycode == KEY_F and not pausado() and not contrato.activo: alternar_drone()
@@ -667,13 +728,13 @@ func reabastecer(todas: bool = false) -> void:
 	avisar("Semeadoras reabastecidas · %d MT" % custo)
 
 func comandos_actuais() -> String:
-	if trator_actual==caminhao and caminhao!=null: return "CAMIÃO · WASD conduzir · W+T turbo · E sair parado\nC carregar/entregar · Carga %d/500 · Pare dentro da garagem da empresa" % caminhao.total()
-	if camera.livre: return "CÂMARA LIVRE · WASD mover · Q/E altura · Shift acelerar\nRato olhar · V regressar · L dia/noite · +1 dia avança calendário"
+	if trator_actual==caminhao and caminhao!=null: return "CAMIÃO · WASD conduzir · W+T turbo · E sair parado\nX carregar/entregar · Carga %d/500 · Pare dentro da garagem da empresa" % caminhao.total()
+	if camera.livre: return "CÂMARA LIVRE · WASD mover · Q/E altura · Shift acelerar\nRato olhar · V regressar · L alterna dia/noite"
 	if drone_actual!=null: return "DRONE · WASD voar · Espaço subir · Ctrl descer\nR ligar/desligar irrigação · F devolver"
 	if trator_actual!=null:
 		var texto: String = "TRACTOR · WASD conduzir · W+T turbo\nE sair parado · G engatar/soltar · Espaço ligar máquina"
 		var maquina: Node3D = trator_actual.implemento
-		if maquina!=null and maquina.tipo==4: texto += "\nC carregar / depositar / vender · %d/120 unidades" % maquina.total()
+		if maquina!=null and maquina.tipo==4: texto += "\nX carregar / depositar / vender · %d/120 unidades" % maquina.total()
 		if maquina!=null and maquina.tipo==1: texto += "\nSementes: %d/300 · B abastecer (%d MT)" % [maquina.sementes,maquina.custo_abastecer()]
 		return texto
 	if armazem.perto(): return "GARAGEM · Entre a pé para guardar a colheita\nEntre com carrinha para carregar · E retirar à mão"
@@ -791,3 +852,10 @@ func capturar_logistica() -> void:
 	camera.giro = -0.8; camera.inclinacao = -0.2; camera.distancia = 6
 	await fotografia("sementes-comandos")
 	get_tree().quit()
+
+func sair_guardando() -> void:
+	if partida!=null and partida.iniciada and not partida.guardar(): return
+	get_tree().quit()
+
+func _notification(tipo: int) -> void:
+	if tipo==NOTIFICATION_WM_CLOSE_REQUEST: sair_guardando()

@@ -1,5 +1,6 @@
 extends "res://scripts/player.gd"
 ## Peão com percursos pelo portão; tarefas e contratação ficam em módulos próprios.
+var rotina: RefCounted
 var grupo: bool = false
 var numero: int = 0
 var servico: Dictionary = {}
@@ -27,6 +28,8 @@ var ferramenta_servico: Node3D
 
 func _ready() -> void:
 	aparencia = numero+1
+	roupa = numero%3; perfil = numero%5
+	if numero>=20: idade = "crianca" if numero in [20,24,40,44,48,52,56] else "idoso" if numero%3==0 else "adulto"
 	super._ready()
 	add_to_group("pessoas")
 	balão = mundo.placa(self,Vector3(0,2.25,0),nome)
@@ -93,11 +96,16 @@ func _physics_process(delta: float) -> void:
 	tempo_fala = maxf(0,tempo_fala-delta)
 	balão.visible = global_position.distance_to(mundo.jogador.global_position)<15
 	if tempo_fala<=0: balão.text = nome+(" · "+estado if contratado or grupo else "")
-	if em_conversa: return
+	if em_conversa:
+		if rotina!=null: rotina.suspender()
+		return
+	if rotina!=null and (grupo or contratado): rotina.suspender()
 	if grupo:
 		mundo.equipa_grupo.actualizar(self,delta)
 	elif contratado:
 		mundo.tarefas.actualizar(self,delta)
+	elif rotina!=null:
+		rotina.actualizar(delta)
 	elif not rota.is_empty():
 		if vizinho and pausa_trabalho>0:
 			pausa_trabalho -= delta

@@ -9,7 +9,7 @@ func tecla(codigo: int,pressionada: bool) -> void:
 	var evento: InputEventKey = InputEventKey.new(); evento.physical_keycode = codigo; evento.keycode = codigo; evento.pressed = pressionada; Input.parse_input_event(evento)
 func executar() -> void:
 	mundo = load("res://scripts/main.gd").new(); root.add_child(mundo); mundo.hud.escolher(false)
-	exigir(Vector2(mundo.jogador.position.x,mundo.jogador.position.z).distance_to(Vector2(-8,-37))<0.1,"Início à frente da casa")
+	exigir(Vector2(mundo.jogador.position.x,mundo.jogador.position.z).distance_to(Vector2(-8,-29))<0.1,"Início à frente da casa")
 	exigir(mundo.jogador.bracos.size()==2 and mundo.jogador.maos.size()==2,"Rig masculino completo")
 	var posicao_braco: Vector3 = mundo.jogador.bracos[1].position
 	mundo.hud.escolher(true)

@@ -1,0 +1,78 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+
+OK · Nova sessão começa deitado na cama à noite
+OK · Cônjuge já está na cama no início
+OK · Rosto deitado virado para cima
+OK · Braços interiores em abraço
+OK · Casal deitado próximo com cabeças na mesma cabeceira
+OK · Início acorda na cama sem caminhar pela varanda
+OK · E levanta ao lado da cama no piso superior
+ESCADA · (-12.0, 5.635866, -8.529076)
+OK · Escadas permitem chegar fisicamente ao segundo piso
+OK · Tecto de betão presente na câmara normal
+OK · Elevador sobe e deixa passageiro no patamar
+OK · Elevador desce ao rés-do-chão
+OK · De dia E senta na cama
+OK · Cama mantém repouso até E
+OK · E permite sair da cama de dia
+OK · Dorme de noite e acorda às 06:00 sem sair da cama
+OK · Cônjuge acompanha obrigatoriamente o sono
+OK · E liberta jogador ao acordar
+COMPANHIA MESA · true (9.2, 0.64, 2.0)
+OK · C faz companhia caminhar e sentar à mesa
+OK · Comida real e animação de levar alimento à boca
+OK · Companhia come em conjunto
+OK · Televisão permanece ligada até interrupção
+OK · E interrompe televisão
+OK · Roupeiro muda conjunto visível
+OK · Duche tem água e recupera higiene
+OK · Cortina opaca fecha antes de ligar a água
+OK · C convida cônjuge para duche
+OK · Cortina abre para entrada da companhia e fecha durante banho conjunto
+OK · Água pára antes de abrir cortina para saída
+OK · Sai do duche e pano fica aberto
+OK · Terminar banho restaura roupa
+OK · Sanita utilizável
+CASA ATÉ CARRO · true (16.34987, -0.000062, -27.52418) via (16.6, 0.084669, -28.0)
+OK · C chama do segundo piso até ao automóvel com percurso físico
+OK · Entrar em veículo de dois lugares
+OK · C embarca companhia no banco de passageiro
+OK · Corpo alto conserva pose e banco no veículo
+OK · Condutor e companhia desembarcam sem ficar presos
+OK · Entrar em veículo de dois lugares
+OK · C embarca companhia no banco de passageiro
+OK · Corpo alto conserva pose e banco no veículo
+OK · Condutor e companhia desembarcam sem ficar presos
+OK · Entrar em veículo de dois lugares
+OK · C embarca companhia no banco de passageiro
+OK · Corpo alto conserva pose e banco no veículo
+OK · Condutor e companhia desembarcam sem ficar presos
+OK · Entrar em veículo de dois lugares
+OK · C embarca companhia no banco de passageiro
+OK · Corpo alto conserva pose e banco no veículo
+OK · Condutor e companhia desembarcam sem ficar presos
+OK · Entrar em veículo de dois lugares
+OK · C embarca companhia no banco de passageiro
+OK · Corpo alto conserva pose e banco no veículo
+OK · Condutor e companhia desembarcam sem ficar presos
+OK · Entrar em veículo de dois lugares
+OK · C embarca companhia no banco de passageiro
+OK · Corpo alto conserva pose e banco no veículo
+OK · Condutor e companhia desembarcam sem ficar presos
+OK · Criança não entra em contratos de trabalho
+OK · Criança não entra em contratos de trabalho
+OK · Criança não entra em contratos de trabalho
+OK · Criança não entra em contratos de trabalho
+OK · Criança não entra em contratos de trabalho
+OK · Criança não entra em contratos de trabalho
+OK · Criança não entra em contratos de trabalho
+OK · Comunidade tem idades, alturas e corpos variados
+OK · Opção robusta altera proporções
+OK · Opção de companheira
+OK · Opção de companheiro
+OK · Agricultora tem marido por predefinição
+OK · Agricultor tem esposa por predefinição
+OK · Guarda nova família, roupa, corpo e automóveis
+OK · Retoma conserva personalização e família
+OK · Gravações anteriores continuam válidas
+CASA E FAMÍLIA · PASSOU · 0 falhas

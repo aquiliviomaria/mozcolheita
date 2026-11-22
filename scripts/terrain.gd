@@ -70,6 +70,7 @@ func trabalhar(chave: Vector2i, acao: String, cultura: int = 0, destinatario: No
 		if acao!="lavrar" or not disponivel(chave): return false
 		celulas[chave] = {"estado":SOLO,"cultura":0,"tempo":0.0,"humidade":0.0,"saude":60.0,"familia":""}
 	var dados: Dictionary = celulas[chave]
+	var recolhido: int = 0
 	match acao:
 		"lavrar":
 			if int(dados.estado)!=SOLO: return false
@@ -91,6 +92,7 @@ func trabalhar(chave: Vector2i, acao: String, cultura: int = 0, destinatario: No
 			var familia: String = preload("res://scripts/crop.gd").FAMILIAS[int(dados.cultura)]
 			var repetida: bool = str(dados.familia)==familia
 			var quantidade: int = 3+(-1 if repetida else 1 if not str(dados.familia).is_empty() and float(dados.saude)>=35 else 0)
+			recolhido = maxi(1,quantidade)
 			mundo.missoes.registar(int(dados.cultura),maxi(1,quantidade))
 			if destinatario==null: mundo.receber_colheita(int(dados.cultura),maxi(1,quantidade))
 			else: destinatario.carga[int(dados.cultura)] = int(destinatario.carga.get(int(dados.cultura),0))+maxi(1,quantidade)
@@ -100,6 +102,7 @@ func trabalhar(chave: Vector2i, acao: String, cultura: int = 0, destinatario: No
 			dados.tempo = 0.0
 		_: return false
 	pendente = true
+	if mundo.feedback!=null: mundo.feedback.mostrar(chave,acao,int(dados.cultura),recolhido)
 	return true
 
 func avancar(delta: float) -> void:

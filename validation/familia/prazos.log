@@ -1,0 +1,22 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+
+OK · Urgência aumenta prémio/multa e reduz prazo
+OK · Prazo urgente permite três dias de crescimento
+OK · Entrega parcial contabilizada
+OK · Aviso nos últimos vinte por cento
+OK · Quantidade incompleta no prazo causa multa exacta
+OK · Entrega tardia conserva produtos e não conclui missão
+OK · Multa não se repete
+OK · Falha registada no histórico
+OK · Sucesso recebe pagamento integral e bónus
+OK · Pagamento/bónus únicos após sucesso
+OK · Equipa herda prazo da encomenda
+OK · Falha encerra grupo, devolve reserva e aplica só uma multa
+OK · Serviço individual tem prazo e multa no orçamento
+OK · Serviço expirado devolve trabalho não feito e desconta multa
+OK · Serviço falhado registado
+OK · Saltar dias verifica vencimento imediatamente, mesmo no painel
+OK · Histórico visível no menu H
+OK · Aceleração aplica-se a toda a simulação
+OK · Regresso ao tempo normal
+PRAZOS · PASSOU · falhas: 0

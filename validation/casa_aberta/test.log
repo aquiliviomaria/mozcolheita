@@ -1,0 +1,14 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+
+OK · Porta principal visível e independente das paredes
+OK · Sem cobertura sobre a varanda
+OK · Entrada física pela rampa e porta até ao centro da casa
+OK · Interior visível com ocultação do telhado principal
+OK · Saída física da casa pela mesma porta sem ficar preso
+OK · Telhado principal regressa no exterior
+OK · Paredes laterais mantêm colisão
+OK · Sem painéis auxiliares de estado junto ao mapa
+OK · Condução e ícones do tractor preservados
+OK · Drone continua acessível
+OK · Ícones e lógica de rega preservados
+CASA ABERTA · PASSOU · 0 falhas
