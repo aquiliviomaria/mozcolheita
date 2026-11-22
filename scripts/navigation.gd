@@ -1,11 +1,13 @@
 extends RefCounted
 ## Planeamento local apenas quando um peão perde progresso; o grafo mantém os portões.
 static var ultimo_quadro: int = -1
+static var ultima_pesquisa_ms: int = -1000
 static func contornar(pessoa: CharacterBody3D, alvo: Vector3) -> Array[Vector3]:
-	if ultimo_quadro==Engine.get_physics_frames(): return []
+	if ultimo_quadro==Engine.get_physics_frames() or Time.get_ticks_msec()-ultima_pesquisa_ms<150: return []
+	ultima_pesquisa_ms = Time.get_ticks_msec()
 	ultimo_quadro = Engine.get_physics_frames()
 	const PASSO: float = 1.25
-	const RAIO: int = 18
+	const RAIO: int = 9
 	var grelha: AStarGrid2D = AStarGrid2D.new()
 	grelha.region = Rect2i(-RAIO,-RAIO,RAIO*2+1,RAIO*2+1)
 	grelha.cell_size = Vector2.ONE*PASSO

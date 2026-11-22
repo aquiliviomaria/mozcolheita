@@ -4,7 +4,8 @@ const EMPRESAS: Array[String] = ["Tomates do Zambeze","Moageira Nhamatanda","Hor
 const CULTURAS: Array[int] = [0,1,2]
 const QUANTIDADES: Array[int] = [120,100,80]
 const DIAS: Array[int] = [8,6,4]
-const PERFIS: Array[String] = ["Pequena · primeiro cliente","Regular · produção habitual","Grande · organizar equipa"]
+const VALORES: Array[int] = [10000,50000,100000,250000,500000]
+const PERFIS: Array[String] = ["10.000 MT · pequena","50.000 MT · regular","100.000 MT · grande","250.000 MT · industrial","500.000 MT · grande produção"]
 var reputacao: Array[int] = [0,0,0]
 var mundo: Node3D
 var activas: Dictionary = {}
@@ -17,18 +18,15 @@ func custo_equipa(quantidade: int,trabalhadores: int) -> int:
 	for tarifa: int in [6,4,2,8]: tarifas += ceili(tarifa*1.18)
 	return parcelas*(tarifas+2)+quantidade*ceili(5*1.18)+trabalhadores*12
 func oferta(fabrica: int,urgencia: int = 0,perfil: int = 1) -> Dictionary:
-	var nivel: int = clampi(urgencia,0,2); var tipo: int = clampi(perfil,0,2); var cultura: int = CULTURAS[fabrica]
-	var quantidade: int = ceili(QUANTIDADES[fabrica]*[0.35,1.0,2.0][tipo])
+	var nivel: int = clampi(urgencia,0,2); var tipo: int = clampi(perfil,0,4); var cultura: int = CULTURAS[fabrica]
+	var quantidade: int = ceili(QUANTIDADES[fabrica]*[0.35,1.0,2.0,4.0,8.0][tipo])
 	var trabalhadores: int = clampi(ceili(quantidade/50.0),1,10)
 	var custo: int = custo_equipa(quantidade,trabalhadores)
-	var preco: int = ceili(mundo.economia.preco(fabrica,cultura)*(1.0+nivel*0.3)*[0.95,1.0,1.12][tipo])
 	var bonus: int = quantidade*(5+nivel*3)
-	# A encomenda cobre a equipa normal recomendada e deixa margem para progredir.
-	preco = maxi(preco,ceili((custo*1.25-bonus)/quantidade))
-	preco = ceili(preco*(1+minf(0.15,reputacao[fabrica]*0.002)))
-	var recompensa: int = quantidade*preco+bonus
-	var dias: float = maxf(4,DIAS[nivel]*[0.75,1.0,1.5][tipo])
-	return {"perfil":tipo,"cultura":cultura,"quantidade":quantidade,"preco":preco,"bonus":bonus,"recompensa":recompensa,"prazo":dias*preload("res://scripts/calendar.gd").SEGUNDOS_DIA,"penalidade":ceili(recompensa*(0.15+nivel*0.12)),"urgencia":nivel,"estimativa":custo,"trabalhadores":trabalhadores}
+	var recompensa: int = roundi(VALORES[tipo]*[1.0,1.25,1.5][nivel]*(1+minf(0.15,reputacao[fabrica]*0.002)))
+	var preco: int = maxi(1,(recompensa-bonus)/quantidade); bonus = recompensa-preco*quantidade
+	var dias: float = maxf(4,DIAS[nivel]*[0.75,1.0,1.5,2.0,3.0][tipo])
+	return {"perfil":tipo,"cultura":cultura,"quantidade":quantidade,"preco":preco,"bonus":bonus,"recompensa":recompensa,"prazo":dias*preload("res://scripts/calendar.gd").SEGUNDOS_DIA,"penalidade":recompensa*2,"urgencia":nivel,"estimativa":custo,"trabalhadores":trabalhadores}
 func aceitar(fabrica: int,urgencia: int = 0,perfil: int = 1) -> bool:
 	if fabrica<0 or fabrica>=3: return false
 	verificar_prazos()
@@ -58,13 +56,20 @@ func verificar_prazos() -> void:
 		if bool(p.concluida) or bool(p.falhou): continue
 		var restante: float = float(p.limite)-mundo.calendario.decorrido
 		if restante<=0:
-			p.falhou = true; mundo.saldo -= int(p.penalidade)
-			reputacao[fabrica] = maxi(0,reputacao[fabrica]-2-int(p.urgencia))
-			historico.append({"id":p.id,"empresa":EMPRESAS[fabrica],"estado":"Falhou · quebra de contrato","entregue":p.entregue,"quantidade":p.quantidade,"penalidade":p.penalidade,"dia":mundo.calendario.dia()})
-			if mundo.equipa_grupo!=null and not mundo.equipa_grupo.plano.is_empty() and int(mundo.equipa_grupo.plano.id)==int(p.id): mundo.equipa_grupo.terminar("Encomenda vencida · equipa encerrada")
-			mundo.avisar("QUEBRA DE CONTRATO · %s · -%d MT" % [EMPRESAS[fabrica],p.penalidade])
+			quebrar(fabrica,"Falhou · atraso")
 		elif restante<=float(p.prazo)*0.2 and not bool(p.avisado):
 			p.avisado = true; mundo.avisar("PRAZO A TERMINAR · %s · faltam %s" % [EMPRESAS[fabrica],mundo.calendario.restante(restante)])
+func quebrar(fabrica: int,motivo: String) -> bool:
+	if not activas.has(fabrica): return false
+	var p: Dictionary = activas[fabrica]
+	if bool(p.concluida) or bool(p.falhou): return false
+	p.falhou = true; p.cancelada = motivo.contains("Cancelado"); mundo.saldo -= int(p.penalidade)
+	reputacao[fabrica] = maxi(0,reputacao[fabrica]-2-int(p.urgencia))
+	historico.append({"id":p.id,"empresa":EMPRESAS[fabrica],"estado":motivo,"entregue":p.entregue,"quantidade":p.quantidade,"penalidade":p.penalidade,"dia":mundo.calendario.dia()})
+	if mundo.equipa_grupo!=null and not mundo.equipa_grupo.plano.is_empty() and int(mundo.equipa_grupo.plano.id)==int(p.id): mundo.equipa_grupo.terminar("Encomenda encerrada · quebra de contrato")
+	mundo.avisar("QUEBRA DE CONTRATO · %s · -%d MT" % [EMPRESAS[fabrica],p.penalidade]); return true
+func cancelar(fabrica: int) -> bool:
+	verificar_prazos(); return quebrar(fabrica,"Cancelado · quebra de contrato")
 func _process(_delta: float) -> void:
 	if mundo.hud!=null and not mundo.pausado(): verificar_prazos()
 func resumo() -> String:
@@ -76,12 +81,12 @@ func resumo() -> String:
 func descricao(fabrica: int,urgencia: int = 0,perfil: int = 1) -> String:
 	if activas.has(fabrica):
 		var p: Dictionary = activas[fabrica]
-		if not bool(p.concluida) and not bool(p.falhou): return "%s · %d/%d · faltam %s\n%d MT/un. + %d MT bónus · multa por atraso: %d MT" % [EMPRESAS[fabrica],p.entregue,p.quantidade,mundo.calendario.restante(float(p.limite)-mundo.calendario.decorrido),p.preco,p.bonus,p.penalidade]
+		if not bool(p.concluida) and not bool(p.falhou): return "%s · %d/%d · faltam %s\n%d MT/un. + %d MT bónus · multa atraso/cancelamento: %d MT" % [EMPRESAS[fabrica],p.entregue,p.quantidade,mundo.calendario.restante(float(p.limite)-mundo.calendario.decorrido),p.preco,p.bonus,p.penalidade]
 	var p: Dictionary = oferta(fabrica,urgencia,perfil)
 	var distancia: float = INF
 	for filial: Node3D in mundo.fabricas:
 		if filial.numero==fabrica: distancia = minf(distancia,mundo.jogador.position.distance_to(filial.position))
-	return "%s · %d %s · %s\nRecebe %d MT · multa %d MT · prazo %s\nEquipa estimada: %d MT / %d pessoas · margem estimada %d MT\nGaragem mais próxima: %d m · reputação %d/100" % [EMPRESAS[fabrica],p.quantidade,preload("res://scripts/crop.gd").NOMES[int(p.cultura)],PERFIS[int(p.perfil)],p.recompensa,p.penalidade,mundo.calendario.restante(p.prazo),p.estimativa,p.trabalhadores,int(p.recompensa)-int(p.estimativa),roundi(distancia),reputacao[fabrica]]
+	return "%s · %d %s · %s\nRecebe %d MT · multa 2×: %d MT · prazo %s\nEquipa estimada: %d MT / %d pessoas · margem estimada %d MT\nGaragem mais próxima: %d m · reputação %d/100" % [EMPRESAS[fabrica],p.quantidade,preload("res://scripts/crop.gd").NOMES[int(p.cultura)],PERFIS[int(p.perfil)],p.recompensa,p.penalidade,mundo.calendario.restante(p.prazo),p.estimativa,p.trabalhadores,int(p.recompensa)-int(p.estimativa),roundi(distancia),reputacao[fabrica]]
 
 func texto_historico() -> String:
 	var texto: String = "ENCOMENDAS · HISTÓRICO GUARDADO\n"

@@ -223,7 +223,7 @@ func criar_painel() -> void:
 	for i: int in range(3):
 		var indice: int = i
 		var descricao_entrega: Label = legenda(entregas_pagina,mundo.entregas.descricao(i),13); descricao_entrega.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; descricoes_entregas.append(descricao_entrega)
-		botao(entregas_pagina,"Aceitar encomenda · "+mundo.entregas.EMPRESAS[i],func() -> void: mundo.entregas.aceitar(indice,urgencia_entrega.selected,perfil_entrega.selected),["tomate","milho","couve"][i])
+		botao(entregas_pagina,"Aceitar encomenda · "+mundo.entregas.EMPRESAS[i],func() -> void: mundo.central_logistica.propor(indice,urgencia_entrega.selected,perfil_entrega.selected),["tomate","milho","couve"][i])
 	legenda(entregas_pagina,"Estimativa com equipa normal; reveja o orçamento real em Grupo.\nTrabalho manual permite poupar. X carrega; pare dentro da garagem para entregar.",13)
 	var grupo: VBoxContainer = pagina("Grupo","interagir")
 	legenda(grupo,"EQUIPA PARA UMA ENCOMENDA",19)

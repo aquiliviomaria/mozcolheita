@@ -25,6 +25,7 @@ O projecto combina aprendizagem sobre agricultura e gestão com desafios de prod
 - [Guardar e continuar](#guardar-e-continuar)
 - [Organização técnica](#organização-técnica)
 - [Verificar e contribuir](#verificar-e-contribuir)
+- [Desempenho](#desempenho)
 - [Ficheiros e Git](#ficheiros-e-git)
 - [Limitações e próximos passos](#limitações-e-próximos-passos)
 
@@ -51,7 +52,7 @@ MOZCOLHEITA_GODOT=/caminho/para/godot ./Jogar.sh
 3. Escolhe a cultura em **H → Culturas**. Usa a **semeadora manual** e depois o **regador**.
 4. A primeira rega inicia o crescimento. Espera **três dias completos de jogo** desde essa rega.
 5. Quando estiver maduro, selecciona **mãos livres** e colhe. Os produtos vão para a sacola, com som, partículas e indicação da quantidade.
-6. Guarda a produção no armazém ou transporta-a para uma fábrica. Consulta **H → Entregas** antes de assumir uma encomenda.
+6. Guarda a produção no centro logístico, escolhe produto e quantidade para carregar e indica a fábrica de destino. Abre **M** para consultar e aceitar encomendas antes de produzir ou viajar.
 7. Começa por encomendas pequenas. Aumenta a produção e contrata ajuda quando conseguires coordenar sementes, espaço de carga e prazo.
 
 Para uma primeira experiência, prepara poucos canteiros e completa um ciclo inteiro. Depois experimenta executar as mesmas tarefas com tractor e máquinas.
@@ -133,13 +134,23 @@ Corações representam vida; talheres representam alimentação (**100 = saciado
 | Automóveis familiares | 2; 2 lugares cada | Conduzir e viajar com companhia. |
 | Drones agrícolas | 3 | Voo remoto e irrigação. O agricultor permanece no local de lançamento. |
 
-Um **indicador verde** assinala o equipamento disponível. Aproxima o tractor, pára e usa **G** para engatar/soltar. **Espaço** liga/desliga a máquina. **W + T** activa turbo e **Ctrl** trava. O condutor fica visível no veículo.
+Um **indicador verde** assinala o equipamento disponível. Aproxima o tractor, pára e usa **G** para engatar/soltar. **Espaço** liga/desliga a máquina. **W + T** activa turbo e **Ctrl** trava. O condutor fica visível no veículo. Ao pilotar o drone com F, o agricultor permanece no chão com um comando de duas mãos, ecrã e antenas; ao devolver o drone, recolhe o comando e retoma a ferramenta.
 
 Cada semeadora tem depósito de **300 sementes**. **B** repõe as sementes em falta a **2 MT por unidade**; H → Mercado permite abastecer máquinas dos funcionários. Contratos individuais não compram sementes silenciosamente.
 
-A garagem/armazém tem duas portas automáticas. Entrar carregado deposita os produtos. Sair conserva o stock. Depois, uma nova entrada com carrinha ou camião vazio carrega produtos até à capacidade; excedentes ficam guardados. **X** permite transferências com o veículo parado. Caixas abertas mostram os produtos e as quantidades reais.
+O **centro logístico fica fora da quinta**, em **(-205, 25)**, e mede **50 × 64 m**, com 12 m de altura, duas portas de carga, estantes e caixas abertas que mostram os produtos e quantidades. A entrada tem segurança, posto de vigilância e cancela física com sinalização. O acesso liga-se à rede de estradas. O antigo galpão também foi afastado para um anexo em **(-250, 41)**; as máquinas continuam disponíveis no parque da quinta.
 
-Faróis de carros, tractores e camião e luzes dos drones acendem automaticamente à noite. Os ícones de condução aparecem apenas ao conduzir/pilotar, com a tecla no centro de cada ícone. O HUD mantém vida, alimentação, energia, saldo, logótipo e minimapa; ferramentas e missões ficam nos painéis K/H.
+1. Entrar com colheita deposita os produtos no stock. Sair conserva o que ficou guardado.
+2. Uma nova entrada com transporte vazio abre a escolha de **produto e quantidade**. Também podes usar E a pé ou X com transporte parado junto ao armazém.
+3. O carregamento respeita o stock e a capacidade; os outros produtos e excedentes ficam guardados.
+4. Depois de carregar, surge a escolha da **sede ou filial** que aceita o produto. A seta e o minimapa passam a guiar para esse local.
+5. Podes consultar e aceitar uma missão com **M** antes de carregar ou partir. O carregamento não aceita contratos automaticamente.
+
+![Escolha de produto e quantidade no centro logístico](preview/logistica_v2/escolher-carga.png)
+
+![Escolha do local de entrega](preview/logistica_v2/escolher-destino.png)
+
+Faróis de carros, tractores e camião e luzes dos drones acendem automaticamente à noite. Os ícones de condução aparecem apenas ao conduzir/pilotar, com a tecla no centro de cada ícone. O HUD mantém vida, alimentação, energia, saldo, logótipo, minimapa e um botão compacto **M · MISSÕES** no canto superior. Ferramentas ficam em K; a gestão detalhada continua em H.
 
 ## Missões, empresas e contratação
 
@@ -147,22 +158,27 @@ Faróis de carros, tractores e camião e luzes dos drones acendem automaticament
 
 A meta inicial de produção é **colher 500 tomates**, com recompensa de **15.000 MT**. Existem metas seguintes para outras culturas. É contada a colheita real, incluindo a produção dos trabalhadores.
 
-Em **H → Entregas**, escolhe o tamanho da encomenda e a urgência. Antes de aceitar, consulta quantidade, prazo, recompensa, multa, estimativa de equipa, margem e distância aproximada. A estimativa não substitui o orçamento real de contratação.
+Em **M** ou **H → Entregas**, escolhe o valor da encomenda e a urgência. Antes de aceitar, consulta quantidade, prazo, recompensa, multa, estimativa de equipa, margem e distância aproximada e confirma o diálogo do contrato. A estimativa não substitui o orçamento real de contratação.
 
 | Empresa | Produtos aceites | Garagem principal (X, Z) |
 |---|---|---|
-| Tomates do Zambeze | Tomate | (-60, 110) |
-| Moageira Nhamatanda | Milho | (0, 110) |
-| Hortícolas Maputo | Couve e cenoura; encomendas de couve | (60, 110) |
+| Tomates do Zambeze | Tomate | (-235, 315) |
+| Moageira Nhamatanda | Milho | (-20, -175) |
+| Hortícolas Maputo | Couve e cenoura; encomendas de couve | (235, 315) |
 
-Há também filiais: **seis locais de entrega**, correspondentes a três empresas. Com mercadoria compatível, uma seta e o minimapa indicam o caminho, dando prioridade às encomendas activas. Conduz o camião para dentro da garagem e pára para entregar.
+Há também filiais: **seis locais de entrega**, correspondentes a três empresas. As fábricas medem **48 × 56 m**, têm 12 m de altura, armazéns laterais, garagem com porta física, cancela e segurança na entrada. Ficam afastadas da quinta e têm acessos por estrada. Com mercadoria compatível, uma seta e o minimapa indicam o caminho, respeitando o destino escolhido; sem escolha explícita, dá prioridade às encomendas activas. Conduz o camião para dentro da garagem e pára para entregar.
 
-Encomendas regulares têm prazos base de **8/6/4 dias**, conforme a urgência. Pequenas e grandes ajustam o prazo, com mínimo de quatro dias; o valor exacto aparece na oferta. Maior urgência aumenta recompensa e penalização. O preço aceite fica fixado.
+Os cinco valores base são **10.000, 50.000, 100.000, 250.000 e 500.000 MT**. Prioridade e urgência acrescentam 25% ou 50%; a reputação pode melhorar ofertas futuras até 15%. O valor final aparece antes da confirmação e fica fixado no contrato. As quantidades aumentam com o nível; encomendas maiores podem exigir várias viagens.
 
-- Entregas parciais pagam as unidades aceites. Completar a quantidade a tempo paga o bónus e melhora a reputação.
+Os prazos base por urgência são **8/6/4 dias**, ajustados ao nível da encomenda, com mínimo de quatro dias para permitir o crescimento das culturas. Consulta sempre o prazo exacto apresentado.
+
+- Entregas parciais pagam as unidades aceites. Completar a quantidade a tempo paga o restante e o bónus, perfazendo o valor aprovado.
 - Ao chegar aos últimos 20% do prazo, aparece um aviso temporário.
-- Falhar o prazo quebra o contrato e desconta a multa aprovada **uma única vez**. O saldo pode ficar negativo.
-- Sucessos e falhas ficam em **H → Histórico**. A reputação altera os preços de ofertas futuras e é guardada.
+- **Atrasar ou cancelar uma nova encomenda aceite cobra uma indemnização de duas vezes o valor total do contrato**, uma única vez. Exemplo: contrato de 50.000 MT → multa de 100.000 MT. O saldo pode ficar negativo.
+- O cancelamento em M exige confirmação com a multa visível. A encomenda fica encerrada e a equipa associada termina; a reserva de trabalho não executado é devolvida pelas regras de contratação.
+- Sucessos, atrasos e cancelamentos ficam em **H → Histórico**. A reputação e os termos aprovados são guardados. Contratos de gravações antigas conservam os termos que já tinham sido acordados.
+
+![Painel M de missões e valores](preview/logistica_v2/missoes-m.png)
 
 ### Contratar pessoas
 
@@ -189,6 +205,7 @@ O pagamento varia com tarefa, quantidade, dificuldade e procura. A proposta disc
 | B | Abastecer semeadora próxima ou engatada. |
 | F | Assumir/devolver drone. |
 | WASD / Espaço / Ctrl / R no drone | Voar / subir / descer / ligar-desligar irrigação. |
+| M | Abrir/fechar missões; rever, aceitar e cancelar encomendas. |
 | H | Gestão: culturas, equipa, mercado, entregas, grupo, histórico e controlos. |
 | J | Comer produto fora da mesa. |
 | L | Alternar noite e manhã seguinte. |
@@ -212,7 +229,7 @@ Casas da comunidade e átrios dos prédios têm portas automáticas; os andares 
 
 **Cinco opções de corpo** no menu e em H → Família: médio, alto, baixo, robusto e magro. A escolha é guardada e mantém-se nas poses domésticas e nos veículos. A comunidade inclui crianças, adultos e idosos, com alturas, volumes, roupas e tons de pele diferentes; os idosos têm cabelo grisalho e traços próprios. As crianças não são contratáveis. Duas pessoas fazem actividades de manutenção de ambiente junto à quinta; a produção efectiva continua a depender do jogador ou dos contratos.
 
-Agricultor e agricultora seguem o estilo do logótipo: pele castanha, roupa creme e verde, bandeira de Moçambique e botas. O agricultor usa chapéu de palha; a agricultora tem lenço, brincos e tecido inspirado na capulana. Partilham controlador e rig, com animações procedurais de caminhada, corrida, plantio, rega, colheita, transporte, condução e interacções domésticas. Há ambiente sonoro rural e conversas simples entre NPCs/jogador.
+Agricultor e agricultora seguem o estilo do logótipo: pele castanha, roupa creme e verde e botas, sem bandeiras ou distintivos nacionais nas roupas. O agricultor usa chapéu de palha; a agricultora tem lenço, brincos e tecido inspirado na capulana. Partilham controlador e rig, com animações procedurais de caminhada, corrida, plantio, rega, colheita, transporte, condução e interacções domésticas. Há ambiente sonoro rural e conversas simples entre NPCs/jogador.
 
 ![Vizinho a regar na sua quinta](preview/rotinas/vizinho-a-regar.png)
 
@@ -252,11 +269,11 @@ Não são necessários plugins nativos. `main.tscn` inicia a composição dos si
 | Rotinas da comunidade | `community_routine.gd`, `npc.gd` |
 | Televisão | `television.gd`, `tv_program.gd`, `tv_news.gd` |
 | Veículos e máquinas | `tractor.gd`, `car.gd`, `truck.gd`, `trailer.gd`, `implement.gd`, `drone.gd` |
-| Arte e entradas dos veículos | `vehicle_art.gd`, `vehicle_lights.gd`, `input_drive.gd` |
-| Economia e objectivos | `economy.gd`, `missions.gd`, `deliveries.gd` |
+| Arte e entradas dos veículos | `vehicle_art.gd`, `vehicle_lights.gd`, `input_drive.gd`, `drone_remote.gd` |
+| Economia e objectivos | `economy.gd`, `missions.gd`, `deliveries.gd`, `logistics_ui.gd` |
 | Trabalhadores | `npc.gd`, `contract.gd`, `crew.gd`, `tasks.gd`, `navigation.gd` |
 | Comunidade e acessos | `community.gd`, `world_details.gd`, `traffic.gd`, `residence.gd`, `layout.gd` |
-| Armazém e empresas | `warehouse.gd`, `factory.gd`, `produce_crate.gd` |
+| Armazém e empresas | `warehouse.gd`, `factory.gd`, `industrial_sites.gd`, `industrial_gate.gd`, `industrial_art.gd`, `produce_crate.gd` |
 | Interface | `hud.gd`, `driving_hud.gd`, `minimap.gd`, `delivery_route.gd` |
 | Persistência | `persistence.gd` |
 
@@ -286,6 +303,9 @@ Executa os comandos a partir da raiz. Os testes alteram a sessão de teste; test
 ./Jogar.sh --headless --script validation/familia/test.gd
 ./Jogar.sh --headless --script validation/elevador/test.gd
 
+# Centro logístico, contratos em dobro e escolha de carga
+./Jogar.sh --headless --script validation/logistica_v2/test.gd
+
 # Rotinas dos moradores e telejornal dinâmico
 ./Jogar.sh --headless --script validation/rotinas/test.gd
 ./Jogar.sh --headless --script validation/telejornal/test.gd
@@ -299,9 +319,27 @@ Cada teste escreve o resultado no terminal e termina com código de saída zero 
 ./Jogar.sh --script validation/familia/capture_duche.gd
 ./Jogar.sh --script validation/elevador/capture.gd
 ./Jogar.sh --script validation/rotinas/capture.gd
+./Jogar.sh --script validation/logistica_v2/capture.gd
 ```
 
 Ao alterar um sistema: mantém GDScript tipado, usa as acções comuns do terreno/economia/calendário, preserva a compatibilidade da gravação, executa as verificações relevantes e actualiza esta documentação. Para elementos visuais, revê capturas do jogo além do arranque headless.
+
+## Desempenho
+
+As optimizações mantêm as rotinas e a produção, reduzindo trabalho fora do campo de visão:
+
+- Tráfego de ambiente acompanha a altura da estrada sem resolver contactos com o chão a cada ciclo. Mantém movimento com colisão contra actores/veículos e um sensor frontal de obstáculos a intervalos curtos. O controlador dos veículos conduzidos pelo jogador mantém a física própria.
+- NPCs livres distantes tomam decisões a intervalos de 0,2–0,5 s. Contratados, equipas e pessoas próximas conservam actualizações completas. Personagens invisíveis dispensam animações dos membros.
+- Percursos directos livres evitam criar grafos desnecessários. O desvio local tem grelha menor e orçamento partilhado entre pesquisas.
+- Culturas das quintas vizinhas usam modelos detalhados de perto e silhuetas de folhas à distância. Malhas de corpos são reutilizadas; pequenas superfícies têm menos polígonos.
+- Paredes e decoração estática dos edifícios industriais são agrupadas por material em MultiMesh, mantendo colisores e portas móveis separados.
+
+No ensaio de 60 ciclos dos mesmos **20 veículos**, o controlador antigo gastou cerca de **29,7 ms/ciclo**, contra **0,53 ms/ciclo** do controlador optimizado. É uma medição de CPU dessa componente em headless, não uma promessa de FPS em todas as máquinas. Para reproduzir:
+
+```sh
+./Jogar.sh --headless --script validation/logistica_v2/traffic_benchmark.gd
+./Jogar.sh --headless --script validation/logistica_v2/performance.gd
+```
 
 ## Ficheiros e Git
 

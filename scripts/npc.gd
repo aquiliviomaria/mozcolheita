@@ -1,5 +1,7 @@
 extends "res://scripts/player.gd"
 ## Peão com percursos pelo portão; tarefas e contratação ficam em módulos próprios.
+var passo_distante: bool = false
+var acumulado_lod: float = 0
 var rotina: RefCounted
 var grupo: bool = false
 var numero: int = 0
@@ -84,15 +86,28 @@ func caminhar(destino: Vector3, delta: float, alcance: float = 0.7) -> bool:
 			if preload("res://scripts/layout.gd").distancia(desvio_local.back(),proximo)>1.4: desvio_local.append(proximo)
 			desvio_local.append_array(restantes); percurso = desvio_local
 		tempo_preso = 0; intervalo_desvio = 3.0
-	move_and_slide()
+	if passo_distante:
+		move_and_collide(Vector3(velocity.x,0,velocity.z)*delta)
+		global_position.y = mundo.altura(global_position)+0.08
+	else: move_and_slide()
 	visual.rotation.y = lerp_angle(visual.rotation.y,atan2(-direccao.x,-direccao.z),minf(1,delta*8))
 	animar(delta,2.0)
 	return false
 
+func animar(delta: float,andamento: float,sentado: bool = false) -> void:
+	if is_instance_valid(visual) and visual.visible: super.animar(delta,andamento,sentado)
+
 func _physics_process(delta: float) -> void:
 	if mundo.hud==null or mundo.pausado(): return
-	var observador: Vector3 = mundo.camera.camara.global_position if mundo.camera.livre else mundo.jogador.global_position
-	visual.visible = global_position.distance_squared_to(observador)<85*85
+	var observador: Vector3 = mundo.camera.camara.global_position
+	var distancia2: float = global_position.distance_squared_to(observador)
+	visual.visible = distancia2<100*100
+	passo_distante = distancia2>90*90 and not contratado and not grupo and not em_conversa
+	if passo_distante:
+		acumulado_lod += delta
+		if acumulado_lod < (0.5 if distancia2>200*200 else 0.2): return
+		delta = acumulado_lod; acumulado_lod = 0
+	else: acumulado_lod = 0
 	tempo_fala = maxf(0,tempo_fala-delta)
 	balão.visible = global_position.distance_to(mundo.jogador.global_position)<15
 	if tempo_fala<=0: balão.text = nome+(" · "+estado if contratado or grupo else "")

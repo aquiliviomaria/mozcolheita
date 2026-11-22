@@ -17,6 +17,7 @@ var drone_actual: Node3D
 var contrato: Node
 var tarefas: Node
 var missoes: Node
+var central_logistica: CanvasLayer
 var armazem: Node3D
 var fabricas: Array[Node3D] = []
 var economia: Node
@@ -175,6 +176,7 @@ func _ready() -> void:
 	hud = sistema(Hud) as CanvasLayer
 	get_tree().auto_accept_quit = false
 	guia_entrega = sistema(preload("res://scripts/delivery_route.gd")) as CanvasLayer
+	central_logistica = sistema(preload("res://scripts/logistics_ui.gd")) as CanvasLayer
 	painel_conducao = preload("res://scripts/driving_hud.gd").new(); painel_conducao.mundo = self; hud.raiz.add_child(painel_conducao)
 	if "--capturar-logistica" in OS.get_cmdline_user_args(): capturar_logistica.call_deferred()
 	if "--teste-logistica" in OS.get_cmdline_user_args(): testar_logistica.call_deferred()
@@ -209,12 +211,13 @@ func altura(ponto: Vector3) -> float:
 
 func criar_edificios() -> void:
 	var galpao: Node3D = Node3D.new()
-	galpao.position = Vector3(-42,altura(Vector3(-42,0,40)),40)
+	galpao.position = preload("res://scripts/industrial_sites.gd").GALPAO; galpao.position.y = altura(galpao.position)
 	add_child(galpao)
 	for lado: float in [-1.0,1.0]: caixa(galpao,Vector3(lado*15,2.8,0),Vector3(0.3,5.6,22),Color("998b71"),true)
 	caixa(galpao,Vector3(0,2.8,11),Vector3(30,5.6,0.3),Color("998b71"),true)
 	caixa(galpao,Vector3(0,5.8,0),Vector3(31,0.25,23),Color("52645e"),true)
-	placa(galpao,Vector3(0,6.5,-11),"GALPÃO")
+	placa(galpao,Vector3(0,6.5,-11),"ANEXO LOGÍSTICO")
+	preload("res://scripts/industrial_art.gd").compactar(galpao,[])
 
 func criar_maquinas() -> void:
 	for indice: int in range(3):
@@ -304,11 +307,7 @@ func interagir() -> void:
 	if casa!=null and casa.vida_domestica.interagir(): return
 	for fabrica: Node3D in fabricas:
 		if fabrica.perto(): entregas.entregar(sacola,fabrica.numero); economia.vender(sacola,fabrica.numero); return
-	if armazem!=null and armazem.perto():
-		var carga: Dictionary = retirar_stock()
-		for cultura_id: int in carga: sacola[cultura_id] = int(sacola.get(cultura_id,0))+int(carga[cultura_id])
-		avisar("Carga recolhida. Leve-a a uma fábrica e prima E.")
-		return
+	if armazem!=null and armazem.perto(): armazem.solicitar_carga(); return
 	var pessoa: Node3D = pessoa_proxima()
 	if pessoa!=null:
 		if not pessoa.contratado: contrato.iniciar(pessoa)
@@ -336,7 +335,7 @@ func dinheiro() -> int:
 	return saldo
 
 func pausado() -> bool:
-	return hud==null or hud.selecao.visible or hud.aberto or hud.kit_aberto
+	return hud==null or hud.selecao.visible or hud.aberto or hud.kit_aberto or (central_logistica!=null and central_logistica.aberto)
 
 func receber_colheita(cultura: int, quantidade: int) -> void:
 	sacola[cultura] = int(sacola.get(cultura,0))+quantidade
@@ -358,7 +357,7 @@ func dica() -> String:
 		return "G · Acoplar "+maquina.NOMES[maquina.tipo]+"   E · Sair" if maquina!=null else "WASD · Conduzir   E · Sair do tractor"
 	for fabrica: Node3D in fabricas:
 		if fabrica.perto(): return "E · Vender carga à fábrica "+["A","B","C"][fabrica.numero]
-	if armazem!=null and armazem.perto(): return "E · Recolher produtos para entrega   H · Stock e sementes"
+	if armazem!=null and armazem.perto(): return "E · Escolher produto e quantidade   M · Missões"
 	if pessoa_proxima()!=null: return "E · Conversar / contratar"
 	if trator_proximo()!=null: return "E · Entrar no tractor"
 	if ferramentas==null: return ""
@@ -394,6 +393,14 @@ func _unhandled_input(evento: InputEvent) -> void:
 	if hud==null: return
 	if hud.selecao.visible:
 		if evento is InputEventKey and evento.pressed and not evento.echo and evento.physical_keycode==KEY_F9: partida.carregar()
+		return
+	if evento is InputEventKey and evento.pressed and not evento.echo and evento.physical_keycode==KEY_M and not contrato.activo:
+		central_logistica.alternar_missoes(); return
+	if central_logistica!=null and central_logistica.aberto:
+		if evento is InputEventKey and evento.pressed:
+			if evento.physical_keycode==KEY_ESCAPE: central_logistica.fechar()
+			elif evento.physical_keycode==KEY_F5: partida.guardar()
+			elif evento.physical_keycode==KEY_F9: central_logistica.fechar(); partida.carregar()
 		return
 	if casa!=null and casa.vida_domestica.ocupado():
 		casa.vida_domestica.entrada(evento); return
@@ -551,9 +558,9 @@ func testar() -> void:
 	verificar(not reboque.acoplar(tractor_teste),"Volume bloqueado impede engate")
 	bloqueio.free(); await get_tree().physics_frame
 	verificar(reboque.acoplar(tractor_teste),"Carrinha acopla após libertar espaço")
-	reboque.carregar({0:7}); tractor_teste.position = Vector3(32,altura(Vector3(32,0,18)),18)
+	reboque.carregar({0:7}); tractor_teste.position = armazem.ENTREGA; jogador.position = tractor_teste.position
 	verificar(reboque.transferir()==7 and int(stock.get(0,0))==7,"Carrinha deposita no armazém")
-	reboque.carregar({1:8}); tractor_teste.position = Vector3(0,altura(Vector3(0,0,102)),102)
+	reboque.carregar({1:8}); tractor_teste.position = preload("res://scripts/industrial_sites.gd").entrada(1); jogador.position = tractor_teste.position
 	verificar(reboque.transferir()>0 and reboque.total()==0 and reboque.transferir()==0,"Carrinha vende sem duplicação")
 	reboque.soltar()
 	testar_contratos()
@@ -737,7 +744,7 @@ func comandos_actuais() -> String:
 		if maquina!=null and maquina.tipo==4: texto += "\nX carregar / depositar / vender · %d/120 unidades" % maquina.total()
 		if maquina!=null and maquina.tipo==1: texto += "\nSementes: %d/300 · B abastecer (%d MT)" % [maquina.sementes,maquina.custo_abastecer()]
 		return texto
-	if armazem.perto(): return "GARAGEM · Entre a pé para guardar a colheita\nEntre com carrinha para carregar · E retirar à mão"
+	if armazem.perto(): return "ARMAZÉM · Entre com colheita para guardar\nE escolhe produto e quantidade · M missões"
 	for maquina: Node3D in implementos:
 		if maquina.tipo==1 and preload("res://scripts/layout.gd").distancia(jogador.position,maquina.position)<5:
 			return "SEMEADORA · %d/300 sementes\nB abastecer · %d MT · G engata com tractor parado" % [maquina.sementes,maquina.custo_abastecer()]
@@ -750,43 +757,23 @@ func testar_logistica() -> void:
 	verificar(carrinhas.size()==3 and fabricas.size()>=6,"Três carrinhas e seis garagens de fábricas")
 	for fabrica_teste: Node3D in fabricas: verificar(not preload("res://scripts/layout.gd").dentro(fabrica_teste.position),"Fábrica fora da quinta")
 	stock.clear(); sacola = {0:80,1:70}
-	jogador.position = Vector3(32,altura(Vector3(32,0,35)),35)
-	armazem.actualizar(1)
-	verificar(sacola.is_empty() and int(stock[0])+int(stock[1])==150,"Entrada a pé deposita colheita")
-	jogador.position = Vector3(5,altura(Vector3(5,0,5)),5); armazem.actualizar(1)
-	verificar(armazem.portas[0].position.y==3 and armazem.portas[1].position.y==3 and int(stock[0])+int(stock[1])==150,"Portas fecham sem perder stock")
-	var veiculo: CharacterBody3D = tratores[2]
-	var reboque: Node3D = carrinhas[2]
-	veiculo.position = Vector3(32,altura(Vector3(32,0,40))+0.1,40); veiculo.rotation.y = PI
+	jogador.position = armazem.CENTRO; armazem.actualizar(1)
+	verificar(sacola.is_empty() and int(stock[0])+int(stock[1])==150,"Entrada deposita colheita no novo armazém")
+	jogador.position = Vector3.ZERO; armazem.actualizar(1)
+	var veiculo: CharacterBody3D = tratores[2]; var reboque: Node3D = carrinhas[2]
+	veiculo.position = armazem.CENTRO+Vector3(0,0,5); veiculo.position.y = altura(veiculo.position)+0.1; veiculo.rotation.y = PI
 	reboque.position = veiculo.to_global(Vector3(0,0,4.8)); reboque.position.y = altura(reboque.position)
 	await get_tree().physics_frame
-	verificar(veiculo.entrar() and reboque.acoplar(veiculo),"Carrinha entra na garagem engatada")
+	verificar(veiculo.entrar() and reboque.acoplar(veiculo),"Carrinha engata no centro logístico")
 	armazem.actualizar(1)
-	verificar(reboque.total()==120 and int(stock.get(0,0))+int(stock.get(1,0))==30,"Garagem carrega carrinha e guarda excedente")
-	armazem.actualizar(1)
-	verificar(reboque.total()==120,"Carga automática não duplica em permanência")
-	reboque.position.z = 18; armazem.actualizar(1)
-	reboque.position.z = 35; armazem.actualizar(1)
-	verificar(reboque.total()==0 and int(stock.get(0,0))+int(stock.get(1,0))==150,"Carrinha com colheita descarrega numa nova entrada")
-	armazem.actualizar(1); verificar(reboque.total()==0,"Não recarrega antes de sair")
-	reboque.position.z = 18; armazem.actualizar(1)
-	reboque.position.z = 35; armazem.actualizar(1)
-	verificar(reboque.total()==120,"Voltar com carrinha vazia recolhe carga guardada")
-	veiculo.position = Vector3(32,altura(Vector3(32,0,52)),52)
-	reboque.position = veiculo.to_global(Vector3(0,0,4.8)); armazem.actualizar(1)
-	verificar(float(armazem.portas[1].get_meta("abertura"))>0.9,"Porta mantém passagem para tractor e reboque")
-	reboque.soltar(); veiculo.sair(); reboque.position = Vector3(6,altura(Vector3(6,0,56)),56)
-	veiculo.position = Vector3(6,altura(Vector3(6,0,20)),20)
-	# Aproximação física: a porta deve abrir antes do tractor chegar.
-	veiculo.position = Vector3(32,altura(Vector3(32,0,8))+0.1,8); veiculo.rotation.y = PI
-	jogador.position = Vector3(5,altura(Vector3(5,0,5)),5)
-	armazem.actualizar(1); veiculo.entrar()
-	var acelerar: InputEventKey = InputEventKey.new(); acelerar.physical_keycode = KEY_W; acelerar.keycode = KEY_W; acelerar.pressed = true; Input.parse_input_event(acelerar)
-	for i: int in range(130): await get_tree().physics_frame
-	acelerar.pressed = false; Input.parse_input_event(acelerar)
-	verificar(veiculo.position.z>56,"Tractor atravessa as duas portas em movimento")
-	for i: int in range(25): await get_tree().physics_frame
-	veiculo.sair(); veiculo.position = Vector3(6,altura(Vector3(6,0,20)),20)
+	verificar(reboque.total()==0 and central_logistica.aberto,"Armazém espera escolha do produto")
+	central_logistica.carregar_escolha(0,80,reboque); central_logistica.carregar_escolha(1,70,reboque); central_logistica.fechar()
+	verificar(reboque.total()==120 and int(stock.get(0,0))+int(stock.get(1,0))==30,"Carga escolhida respeita capacidade e excedente")
+	reboque.position = armazem.ENTREGA; armazem.actualizar(1)
+	reboque.position = armazem.CENTRO; armazem.actualizar(1)
+	verificar(reboque.total()==0 and int(stock.get(0,0))+int(stock.get(1,0))==150,"Nova entrada carregada deposita os produtos")
+	reboque.soltar(); veiculo.sair(); central_logistica.fechar()
+	reboque.position = Vector3(6,altura(Vector3(6,0,56)),56); veiculo.position = Vector3(6,altura(Vector3(6,0,20)),20)
 	var semeadora: Node3D = implementos[1]
 	semeadora.sementes = 0
 	var chave: Vector2i = Vector2i(7,3); terreno.trabalhar(chave,"lavrar")

@@ -43,15 +43,14 @@ func _ready() -> void:
 		mundo.add_child(pessoa); mundo.pessoas.append(pessoa)
 	for i: int in range(3): criacao(i)
 	for i: int in range(3):
-		var local: Vector3 = [Vector3(-245,0,-45),Vector3(-70,0,225),Vector3(300,0,225)][i]
-		var fabrica: Node3D = preload("res://scripts/factory.gd").new(); fabrica.mundo = mundo; fabrica.numero = i; fabrica.local_filial = local
-		mundo.add_child(fabrica); mundo.fabricas.append(fabrica)
-		if i==0:
-			# A filial voltada a norte é alcançada pelo lado, sem atravessar o edifício.
-			via([Vector3(local.x+24,0,92),Vector3(local.x+24,0,local.z-24),Vector3(local.x,0,local.z-24),local],10)
-		else: via([Vector3(local.x,0,140),Vector3(local.x,0,local.z-24),local],10)
+		var fabrica: Node3D = preload("res://scripts/factory.gd").new(); fabrica.mundo = mundo; fabrica.numero = i; fabrica.local_filial = preload("res://scripts/industrial_sites.gd").FILIAIS[i]; mundo.add_child(fabrica); mundo.fabricas.append(fabrica)
 	for fabrica: Node3D in mundo.fabricas:
-		if fabrica.position.z==110: via([Vector3(fabrica.position.x,0,92),fabrica.position],10)
+		var p: Vector3 = fabrica.position
+		var x: float = -300 if p.x < -180 else -122 if p.x<0 else 270 if p.x<270 else 345
+		var z: float = -102 if p.z<0 else 140
+		via([Vector3(x,0,z),Vector3(x,0,p.z-46),Vector3(p.x,0,p.z-46),Vector3(p.x,0,p.z)],10)
+	via([Vector3(-300,0,92),Vector3(-174,0,92),Vector3(-174,0,-28),Vector3(-205,0,-28),Vector3(-205,0,25)],10)
+	via([Vector3(-205,0,57),Vector3(-205,0,92)],10)
 	for portao: Vector3 in preload("res://scripts/layout.gd").PORTOES:
 		var fora: Vector3 = Vector3(portao.x,0,140 if portao.z>0 else -102) if portao.z!=0 else Vector3(signf(portao.x)*122,0,portao.z)
 		via([portao,fora],10)

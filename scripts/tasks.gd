@@ -122,9 +122,9 @@ func transportar(pessoa: Node3D,tarefa: Dictionary,delta: float) -> void:
 		if int(origem[cultura])==0: origem.erase(cultura)
 		if reboque!=null: reboque.actualizar_carga()
 	if int(tarefa.tipo)==6 and not bool(tarefa.get("aproximou",false)):
-		if not ir(pessoa,Vector3(-60+int(tarefa.fabrica)*60,0,92),delta,1.2): return
+		if not ir(pessoa,preload("res://scripts/industrial_sites.gd").entrada(int(tarefa.fabrica))+Vector3(0,0,-8),delta,1.2): return
 		tarefa.aproximou = true; pessoa.destino_actual = Vector3.INF; pessoa.percurso.clear()
-	var alvo: Vector3 = mundo.armazem.ENTREGA if int(tarefa.tipo)==5 else Vector3(-60+int(tarefa.fabrica)*60,0,102)
+	var alvo: Vector3 = mundo.armazem.ENTREGA if int(tarefa.tipo)==5 else preload("res://scripts/industrial_sites.gd").entrada(int(tarefa.fabrica))
 	if not ir(pessoa,alvo,delta,2.5): return
 	var unidades: int = mini(restante,int(carga.get(cultura,0)))
 	if unidades<=0: return

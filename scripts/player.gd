@@ -1,9 +1,12 @@
 extends CharacterBody3D
 ## Corpo físico e avatar articulado. Os pivôs mantêm os membros ligados ao tronco.
 static var esfera_partilhada: SphereMesh
+static var contornos_partilhados: Dictionary = {}
 static var cubo_partilhado: BoxMesh
 var mundo: Node3D
 var mulher: bool = false
+var pilotar_drone: bool = false
+var comando_drone: Node3D
 var deitado: bool = false
 var lado_cama: int = 1
 var roupa: int = 0
@@ -48,7 +51,7 @@ func peca(pai: Node3D, posicao: Vector3, tamanho: Vector3, cor: Color, redonda: 
 	var malha: MeshInstance3D = MeshInstance3D.new()
 	if redonda:
 		if esfera_partilhada==null:
-			esfera_partilhada = SphereMesh.new(); esfera_partilhada.radius = 0.5; esfera_partilhada.height = 1.0; esfera_partilhada.radial_segments = 24; esfera_partilhada.rings = 12
+			esfera_partilhada = SphereMesh.new(); esfera_partilhada.radius = 0.5; esfera_partilhada.height = 1.0; esfera_partilhada.radial_segments = 16; esfera_partilhada.rings = 8
 		malha.mesh = esfera_partilhada
 	else:
 		if cubo_partilhado==null: cubo_partilhado = BoxMesh.new()
@@ -60,27 +63,31 @@ func peca(pai: Node3D, posicao: Vector3, tamanho: Vector3, cor: Color, redonda: 
 	return malha
 
 func contorno(pai: Node3D, aneis: Array[Vector3], cor: Color) -> MeshInstance3D:
+	var chave_modelo: String = str(aneis)+cor.to_html()
+	if contornos_partilhados.has(chave_modelo):
+		var reutilizada: MeshInstance3D = MeshInstance3D.new(); reutilizada.mesh = contornos_partilhados[chave_modelo]; pai.add_child(reutilizada); return reutilizada
 	# Secções contínuas evitam membros em forma de contas e juntas de marioneta.
 	var superficie: SurfaceTool = SurfaceTool.new()
 	superficie.begin(Mesh.PRIMITIVE_TRIANGLES)
 	superficie.set_material(mundo.material(cor))
 	for fila_anel: int in range(aneis.size()-1):
-		for segmento: int in range(24):
+		for segmento: int in range(16):
 			for canto: Vector2i in [Vector2i(0,0),Vector2i(1,1),Vector2i(1,0),Vector2i(0,0),Vector2i(0,1),Vector2i(1,1)]:
 				var anel: Vector3 = aneis[fila_anel+canto.y]
-				var angulo: float = TAU*float(segmento+canto.x)/24.0
+				var angulo: float = TAU*float(segmento+canto.x)/16.0
 				superficie.set_smooth_group(0)
 				superficie.add_vertex(Vector3(sin(angulo)*anel.y,anel.x,cos(angulo)*anel.z))
 	superficie.generate_normals()
 	superficie.index()
 	var malha: MeshInstance3D = MeshInstance3D.new()
-	malha.mesh = superficie.commit()
+	malha.mesh = superficie.commit(); contornos_partilhados[chave_modelo] = malha.mesh
 	pai.add_child(malha)
 	return malha
 
 func criar_avatar() -> void:
 	preload("res://scripts/avatar.gd").construir(self)
 	visual.scale = escala_corpo()
+	if self==mundo.jogador: comando_drone = preload("res://scripts/drone_remote.gd").criar(self)
 
 func animacao(acao: String,duracao: float = 1.2) -> void:
 	acao_animacao = acao; tempo_acao = duracao
@@ -119,6 +126,11 @@ func animar(delta: float, andamento: float, sentado: bool = false) -> void:
 		acao_animacao = "carrying"
 	if is_instance_valid(cesto): cesto.visible = transportar
 
+	if pilotar_drone:
+		for i: int in range(2): bracos[i].rotation = Vector3(0.9,0,0); cotovelos[i].rotation = Vector3(1.2,0,0)
+		cesto.hide()
+		if is_instance_valid(comando_drone): comando_drone.position = visual.to_local((maos[0].global_position+maos[1].global_position)*0.5)+Vector3(0,-0.035,-0.025)
+	if is_instance_valid(comando_drone): comando_drone.visible = pilotar_drone
 	if deitado: aplicar_pose_cama()
 
 func deitar(lado: int) -> void:

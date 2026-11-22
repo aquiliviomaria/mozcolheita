@@ -36,5 +36,5 @@ func executar() -> void:
 	var d: Dictionary = mundo.partida.capturar(); mundo.entregas.reputacao[1] = 0; mundo.partida.aplicar(d)
 	exigir(mundo.entregas.reputacao[1]==8,"Reputação faz parte da gravação")
 	mundo.hud.alternar(); mundo.hud.perfil_entrega.select(2); mundo.hud._process(0.3)
-	exigir(mundo.hud.descricoes_entregas[0].text.contains("equipa") and mundo.hud.descricoes_entregas[0].text.contains("margem"),"Painel mostra perfil, custo, margem, prazo e multa")
+	exigir(mundo.hud.descricoes_entregas[0].text.to_lower().contains("equipa") and mundo.hud.descricoes_entregas[0].text.contains("margem"),"Painel mostra perfil, custo, margem, prazo e multa")
 	print("CONTRATOS · ","PASSOU" if falhas==0 else "FALHOU"," · ",falhas," falhas"); quit(0 if falhas==0 else 1)

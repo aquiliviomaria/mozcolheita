@@ -21,7 +21,9 @@ func livre(p: Vector3,margem: float = 0) -> bool:
 func _ready() -> void:
 	for n: Node3D in mundo.comunidade.casas: reservar(n.position,Vector2(17,17))
 	for n: Node3D in mundo.comunidade.edificios: reservar(n.position,Vector2(32,32))
-	for n: Node3D in mundo.fabricas: reservar(n.position,Vector2(22,28))
+	for n: Node3D in mundo.fabricas: reservar(n.position,Vector2(58,90))
+	reservar(preload("res://scripts/industrial_sites.gd").ARMAZEM,Vector2(65,100))
+	reservar(preload("res://scripts/industrial_sites.gd").GALPAO,Vector2(40,35))
 	for p: Vector3 in preload("res://scripts/village.gd").CENTROS: reservar(p,Vector2(95,95))
 	var cidade: Node3D = mundo.comunidade
 	via([Vector3(-350,0,-240),Vector3(350,0,-240)],9)

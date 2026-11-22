@@ -38,14 +38,17 @@ func executar() -> void:
 	mundo.caminhao.carregar({1:550}); exigir(mundo.caminhao.total()==500,"Capacidade real do camião")
 	mundo.caminhao.carga.clear(); mundo.caminhao.actualizar_carga()
 	exigir(mundo.entregas.aceitar(1) and not mundo.entregas.aceitar(1),"Aceitar encomenda sem duplicar contrato")
-	mundo.caminhao.carregar({1:100}); mundo.caminhao.position = Vector3(0,mundo.altura(Vector3(0,0,90))+0.1,90); mundo.caminhao.rotation.y = PI
+	mundo.caminhao.carregar({1:100}); mundo.caminhao.position = mundo.fabricas[1].position+Vector3(0,0,-62); mundo.caminhao.position.y = mundo.altura(mundo.caminhao.position)+0.1; mundo.caminhao.rotation.y = PI
 	await physics_frame; exigir(mundo.caminhao.entrar(),"Entrar e conduzir camião")
 	mundo.hud.escolher(false)
 	exigir(mundo.jogador.visual.get_parent()==mundo.caminhao and mundo.jogador.visual.visible,"Condutor visível na cabine")
 	Engine.time_scale = 8; tecla(KEY_W,true)
-	for i: int in range(60): await physics_frame
+	for i: int in range(240):
+		await physics_frame
+		if mundo.fabricas[1].to_local(mundo.caminhao.position).z > -5: break
 	tecla(KEY_W,false)
 	for i: int in range(30): await physics_frame
+	print("CHEGADA · ",mundo.fabricas[1].to_local(mundo.caminhao.position)," · carga ",mundo.caminhao.carga)
 	exigir(bool(mundo.entregas.activas[1].concluida) and mundo.caminhao.total()==0,"Entrega física ao parar na garagem da fábrica")
 	var saldo: int = mundo.saldo; mundo.entregas.entregar({1:100},1); exigir(mundo.saldo==saldo,"Encomenda concluída não paga duas vezes")
 	mundo.caminhao.rapidez = 0; mundo.caminhao.sair(); mundo.caminhao.position = Vector3(49,mundo.altura(Vector3(49,0,18))+0.1,18)

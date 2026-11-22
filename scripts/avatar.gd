@@ -18,20 +18,6 @@ static func linha(a: Node3D,pai: Node3D,pontos: Array[Vector3],raio: float,cor: 
 	for i: int in range(pontos.size()-1): preload("res://scripts/geometry.gd").tubo(s,pontos[i],pontos[i+1],raio,cor,raio,8)
 	var vista: MeshInstance3D = MeshInstance3D.new(); vista.mesh = preload("res://scripts/geometry.gd").terminar(s); pai.add_child(vista)
 
-static func bandeira(a: Node3D) -> void:
-	var origem: Vector3 = Vector3(0,1.19,-0.164)
-	for i: int in range(3): a.peca(a.visual,origem+Vector3(0,0.032-i*0.032,0),Vector3(0.15,0.028,0.006),[CLARO,Color("181b16"),Color("f5ce48")][i])
-	for y: float in [-0.016,0.016]: a.peca(a.visual,origem+Vector3(0,y,-0.004),Vector3(0.15,0.004,0.004),Color("f8f1de"))
-	var s: SurfaceTool = SurfaceTool.new(); s.begin(Mesh.PRIMITIVE_TRIANGLES)
-	preload("res://scripts/geometry.gd").triangulo(s,origem+Vector3(-0.075,0.048,-0.008),origem+Vector3(0.0,0,-0.008),origem+Vector3(-0.075,-0.048,-0.008),Color("d3342f"))
-	# Estrela dourada no triângulo vermelho; distintivo legível à escala do avatar.
-	for i: int in range(10):
-		var t0: float = -PI/2+i*TAU/10; var t1: float = t0+TAU/10
-		var r0: float = 0.019 if i%2==0 else 0.008; var r1: float = 0.008 if i%2==0 else 0.019
-		var c: Vector3 = origem+Vector3(-0.049,0,-0.010)
-		preload("res://scripts/geometry.gd").triangulo(s,c,c+Vector3(cos(t0)*r0,sin(t0)*r0,0),c+Vector3(cos(t1)*r1,sin(t1)*r1,0),OURO)
-	var vista: MeshInstance3D = MeshInstance3D.new(); vista.mesh = preload("res://scripts/geometry.gd").terminar(s); a.visual.add_child(vista)
-
 static func rosto(a: Node3D,pele: Color) -> void:
 	var cabelo: Color = Color("b7b1a0") if a.idade=="idoso" else CABELO
 	a.rosto = Node3D.new(); a.visual.add_child(a.rosto); a.rosto.name = "RostoOficial"
@@ -93,7 +79,6 @@ static func construir(a: Node3D) -> void:
 		a.peca(a.visual,Vector3(lado*0.14,1.25,-0.147),Vector3(0.045,0.037,0.015),OURO,true)
 	contorno(a,a.visual,[Vector3(0.93,0.213,0.15),Vector3(0.98,0.213,0.15)],Color("6f4529"))
 	a.peca(a.visual,Vector3(0,0.954,-0.154),Vector3(0.065,0.047,0.012),OURO,true)
-	bandeira(a)
 	contorno(a,a.visual,[Vector3(1.40,0.068,0.065),Vector3(1.59,0.064,0.065)],pele)
 	rosto(a,pele)
 	if a.mulher:

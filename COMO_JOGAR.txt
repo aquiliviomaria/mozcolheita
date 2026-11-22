@@ -43,18 +43,22 @@ Três tractores, um camião e dois automóveis familiares têm dois lugares.
 G engata/solta implemento ou carrinha. Indicador verde mostra disponibilidade.
 Espaço no tractor liga/desliga a máquina. X transfere carga (substitui C).
 B abastece semeadora próxima/engatada: depósito de 300, 2 MT por semente.
-F assume/devolve drone | WASD voa | Espaço sobe | Ctrl desce | R irriga.
+F assume/devolve drone; operador segura comando nas duas mãos | WASD voa | Espaço sobe | Ctrl desce | R irriga.
 V activa câmara livre; WASD move, Q/E altera altura, V regressa.
 
 ARMAZÉM E ENTREGAS
-Entre carregado para guardar. Saia e volte vazio com carrinha/camião para carregar.
+Centro logístico fora da quinta: (-205, 25), com segurança e cancela.
+Entre carregado para guardar. Saia e volte vazio para escolher produto e quantidade.
+Depois escolha sede/filial de destino; siga a seta até à garagem.
 Stock excedente fica no armazém. Três carrinhas: 120 unidades; camião: 500.
-H → Entregas: escolha tamanho/urgência; reveja prazo, recompensa e multa.
-Tomates do Zambeze compra tomate; Moageira Nhamatanda milho; Hortícolas Maputo couve/cenoura.
+M abre missões: escolha 10.000, 50.000, 100.000, 250.000 ou 500.000 MT e urgência.
+Reveja o valor final, quantidade, prazo e multa antes de confirmar.
+Fábricas grandes e afastadas: Tomates do Zambeze compra tomate; Moageira Nhamatanda milho; Hortícolas Maputo couve/cenoura.
 Com mercadoria compatível, seta e minimapa guiam à empresa.
 Entre na garagem da fábrica e pare para entregar.
 Quantidade completa a tempo paga bónus e melhora reputação.
-Falhar prazo aplica multa única e fica registado em H → Histórico.
+Atrasar OU cancelar encomenda aceite paga multa única de 2× valor aprovado.
+Cancelar em M pede confirmação; sucessos e quebras ficam em H → Histórico.
 
 CONTRATAÇÃO
 E junto de um adulto: tarefa, quantidade, parcela e orçamento obrigatórios.

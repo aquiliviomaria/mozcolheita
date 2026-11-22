@@ -27,6 +27,15 @@ func criar_fazenda(indice: int) -> void:
 			plantas.multimesh.set_instance_transform(z*24+x,Transform3D(Basis.IDENTITY,ponto))
 	add_child(plantas)
 	campos.append(plantas)
+	plantas.visibility_range_end = 135; plantas.visibility_range_end_margin = 12
+	plantas.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# Uma silhueta simples de duas folhas por planta mantém a machamba visível à distância.
+	var longe: MultiMeshInstance3D = MultiMeshInstance3D.new(); longe.multimesh = MultiMesh.new(); longe.multimesh.transform_format = MultiMesh.TRANSFORM_3D
+	var g: GDScript = preload("res://scripts/geometry.gd"); var s: SurfaceTool = SurfaceTool.new(); s.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for lado: float in [-1,1]: g.folha(s,Vector3.ZERO,Vector3(lado*0.3,0.7,0),0.22,Color("42823e"),0.08,false)
+	longe.multimesh.mesh = g.terminar(s); longe.multimesh.instance_count = plantas.multimesh.instance_count
+	for i: int in range(longe.multimesh.instance_count): longe.multimesh.set_instance_transform(i,plantas.multimesh.get_instance_transform(i))
+	longe.visibility_range_begin = 125; longe.visibility_range_end = 350; longe.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF; add_child(longe)
 	var galpao: Vector3 = centro+Vector3(26,0,4)
 	galpao.y = mundo.altura(galpao)
 	mundo.caixa(self,galpao+Vector3(0,2,0),Vector3(10,4,12),Color("a88b63"),true)

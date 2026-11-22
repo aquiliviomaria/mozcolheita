@@ -75,13 +75,13 @@ func transferir() -> int:
 	if tractor==null or absf(tractor.rapidez)>0.3: return 0
 	var plano: GDScript = preload("res://scripts/layout.gd")
 	for fabrica: Node3D in mundo.fabricas:
-		if plano.distancia(tractor.global_position,fabrica.global_position+Vector3(0,0,-8))<12:
+		if plano.distancia(tractor.global_position,fabrica.global_position+Vector3(0,0,-42))<15:
 			var entregues: int = mundo.entregas.entregar(carga,fabrica.numero)
 			var receita: int = mundo.economia.vender(carga,fabrica.numero); actualizar_carga(); return receita+entregues
-	if plano.distancia(tractor.global_position,mundo.armazem.CENTRO)<10:
+	if mundo.armazem.perto():
 		if not carga.is_empty():
 			var quantidade: int = total(); mundo.depositar(carga); actualizar_carga(); mundo.avisar("Carrinha descarregada no armazém."); return quantidade
-		var recolhidas: int = carregar(mundo.stock); mundo.avisar("Carga recolhida do armazém: %d" % recolhidas); return recolhidas
+		mundo.armazem.solicitar_carga(self); return 0
 	var recolhidas: int = carregar(mundo.sacola)
 	mundo.avisar("Carrinha: %d/%d unidades" % [total(),CAPACIDADE]); return recolhidas
 

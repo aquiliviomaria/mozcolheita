@@ -3,9 +3,9 @@ extends RefCounted
 const METADE: Vector2 = Vector2(96,78)
 const PORTOES: Array[Vector3] = [Vector3(0,0,78),Vector3(60,0,78),Vector3(0,0,-78),Vector3(-60,0,-78),Vector3(96,0,0),Vector3(-96,0,0)]
 const LARGURA_PORTAO: float = 12.0
-const GALPAO: Rect2 = Rect2(-57,29,30,22)
+const GALPAO: Rect2 = Rect2(-265,30,30,22)
 const CASA: Rect2 = Rect2(-26,-64,36,37)
-const ARMAZEM: Rect2 = Rect2(22,24,20,26)
+const ARMAZEM: Rect2 = preload("res://scripts/industrial_sites.gd").AREA_ARMAZEM
 
 static func distancia(a: Vector3,b: Vector3) -> float:
 	return Vector2(a.x,a.z).distance_to(Vector2(b.x,b.z))
@@ -54,6 +54,8 @@ static func livre(a: Vector3,b: Vector3,folga: float = 1.0) -> bool:
 	return true
 
 static func caminho(a: Vector3,b: Vector3,folga: float = 2.0) -> Array[Vector3]:
+	# O caminho directo já é o mínimo; evita construir um grafo para cada passo rural.
+	if livre(a,b,maxf(1,folga-1)): return [b]
 	var pontos: Array[Vector3] = [a,b]
 	for portao: Vector3 in PORTOES:
 		var fora: Vector3 = portao+(exterior(portao)-portao).normalized()*maxf(7,folga*2+2)

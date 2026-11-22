@@ -1,6 +1,8 @@
 extends CanvasLayer
 ## Navegação a 1 Hz, sobre a rede de ruas; seta 3D e indicação fixa no HUD.
 var mundo: Node3D
+var local_escolhido: Node3D
+var empresa_escolhida: int = -1
 var destino: Node3D
 var rota: Array[Vector3] = []
 var seta: Node3D
@@ -24,8 +26,13 @@ func carga_actual() -> Dictionary:
 	return mundo.sacola
 
 func escolher_destino(carga: Dictionary,origem: Vector3) -> Node3D:
+	if is_instance_valid(local_escolhido):
+		for c: int in carga:
+			if int(carga[c])>0 and mundo.economia.aceita(local_escolhido.numero,c): return local_escolhido
+		local_escolhido = null
 	var melhor: Node3D; var custo: float = INF
 	for fabrica: Node3D in mundo.fabricas:
+		if empresa_escolhida>=0 and fabrica.numero!=empresa_escolhida: continue
 		for cultura: int in carga:
 			if int(carga[cultura])<=0 or not mundo.economia.aceita(fabrica.numero,cultura): continue
 			var prioridade: float = 10000
@@ -34,6 +41,8 @@ func escolher_destino(carga: Dictionary,origem: Vector3) -> Node3D:
 				if not bool(p.concluida) and not bool(p.falhou) and int(p.cultura)==cultura: prioridade = 0
 			var distancia: float = prioridade+origem.distance_to(fabrica.position)
 			if distancia<custo: melhor = fabrica; custo = distancia
+	if melhor==null and empresa_escolhida>=0:
+		empresa_escolhida = -1; return escolher_destino(carga,origem)
 	return melhor
 
 func projectar(ponto: Vector3) -> Vector3:
@@ -74,7 +83,7 @@ func caminho_ruas(inicio: Vector3,fim: Vector3) -> Array[Vector3]:
 func actualizar_rota(origem: Vector3) -> void:
 	rota.clear()
 	if destino==null: return
-	var entrada: Vector3 = destino.position+Vector3(0,0,-22); entrada.y = 0
+	var entrada: Vector3 = destino.position+Vector3(0,0,-46); entrada.y = 0
 	var inicio: Vector3 = origem; inicio.y = 0
 	var plano: GDScript = preload("res://scripts/layout.gd")
 	if plano.dentro(inicio):
@@ -90,6 +99,7 @@ func actualizar_rota(origem: Vector3) -> void:
 
 func _process(delta: float) -> void:
 	if mundo.hud==null or not seta.is_inside_tree(): return
+	if mundo.pausado(): texto.hide(); seta.hide(); return
 	var origem: Vector3 = mundo.trator_actual.position if mundo.trator_actual!=null else mundo.jogador.position
 	intervalo -= delta/maxf(1,Engine.time_scale)
 	if intervalo<=0:

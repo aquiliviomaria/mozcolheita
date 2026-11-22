@@ -54,7 +54,7 @@ func assumir() -> bool:
 	corpo.collision_layer = 0
 	voando = true
 	mundo.drone_actual = self
-	mundo.jogador.bloqueado = true
+	mundo.jogador.bloqueado = true; mundo.jogador.pilotar_drone = true; mundo.jogador.animar(0,0); mundo.ferramentas.vista.hide()
 	position.y = mundo.altura(position)+3.0
 	mundo.camera.alvo = self
 	mundo.camera.distancia = 5.0
@@ -68,7 +68,7 @@ func devolver() -> void:
 	position = origem
 	rotation = Vector3.ZERO
 	mundo.drone_actual = null
-	mundo.jogador.bloqueado = false
+	mundo.jogador.bloqueado = false; mundo.jogador.pilotar_drone = false; mundo.jogador.repor_pose(); mundo.ferramentas.vista.show()
 	mundo.camera.alvo = mundo.jogador
 	mundo.camera.distancia = 7.5
 
