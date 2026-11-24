@@ -21,7 +21,7 @@ static func contornar(pessoa: CharacterBody3D, alvo: Vector3) -> Array[Vector3]:
 	for x: int in range(-RAIO,RAIO+1):
 		for z: int in range(-RAIO,RAIO+1):
 			var ponto: Vector3 = pessoa.global_position+Vector3(x*PASSO,0,z*PASSO)
-			ponto.y = pessoa.mundo.altura(ponto)+0.95
+			ponto.y = pessoa.position.y+0.95 if pessoa.mundo.casa!=null and pessoa.mundo.casa.dentro(pessoa.position) else pessoa.mundo.altura(ponto)+0.95
 			consulta.transform = Transform3D(Basis.IDENTITY,ponto)
 			grelha.set_point_solid(Vector2i(x,z),not espaco.intersect_shape(consulta,1).is_empty())
 	grelha.set_point_solid(Vector2i.ZERO,false)

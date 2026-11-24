@@ -48,6 +48,9 @@ func executar() -> void:
 		if mundo.fabricas[1].to_local(mundo.caminhao.position).z > -5: break
 	tecla(KEY_W,false)
 	for i: int in range(30): await physics_frame
+	for i: int in range(600):
+		await physics_frame
+		if mundo.caminhao.total()==0: break
 	print("CHEGADA · ",mundo.fabricas[1].to_local(mundo.caminhao.position)," · carga ",mundo.caminhao.carga)
 	exigir(bool(mundo.entregas.activas[1].concluida) and mundo.caminhao.total()==0,"Entrega física ao parar na garagem da fábrica")
 	var saldo: int = mundo.saldo; mundo.entregas.entregar({1:100},1); exigir(mundo.saldo==saldo,"Encomenda concluída não paga duas vezes")

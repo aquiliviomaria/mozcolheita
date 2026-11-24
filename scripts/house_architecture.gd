@@ -1,5 +1,5 @@
 extends RefCounted
-## Arquitectura com vãos reais, lajes de betão, escadas e cortes visuais por piso.
+## Arquitectura com vãos reais, lajes de betão, escadas e estrutura sempre visível.
 const BASE: float = 0.64
 const PISO: float = 5.64
 const COR: Color = Color("c6bdac")
@@ -76,3 +76,12 @@ static func escadas(c: Node3D) -> void:
 	for x: float in [-14.6,-9.4]:
 		var corrimao: Node3D = bloco(c,Vector3(x,4.2,-1.75),Vector3(0.14,0.14,12.55),Color("765337")); corrimao.rotation.x = atan2(5,11.5)
 		for i: int in range(7): bloco(c,Vector3(x,BASE+0.6+i*5.0/6,4-i*11.5/6),Vector3(0.12,1.2,0.12),Color("765337"),false)
+
+	# Guarda-corpo no perímetro do vão superior; a chegada z=-7.5 continua livre.
+	for x: float in [-14.7,-9.3]:
+		var barra: Node3D = bloco(c,Vector3(x,PISO+1.12,-1.7),Vector3(0.09,0.09,11.5),Color("455257"),true,true); barra.name = "GuardaCorpoFerro"
+		for i: int in range(13): bloco(c,Vector3(x,PISO+0.55,-7.2+i*0.91),Vector3(0.055,1.1,0.055),Color("455257"),false,true)
+		# Barreira contínua invisível entre montantes impede cair pelas aberturas.
+		var corpo: StaticBody3D = StaticBody3D.new(); var col: CollisionShape3D = CollisionShape3D.new(); var forma: BoxShape3D = BoxShape3D.new(); forma.size = Vector3(0.12,1.15,11.5); col.shape = forma; corpo.position = Vector3(x,PISO+0.575,-1.7); corpo.add_child(col); c.add_child(corpo)
+	bloco(c,Vector3(-12,PISO+1.12,4.08),Vector3(5.5,0.09,0.09),Color("455257"),true,true)
+	for i: int in range(7): bloco(c,Vector3(-14.7+i*0.9,PISO+0.55,4.08),Vector3(0.055,1.1,0.055),Color("455257"),true,true)

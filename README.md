@@ -87,31 +87,42 @@ Um dia dura **dez minutos reais** em velocidade normal. **L** alterna para as 18
 
 ## Casa, descanso e alimentação
 
-A casa principal tem **dois pisos**, varanda coberta e lajes de betão. O logótipo fica na fachada do segundo piso, acima da porta. O rés-do-chão tem sala com sofá e televisão, corredor e cozinha; em cima ficam quarto de casal, roupeiro e casa de banho com lavatório, sanita e duche. Escadas e elevador ligam os pisos. Há janelas transparentes, incluindo junto à cama. O casal dorme de barriga para cima, próximo e com os braços em abraço; as duas almofadas ficam alinhadas junto à cabeceira de madeira.
+A casa principal tem **dois pisos**, varanda coberta e lajes de betão. O logótipo fica na fachada do segundo piso, acima da porta. O rés-do-chão tem sala com sofá e televisão, corredor e cozinha; em cima ficam quarto de casal, roupeiro e casa de banho com lavatório, sanita e duche. Escadas e elevador ligam os pisos. O vão da escada no piso superior tem guarda-corpo de ferro com barreira física, mantendo livre a chegada da escada. Há janelas transparentes, incluindo junto à cama. O casal dorme de barriga para cima, próximo e com os braços em abraço; as duas almofadas ficam alinhadas junto à cabeceira de madeira.
 
 | Local / tecla | Comportamento |
 |---|---|
 | Cama + E, de dia | Senta na cama. Permanece até E para sair. |
 | Cama + E, à noite | Deita-se com o cônjuge e avança até às 06:00. Acorda na cama e só sai com E. |
-| Mesa + E | Senta; E novamente come com alimento na mão e animação. WASD/Esc levanta; E também permite levantar após a refeição. |
+| Mesa + E | Senta diante de pratos vazios. A companhia vai à cozinha, prepara a refeição, transporta a travessa, serve e senta-se; só depois ambos comem. WASD/Esc levanta. |
 | Sofá + E | Senta e liga a televisão. O canal MOZTV mostra notícias variadas de jogos, cultura, agricultura e da comunidade, com fontes; continua até interromper com E/WASD/Esc. Espaço liga/desliga o aparelho. |
 | Roupeiro + E | Alterna quatro conjuntos de roupa, conservados na gravação. |
-| Duche + E | Entra, fecha a cortina de pano opaco e só depois liga a água. E pára a água, abre a cortina para sair e repõe a roupa anterior. |
-| Sanita + E | Usa sentado; E termina. |
-| Elevador + E | Chama a cabine e entra quando as portas abrem. Dentro: 1 rés-do-chão, 2 piso do quarto, E sai sem viajar. |
-| C durante uma actividade | Convida o cônjuge para a mesa, sofá, cama ou duche. Dormir à noite reúne o casal automaticamente. |
+| Duche + E | Entra, fecha a cortina de pano opaco e só depois liga a água. E pára a água, abre a cortina para sair. Fica de roupão até trocar no roupeiro. |
+| Sanita + E | Usa sentado no assento; E levanta e acciona a descarga, com água animada e som espacial. |
+| Lavatório + E | Abre a escolha: ←/→ ou 1/2 seleccionam lavar a cara ou escovar os dentes; E começa. E/Esc ou WASD interrompem. |
+| Elevador + E | Chama a cabine e entra quando as portas abrem. Dentro: WASD anda, rato roda a câmara, 1 rés-do-chão, 2 piso do quarto, E abre a saída; sai a pé. |
+| C em qualquer local | Chama a companhia a correr até si; durante uma actividade convida o cônjuge para a mesa, sofá, cama ou duche. Dormir à noite reúne o casal automaticamente. |
 
-A mesa começa com **quatro refeições**. Depois usa um produto da sacola ou do armazém. Cada refeição recupera até 35 de alimentação, 30 de energia e 10 de vida; não há consumo quando as necessidades já estão completas nem duplicação por premir repetidamente durante a animação. A refeição é partilhada visualmente com a companhia presente. Fora da mesa, J mantém a alimentação por produtos consigo ou junto ao armazém.
+O teto, as lajes, paredes e móveis permanecem visíveis durante o banho e as viagens do elevador; não há cortes automáticos da casa. A câmara do elevador fica dentro da cabine.
 
-Dormir recupera energia, até 15 de vida e consome 8 de alimentação. **Sono avança culturas e prazos e pode causar quebra de contrato.** Acordar não executa instantaneamente os percursos dos funcionários. A higiene diminui lentamente durante a sessão e recupera no duche/sanita; não há penalização de produção por higiene nesta versão.
+A mesa e as cadeiras têm proporções ajustadas ao rig: jogador e companhia apoiam a bacia no assento, com coxas horizontais, em todos os perfis de corpo. Há **quatro ementas visuais**, alternadas depois de comer e a cada novo dia: xima com matapa e tomate; arroz com feijão e legumes; milho assado com salada; pão com fruta e chá. O alimento levado à boca acompanha a ementa servida. A rotação é conservada na gravação.
 
-O duche tem cortina animada com pregas e laterais opacas. Com **C**, a água pára, a cortina abre para receber o cônjuge e volta a fechar antes de retomar o banho. A cortina fica aberta depois da saída; a higiene só recupera enquanto a água corre.
+![Casal a comer depois do serviço da refeição](preview/casa_servicos/comer-juntos.png)
 
-O elevador tem cabine iluminada, corrimãos, painel de botões, indicador de piso e portas duplas na cabine e nos dois patamares. Se estiver noutro piso, vem vazio para receber o jogador. **Só viaja com todas as portas fechadas**; um sensor impede o fecho sobre uma personagem no limiar. As portas são de **vidro transparente com caixilho metálico**. Dentro da cabine, **WASD permite andar livremente**, incluindo durante a viagem, sem recentrar a personagem. Ao chegar, abre e o jogador pode permanecer ou sair a pé pelo patamar; 1/2 escolhem o piso e E abre a saída. As portas do piso sem cabine permanecem fechadas.
+A cozinha começa com **quatro refeições**. A mesa tem apenas pratos vazios até o cônjuge trazer a comida. A preparação demora 2,5 segundos depois de chegar à bancada; há transporte físico da travessa e o consumo espera que os dois estejam sentados. Levantar antes de comer cancela o serviço sem gastar uma porção. Depois usa um produto da sacola ou do armazém. Cada refeição recupera até 35 de alimentação, 30 de energia e 10 de vida; A refeição automática gasta uma porção mesmo que já esteja alimentado; premir E repetidamente durante a animação não duplica o consumo. A refeição é partilhada visualmente com a companhia presente. Fora da mesa, J mantém a alimentação por produtos consigo ou junto ao armazém.
+
+Dormir recupera energia, até 15 de vida e consome 8 de alimentação. **Sono avança culturas e prazos e pode causar quebra de contrato.** Acordar não executa instantaneamente os percursos dos funcionários. No lavatório, lavar a cara dura 4 segundos e recupera 12 de higiene; escovar os dentes dura 7 segundos e recupera 18, com escova visível na mão. Interromper não concede recuperação. A torneira pára e os objectos são retirados ao terminar ou cancelar. O espelho apresenta uma vista frontal da zona do lavatório a baixa resolução (192 × 192), actualizada cerca de sete vezes por segundo apenas quando o jogador está próximo; não é uma reflexão física de toda a sala. A preparação e o serviço são encenados com percursos e animações; não existe ainda um sistema de receitas com ingredientes individuais.
+
+A higiene diminui lentamente durante a sessão e recupera no duche, sanita e lavatório; não há penalização de produção por higiene nesta versão.
+
+![Roupão depois do banho, no quarto](preview/casa_servicos/roupao.png)
+
+O duche tem cortina animada com pregas e laterais opacas de 1,8 m: protege o corpo e deixa visíveis as cabeças dos chuveiros e a água a cair. Ao sair, jogador e companhia usam roupão fechado; o jogador muda de roupa no roupeiro do quarto. Com **C**, a água pára, a cortina abre para receber o cônjuge e volta a fechar antes de retomar o banho. A cortina fica aberta depois da saída; a higiene só recupera enquanto a água corre.
+
+O elevador tem cabine iluminada, corrimãos, painel de botões, indicador de piso e portas duplas na cabine e nos dois patamares. Se estiver noutro piso, vem vazio para receber o jogador. **Só viaja com todas as portas fechadas**; um sensor impede o fecho sobre uma personagem no limiar. As portas são de **vidro transparente com caixilho metálico**. Dentro da cabine, **o rato roda a câmara na horizontal e vertical**, numa órbita curta limitada pelas paredes, e **WASD permite andar livremente**, incluindo durante a viagem, sem recentrar a personagem. Ao chegar, abre e o jogador pode permanecer ou sair a pé pelo patamar; 1/2 escolhem o piso e E abre a saída. As portas do piso sem cabine permanecem fechadas.
 
 ![Elevador com portas de vidro e cabine iluminada](preview/acessos/elevador-vidro.png)
 
-A porta da casa abre por proximidade, de ambos os lados. Os tectos de betão mantêm-se presentes na câmara normal. A câmara livre e capturas de enquadramento permitem cortes visuais para mostrar os interiores, mantendo as colisões. Mobília inclui cama de casal, almofadas, sofá de dois lugares, mesas, cadeiras, armário, estantes, bancada e frigorífico decorativos.
+A porta da casa abre por proximidade, de ambos os lados. Os tectos de betão mantêm-se presentes na câmara normal. O teto e os pisos continuam visíveis com câmara livre e enquadramentos domésticos; para ver o interior, a câmara deve estar dentro da casa. Mobília inclui cama de casal, almofadas, sofá de dois lugares, mesas, cadeiras, armário, estantes, bancada e frigorífico decorativos.
 
 ### Companhia familiar
 
@@ -128,11 +139,15 @@ Corações representam vida; talheres representam alimentação (**100 = saciado
 | Equipamento | Quantidade / capacidade | Utilização |
 |---|---|---|
 | Tractores | 3 | Conduzir e operar um implemento engatado de cada vez. |
-| Implementos | 12 | Preparar solo, semear, irrigar e colher. |
+| Implementos | 4, um de cada tipo | Preparar solo, semear, irrigar e colher. |
 | Carrinhas / reboques | 3; 120 unidades cada | Transportar produtos com tractor. |
 | Camião | 1; 500 unidades; 2 lugares | Carregar e entregar encomendas nas empresas. |
 | Automóveis familiares | 2; 2 lugares cada | Conduzir e viajar com companhia. |
-| Drones agrícolas | 3 | Voo remoto e irrigação. O agricultor permanece no local de lançamento. |
+| Drones agrícolas | 2 | Voo remoto e irrigação. O agricultor permanece no local de lançamento. |
+
+![Parque de máquinas no outro lado da casa](preview/casa_servicos/parque-maquinas.png)
+
+Os três tractores, os quatro implementos (preparador, semeadora, irrigador e ceifeira), os dois drones e as três carrinhas ficam num parque no lado oposto da casa, à esquerda da fachada e separado dos automóveis, sem bloquear entradas ou portões. Gravações com a frota anterior são adaptadas na retoma, conservando as cargas das carrinhas e removendo engates duplicados.
 
 Um **indicador verde** assinala o equipamento disponível. Aproxima o tractor, pára e usa **G** para engatar/soltar. **Espaço** liga/desliga a máquina. **W + T** activa turbo e **Ctrl** trava. O condutor fica visível no veículo. Ao pilotar o drone com F, o agricultor permanece no chão com um comando de duas mãos, ecrã e antenas; ao devolver o drone, recolhe o comando e retoma a ferramenta.
 
@@ -140,13 +155,15 @@ Cada semeadora tem depósito de **300 sementes**. **B** repõe as sementes em fa
 
 O **armazém de produção fica dentro da quinta**, em **(52, 40)**, e mede **36 × 32 m**, com 7 m de altura, duas portas de carga, estantes e caixas abertas que mostram os produtos e quantidades. O acesso é livre, **sem segurança nem cancela**: estes existem apenas nas fábricas onde se vende a produção. Há acessos para camiões pelo portão leste e pelo portão sul de (60, 78). O anexo exterior em **(-250, 41)** permanece como edifício de apoio; as máquinas continuam no parque da quinta.
 
-1. Entrar com colheita deposita os produtos no stock. Sair conserva o que ficou guardado.
+1. Entrar com colheita chama **Celso, o funcionário permanente do armazém**. Ele espera sentado no balcão, levanta-se, recolhe uma caixa e leva-a à zona de armazenamento. A descarga só altera o stock no gesto final. Sair conserva o que ficou guardado.
 2. Uma nova entrada com transporte vazio abre a escolha de **produto e quantidade**. Também podes usar E a pé ou X com transporte parado junto ao armazém.
-3. O carregamento respeita o stock e a capacidade; os outros produtos e excedentes ficam guardados.
+3. Confirma **Pedir ao funcionário para carregar**. Ele busca uma caixa do produto escolhido, caminha até ao camião/carrinha e coloca a carga. O carregamento respeita o stock e a capacidade; os outros produtos e excedentes ficam guardados. Também há um botão para **descarregar** um transporte com produtos. A pé, pode entregar a colheita da sacola.
 4. Depois de carregar, surge a escolha da **sede ou filial** que aceita o produto. A seta e o minimapa passam a guiar para esse local.
 5. Podes consultar e aceitar uma missão com **M** antes de carregar ou partir. O carregamento não aceita contratos automaticamente.
 
-![Escolha de produto e quantidade no centro logístico](preview/logistica_v2/escolher-carga.png)
+O funcionário atende uma operação de cada vez. **Mantém o transporte e a carga parados até terminar**; acelerar ou afastar-se interrompe a operação e conserva a mercadoria na origem. Enquanto ele caminha, ainda não se desconta stock nem se paga a venda. A caixa transportada representa o lote escolhido, sem simular uma viagem por unidade. Ao terminar, regressa ao balcão e volta a sentar-se. Operações pendentes são canceladas ao retomar uma gravação, sem executar uma transferência antiga sobre o estado carregado.
+
+![Funcionário permanente dentro do armazém](preview/funcionarios/atendente-sentado.png)
 
 ![Escolha do local de entrega](preview/logistica_v2/escolher-destino.png)
 
@@ -166,7 +183,7 @@ Em **M** ou **H → Entregas**, escolhe o valor da encomenda e a urgência. Ante
 | Moageira Nhamatanda | Milho | (-20, -175) |
 | Hortícolas Maputo | Couve e cenoura; encomendas de couve | (235, 315) |
 
-Há também filiais: **seis locais de entrega**, correspondentes a três empresas. As fábricas medem **48 × 56 m**, têm 12 m de altura, armazéns laterais, garagem com porta física, cancela e segurança na entrada. Ficam afastadas da quinta e têm acessos por estrada. Com mercadoria compatível, uma seta e o minimapa indicam o caminho, respeitando o destino escolhido; sem escolha explícita, dá prioridade às encomendas activas. Conduz o camião para dentro da garagem e pára para entregar.
+Há também filiais: **seis locais de entrega**, correspondentes a três empresas. As fábricas medem **48 × 56 m**, têm 12 m de altura, armazéns laterais, garagem com porta física, cancela e segurança na entrada. Ficam afastadas da quinta e têm acessos por estrada. Com mercadoria compatível, uma seta e o minimapa indicam o caminho, respeitando o destino escolhido; sem escolha explícita, dá prioridade às encomendas activas. Conduz o camião ou a carrinha engatada para dentro da garagem e pára para entregar. **Cada um dos seis locais tem um funcionário de recepção** que vem recolher a carga e a leva ao depósito. O pagamento e o progresso da missão acontecem depois da descarga, retirando apenas os produtos que essa empresa aceita; os restantes continuam no transporte. Os prazos continuam a decorrer durante a descarga. Também atende entregas a pé na recepção.
 
 Os cinco valores base são **10.000, 50.000, 100.000, 250.000 e 500.000 MT**. Prioridade e urgência acrescentam 25% ou 50%; a reputação pode melhorar ofertas futuras até 15%. O valor final aparece antes da confirmação e fica fixado no contrato. As quantidades aumentam com o nível; encomendas maiores podem exigir várias viagens.
 
@@ -264,7 +281,7 @@ Não são necessários plugins nativos. `main.tscn` inicia a composição dos si
 | Composição e interacções | `main.gd`, `player.gd`, `camera.gd` |
 | Agricultura | `terrain.gd`, `crop.gd`, `tools.gd`, `farm_feedback.gd` |
 | Calendário e necessidades | `calendar.gd`, `daylight.gd`, `vitals.gd` |
-| Casa e família | `farmhouse.gd`, `house_architecture.gd`, `house_interior.gd`, `home_life.gd`, `family.gd`, `house_elevator.gd` |
+| Casa e família | `farmhouse.gd`, `house_architecture.gd`, `house_interior.gd`, `home_life.gd`, `family.gd`, `house_elevator.gd`, `meal_table.gd`, `bathroom_sink.gd` |
 | Cortina e sequência do duche | `shower_curtain.gd` |
 | Rotinas da comunidade | `community_routine.gd`, `npc.gd` |
 | Televisão | `television.gd`, `tv_program.gd`, `tv_news.gd` |
@@ -273,7 +290,7 @@ Não são necessários plugins nativos. `main.tscn` inicia a composição dos si
 | Economia e objectivos | `economy.gd`, `missions.gd`, `deliveries.gd`, `logistics_ui.gd` |
 | Trabalhadores | `npc.gd`, `contract.gd`, `crew.gd`, `tasks.gd`, `navigation.gd` |
 | Comunidade e acessos | `community.gd`, `world_details.gd`, `traffic.gd`, `residence.gd`, `layout.gd`, `road_network.gd` |
-| Armazém e empresas | `warehouse.gd`, `factory.gd`, `industrial_sites.gd`, `industrial_gate.gd`, `industrial_art.gd`, `produce_crate.gd` |
+| Armazém e empresas | `warehouse.gd`, `factory.gd`, `industrial_sites.gd`, `industrial_gate.gd`, `industrial_art.gd`, `produce_crate.gd`, `warehouse_attendant.gd` |
 | Interface | `hud.gd`, `driving_hud.gd`, `minimap.gd`, `delivery_route.gd` |
 | Persistência | `persistence.gd` |
 
@@ -303,6 +320,8 @@ Executa os comandos a partir da raiz. Os testes alteram a sessão de teste; test
 ./Jogar.sh --headless --script validation/familia/test.gd
 ./Jogar.sh --headless --script validation/elevador/test.gd
 ./Jogar.sh --headless --script validation/acessos/test.gd
+./Jogar.sh --headless --script validation/casa_rotinas/test.gd
+./Jogar.sh --headless --script validation/funcionarios/test.gd
 
 # Centro logístico, contratos em dobro e escolha de carga
 ./Jogar.sh --headless --script validation/logistica_v2/test.gd
@@ -319,6 +338,8 @@ Cada teste escreve o resultado no terminal e termina com código de saída zero 
 ./Jogar.sh --script validation/familia/capture_cama.gd
 ./Jogar.sh --script validation/familia/capture_duche.gd
 ./Jogar.sh --script validation/elevador/capture.gd
+./Jogar.sh --script validation/casa_rotinas/capture.gd
+./Jogar.sh --script validation/funcionarios/capture.gd
 ./Jogar.sh --script validation/rotinas/capture.gd
 ./Jogar.sh --script validation/logistica_v2/capture.gd
 ```
@@ -364,3 +385,15 @@ Possíveis expansões **ainda não implementadas**: eventos sazonais, histórias
 - [Licença GNU GPL v3](LICENSE)
 
 Este README concentra a documentação actual do projecto.
+
+### Verificação das rotinas e da frota
+
+```bash
+./Jogar.sh --headless --script validation/casa_servicos/test.gd
+./Jogar.sh --headless --script validation/elevador/test.gd
+./Jogar.sh --headless --script validation/funcionarios/test.gd
+```
+
+`meal_service.gd` coordena cozinha, travessa e refeição partilhada; `toilet_flush.gd` reutiliza áudio e geometria para a descarga. Os testes cobrem a permanência do teto, roupão/roupeiro, serviço com percursos reais, chamada a correr, frota e adaptação de gravações antigas.
+
+Ficheiros desta revisão doméstica: `scripts/home_life.gd`, `family.gd`, `farmhouse.gd`, `shower_curtain.gd`, `avatar.gd`, `navigation.gd`, `main.gd`, `layout.gd` e `persistence.gd`; novos módulos `scripts/meal_service.gd` e `scripts/toilet_flush.gd`. Verificação e capturas em `validation/casa_servicos/` e `preview/casa_servicos/`. As rotinas partilham `meal_table.gd` e a casa mantém os módulos de arquitectura, interiores, elevador, câmara e lavatório.

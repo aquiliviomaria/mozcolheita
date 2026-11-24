@@ -29,7 +29,7 @@ func limpar_ordem(original: Dictionary) -> Dictionary:
 	for chave: String in ["maquina","etapa","busca"]: copia.erase(chave)
 	return copia
 func capturar() -> Dictionary:
-	var d: Dictionary = {"vitais":{"vida":mundo.vitais.vida,"fome":mundo.vitais.fome,"energia":mundo.vitais.energia,"higiene":mundo.vitais.higiene},"saldo":mundo.saldo,"stock":mundo.stock.duplicate(),"sacola":mundo.sacola.duplicate(),"relogio":mundo.relogio,"calendario":mundo.calendario.decorrido,"terreno":mundo.terreno.celulas.duplicate(true),"jogador":{"mulher":mundo.jogador.mulher,"roupa":mundo.jogador.roupa,"perfil":mundo.jogador.perfil,"posicao":posicao_segura(mundo.jogador,mundo.trator_actual),"giro":mundo.jogador.visual.global_rotation.y},"ferramentas":{"actual":mundo.ferramentas.actual,"cultura":mundo.ferramentas.cultura,"sementes":mundo.ferramentas.sementes,"madeira":mundo.ferramentas.madeira},"missoes":{"indice":mundo.missoes.indice,"produzido":mundo.missoes.produzido,"historico":mundo.missoes.historico},"entregas":{"activas":mundo.entregas.activas.duplicate(true),"historico":mundo.entregas.historico.duplicate(true),"reputacao":mundo.entregas.reputacao.duplicate(),"sequencia":mundo.entregas.sequencia,"concluidas":mundo.entregas.concluidas},"historico_servicos":mundo.contrato.historico.duplicate(true),"vendas":mundo.economia.vendas,"veiculos":[],"maquinas":[],"pessoas":[],"cercas":[],"arvores":[],"drones":[]}
+	var d: Dictionary = {"parque_versao":2,"vitais":{"vida":mundo.vitais.vida,"fome":mundo.vitais.fome,"energia":mundo.vitais.energia,"higiene":mundo.vitais.higiene},"saldo":mundo.saldo,"stock":mundo.stock.duplicate(),"sacola":mundo.sacola.duplicate(),"relogio":mundo.relogio,"calendario":mundo.calendario.decorrido,"terreno":mundo.terreno.celulas.duplicate(true),"jogador":{"mulher":mundo.jogador.mulher,"roupa":mundo.jogador.roupa,"perfil":mundo.jogador.perfil,"posicao":posicao_segura(mundo.jogador,mundo.trator_actual),"giro":mundo.jogador.visual.global_rotation.y},"ferramentas":{"actual":mundo.ferramentas.actual,"cultura":mundo.ferramentas.cultura,"sementes":mundo.ferramentas.sementes,"madeira":mundo.ferramentas.madeira},"missoes":{"indice":mundo.missoes.indice,"produzido":mundo.missoes.produzido,"historico":mundo.missoes.historico},"entregas":{"activas":mundo.entregas.activas.duplicate(true),"historico":mundo.entregas.historico.duplicate(true),"reputacao":mundo.entregas.reputacao.duplicate(),"sequencia":mundo.entregas.sequencia,"concluidas":mundo.entregas.concluidas},"historico_servicos":mundo.contrato.historico.duplicate(true),"vendas":mundo.economia.vendas,"veiculos":[],"maquinas":[],"pessoas":[],"cercas":[],"arvores":[],"drones":[]}
 	for veiculo: Node3D in mundo.tratores+[mundo.caminhao]:
 		var maquina: int = (mundo.implementos+mundo.carrinhas).find(veiculo.implemento)
 		d.veiculos.append({"posicao":veiculo.position,"giro":veiculo.rotation.y,"maquina":maquina})
@@ -47,7 +47,7 @@ func capturar() -> Dictionary:
 	var grupo: Dictionary = {"plano":equipa.plano.duplicate(true),"campos":equipa.campos.duplicate(),"pendentes":equipa.pendentes.duplicate(),"fase":equipa.fase,"sementes":equipa.sementes,"gasto":equipa.gasto,"carregado":equipa.carregado,"centro":equipa.centro,"ultimo":equipa.ultimo,"membros":[]}
 	for pessoa: Node3D in equipa.trabalhadores:
 		grupo.membros.append({"numero":pessoa.numero,"ordem":limpar_ordem(equipa.ordens[pessoa.get_instance_id()]),"trator":mundo.tratores.find(equipa.tractores.get(pessoa.get_instance_id(),null))})
-	d["casa"] = {"refeicoes":mundo.casa.vida_domestica.refeicoes,"introduzido":mundo.casa.vida_domestica.introduzido}
+	d["casa"] = {"refeicoes":mundo.casa.vida_domestica.refeicoes,"introduzido":mundo.casa.vida_domestica.introduzido,"refeicoes_consumidas":mundo.casa.vida_domestica.refeicoes_consumidas}
 	d["familia"] = {"preferencia":mundo.familia.preferencia}
 	d["carros"] = []
 	for carro: Node3D in mundo.carros: d.carros.append({"posicao":carro.position,"giro":carro.rotation.y})
@@ -60,7 +60,7 @@ func validar(d: Dictionary) -> bool:
 		if not d.get(chave) is Dictionary: return false
 	for chave: String in ["veiculos","maquinas","pessoas","cercas","arvores","drones","historico_servicos"]:
 		if not d.get(chave) is Array: return false
-	if d.veiculos.size()!=4 or d.maquinas.size()!=15 or d.arvores.size()!=8 or d.drones.size()!=3 or d.pessoas.size()!=mundo.pessoas.size(): return false
+	if d.veiculos.size()!=4 or d.maquinas.size() not in [7,15] or d.arvores.size()!=8 or d.drones.size() not in [2,3] or d.pessoas.size()!=mundo.pessoas.size(): return false
 	if not d.get("saldo") is int or not is_finite(float(d.get("calendario",NAN))) or float(d.calendario)<0: return false
 	if not d.jogador.get("posicao") is Vector3 or not d.jogador.posicao.is_finite(): return false
 	if d.terreno.size()>28000 or d.cercas.size()<mundo.cerca.portoes.size() or d.cercas.size()>3000: return false
@@ -82,6 +82,7 @@ func validar(d: Dictionary) -> bool:
 		if not d.entregas.has(campo): return false
 	for campo: String in ["plano","campos","pendentes","fase","sementes","gasto","carregado","centro","ultimo","membros"]:
 		if not d.grupo.has(campo): return false
+	if d.has("parque_versao") and (not d.parque_versao is int or int(d.parque_versao) not in range(3)): return false
 	if d.has("familia"):
 		if not d.familia is Dictionary or not d.familia.get("preferencia") is int or int(d.familia.preferencia) not in range(-1,2): return false
 	if d.has("carros"):
@@ -89,10 +90,11 @@ func validar(d: Dictionary) -> bool:
 		for carro: Variant in d.carros:
 			if not carro is Dictionary or not carro.get("posicao") is Vector3 or not carro.posicao.is_finite() or not is_finite(float(carro.get("giro",NAN))): return false
 	for chave: String in ["roupa","perfil"]:
-		if d.jogador.has(chave) and (not d.jogador[chave] is int or int(d.jogador[chave])<0 or int(d.jogador[chave])>(3 if chave=="roupa" else 4)): return false
+		if d.jogador.has(chave) and (not d.jogador[chave] is int or int(d.jogador[chave])<0 or int(d.jogador[chave])>4): return false
 	if d.has("casa"):
 		if not d.casa is Dictionary or not d.casa.get("refeicoes") is int: return false
 		if int(d.casa.refeicoes)<0 or int(d.casa.refeicoes)>4: return false
+		if d.casa.has("refeicoes_consumidas") and (not d.casa.refeicoes_consumidas is int or int(d.casa.refeicoes_consumidas)<0 or int(d.casa.refeicoes_consumidas)>1000000): return false
 	if d.has("vitais"):
 		if not d.vitais is Dictionary: return false
 		for campo: String in ["vida","fome","energia"]:
@@ -109,7 +111,7 @@ func validar(d: Dictionary) -> bool:
 		if not p.servico.is_empty() and int(p.servico.get("trator",-1)) not in range(3): return false
 	var maquinas_vistas: Array[int] = []
 	for item: Dictionary in d.veiculos:
-		if not item.get("posicao") is Vector3 or not item.posicao.is_finite() or int(item.get("maquina",-2)) not in range(-1,15): return false
+		if not item.get("posicao") is Vector3 or not item.posicao.is_finite() or int(item.get("maquina",-2)) not in range(-1,d.maquinas.size()): return false
 		var indice: int = int(item.maquina)
 		if indice>=0:
 			if indice in maquinas_vistas: return false
@@ -170,11 +172,45 @@ func carregar() -> bool:
 	aplicar(d)
 	iniciada = true; intervalo = 0; estado = "Cópia recuperada" if recuperada else "Quinta retomada"
 	mundo.avisar(estado+" · "+mundo.calendario.hora()); return true
-func aplicar(d: Dictionary) -> void:
+func adaptar_frota(original: Dictionary) -> Dictionary:
+	var d: Dictionary = original.duplicate(true)
+	if d.maquinas.size()==15:
+		# Conserva as três carrinhas e respectivas cargas; reduz duplicados dos implementos.
+		var antigas: Array = d.maquinas
+		var novas: Array = []
+		for tipo: int in range(4):
+			var escolhido: int = tipo
+			for v: Dictionary in d.veiculos:
+				if int(v.maquina) in range(12) and int(v.maquina)%4==tipo: escolhido = int(v.maquina); break
+			novas.append(antigas[escolhido])
+		for i: int in range(12,15): novas.append(antigas[i])
+		d.maquinas = novas
+		for i: int in range(mini(mundo.carros.size(),d.get("carros",[]).size())): d.carros[i].posicao = mundo.carros[i].position
+		var usados: Array[int] = []
+		for i: int in range(d.veiculos.size()):
+			var anterior: int = int(d.veiculos[i].maquina)
+			var novo: int = anterior-8 if anterior>=12 else anterior%4 if anterior>=0 else -1
+			d.veiculos[i].maquina = novo if novo not in usados else -1
+			if novo>=0: usados.append(novo)
+			if i<3: d.veiculos[i].posicao = mundo.tratores[i].position
+		for i: int in range(novas.size()): novas[i].posicao = (mundo.implementos+mundo.carrinhas)[i].position
+	if d.drones.size()==3:
+		d.drones = [mundo.drones[0].position,mundo.drones[1].position]
+	if int(original.get("parque_versao",0))<2:
+		for i: int in range(3): d.veiculos[i].posicao = mundo.tratores[i].position
+		for i: int in range(d.maquinas.size()): d.maquinas[i].posicao = (mundo.implementos+mundo.carrinhas)[i].position
+		for i: int in range(d.drones.size()): d.drones[i] = mundo.drones[i].position
+		d.parque_versao = 2
+	return d
+func aplicar(original: Dictionary) -> void:
+	var d: Dictionary = adaptar_frota(original)
+	# Operações pendentes ainda não alteraram inventários; cancelar antes de repor o estado.
+	for site: Node3D in [mundo.armazem]+mundo.fabricas:
+		if site.funcionario!=null: site.funcionario.cancelar(false,true)
 	mundo.familia.desembarcar()
 	mundo.casa.vida_domestica.levantar()
 	mundo.casa.vida_domestica.introduzido = true
-	mundo.jogador.roupa = clampi(int(d.jogador.get("roupa",0)),0,3)
+	mundo.jogador.roupa = clampi(int(d.jogador.get("roupa",0)),0,4)
 	mundo.jogador.perfil = clampi(int(d.jogador.get("perfil",0)),0,4)
 	mundo.familia.preferencia = clampi(int(d.get("familia",{}).get("preferencia",-1)),-1,1)
 	mundo.familia.actividade = "casa"; mundo.familia.pronta = false; mundo.familia.pessoa.position = mundo.casa.to_global(Vector3(5,5.64,3))
@@ -182,6 +218,7 @@ func aplicar(d: Dictionary) -> void:
 		mundo.carros[i].position = d.carros[i].posicao; mundo.carros[i].rotation.y = d.carros[i].giro
 	mundo.vitais.higiene = clampf(float(d.get("vitais",{}).get("higiene",100)),0,100)
 	mundo.casa.vida_domestica.refeicoes = clampi(int(d.get("casa",{}).get("refeicoes",4)),0,4)
+	mundo.casa.vida_domestica.refeicoes_consumidas = clampi(int(d.get("casa",{}).get("refeicoes_consumidas",4-mundo.casa.vida_domestica.refeicoes)),0,1000000)
 	# Primeiro desmontar ocupações e excepções; não pagar nem devolver dinheiro aqui.
 	if mundo.drone_actual!=null: mundo.drone_actual.devolver()
 	if mundo.trator_actual!=null:
@@ -205,7 +242,7 @@ func aplicar(d: Dictionary) -> void:
 	for i: int in range(4):
 		var veiculo: Node3D = (mundo.tratores+[mundo.caminhao])[i]; var v: Dictionary = d.veiculos[i]
 		veiculo.position = v.posicao; veiculo.rotation.y = v.giro; veiculo.rapidez = 0; veiculo.velocity = Vector3.ZERO; veiculo.ocupado = false; veiculo.trabalhador = null; veiculo.atribuido = null; veiculo.recuar = false
-	for i: int in range(15):
+	for i: int in range(mundo.implementos.size()+mundo.carrinhas.size()):
 		var maquina: Node3D = (mundo.implementos+mundo.carrinhas)[i]; var m: Dictionary = d.maquinas[i]
 		maquina.position = m.posicao; maquina.rotation.y = m.giro; maquina.activo = false
 		if maquina.tipo<4: maquina.sementes = m.sementes
@@ -241,7 +278,7 @@ func aplicar(d: Dictionary) -> void:
 	for i: int in range(8):
 		var arvore: Node3D = mundo.ferramentas.arvores[i]; arvore.visible = d.arvores[i].visivel; arvore.set_meta("golpes",d.arvores[i].golpes)
 		for forma: Node in arvore.find_children("*","CollisionShape3D",true,false): forma.set_deferred("disabled",not arvore.visible)
-	for i: int in range(3): mundo.drones[i].position = d.drones[i]; mundo.drones[i].voando = false; mundo.drones[i].irrigando = false
+	for i: int in range(mundo.drones.size()): mundo.drones[i].position = d.drones[i]; mundo.drones[i].voando = false; mundo.drones[i].irrigando = false
 	mundo.jogador.position = d.jogador.posicao; mundo.jogador.velocity = Vector3.ZERO; mundo.jogador.bloqueado = false; mundo.jogador.visual.rotation.y = d.jogador.giro; mundo.camera.livre = false; mundo.camera.enquadramento = false; mundo.camera.alvo = mundo.jogador
 	for campo: String in ["cultura","sementes","madeira"]: mundo.ferramentas.set(campo,d.ferramentas[campo])
 	iniciada = true

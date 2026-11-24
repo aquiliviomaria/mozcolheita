@@ -133,6 +133,13 @@ func animar(delta: float, andamento: float, sentado: bool = false) -> void:
 	if is_instance_valid(comando_drone): comando_drone.visible = pilotar_drone
 	if deitado: aplicar_pose_cama()
 
+func sentar_no_assento(altura_global: float,delta: float = 0) -> void:
+	animar(delta,0,true)
+	# A bacia assenta na cadeira, coxas horizontais e canelas verticais.
+	visual.position.y = altura_global-global_position.y-0.80*escala_corpo().y
+	for i: int in range(2):
+		pernas[i].rotation.x = PI/2; joelhos[i].rotation.x = -PI/2
+
 func deitar(lado: int) -> void:
 	deitado = true; lado_cama = lado; animar(0,0)
 

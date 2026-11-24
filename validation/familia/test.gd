@@ -53,16 +53,17 @@ func executar() -> void:
 	exigir(lar.estado=="acordado" and mundo.calendario.decorrido==600,"Dorme de noite e acorda às 06:00 sem sair da cama")
 	exigir(familia.actividade=="cama" and familia.pronta and familia.pessoa.visual.rotation.x>1,"Cônjuge acompanha obrigatoriamente o sono")
 	tecla(KEY_E); exigir(not lar.ocupado() and not mundo.jogador.bloqueado,"E liberta jogador ao acordar")
+	var porcoes: int = lar.refeicoes
 	colocar(lar.MESA); tecla(KEY_E); mundo.vitais.fome = 20; tecla(KEY_C)
 	familia.pessoa.position = mundo.casa.to_global(Vector3(5,5.7,3)); familia.alvo_anterior = Vector3.INF
 	Engine.time_scale = 8
-	for i: int in range(500):
+	for i: int in range(7200):
 		await physics_frame
-		if familia.pronta: break
+		if lar.refeicoes<porcoes: break
 	Engine.time_scale = 1
 	print("COMPANHIA MESA · ",familia.pronta," ",mundo.casa.to_local(familia.pessoa.position))
 	exigir(familia.pronta and familia.actividade=="mesa","C faz companhia caminhar e sentar à mesa")
-	var porcoes: int = lar.refeicoes; tecla(KEY_E); lar._process(0.2); familia.pose(0.2)
+	lar._process(0.2); familia.pose(0.2)
 	exigir(lar.refeicoes==porcoes-1 and lar.a_comer>0 and is_instance_valid(lar.alimento_mao),"Comida real e animação de levar alimento à boca")
 	exigir(is_instance_valid(familia.comida_mao),"Companhia come em conjunto")
 	lar.levantar(); colocar(lar.SOFA); tecla(KEY_E); lar._process(15)
@@ -81,7 +82,7 @@ func executar() -> void:
 	exigir(not lar.agua.emitting and lar.ocupado(),"Água pára antes de abrir cortina para saída")
 	for i: int in range(30): lar._process(0.1)
 	exigir(not lar.ocupado() and lar.duche.abertura>0.99,"Sai do duche e pano fica aberto")
-	exigir(not lar.agua.emitting and mundo.jogador.roupa==(roupa+1)%4,"Terminar banho restaura roupa")
+	exigir(not lar.agua.emitting and mundo.jogador.roupa==4,"Terminar banho veste roupão")
 	colocar(lar.SANITA); tecla(KEY_E); exigir(lar.estado=="sanita","Sanita utilizável"); tecla(KEY_E)
 	# Chamada real do quarto até ao automóvel: escadas, porta e percurso exterior.
 	mundo.carros[0].entrar(); familia.pessoa.position = mundo.casa.to_global(Vector3(5,5.7,3)); familia.pronta = false; tecla(KEY_C)
@@ -114,7 +115,7 @@ func executar() -> void:
 	mundo.partida.caminho = "user://teste-familia-isolada.mozsave"; familia.preferencia = 1
 	exigir(mundo.partida.guardar(false),"Guarda nova família, roupa, corpo e automóveis")
 	mundo.jogador.perfil = 0; mundo.jogador.roupa = 0; familia.preferencia = -1
-	exigir(mundo.partida.carregar() and mundo.jogador.perfil==3 and mundo.jogador.roupa==(roupa+1)%4 and familia.preferencia==1,"Retoma conserva personalização e família")
+	exigir(mundo.partida.carregar() and mundo.jogador.perfil==3 and mundo.jogador.roupa==4 and familia.preferencia==1,"Retoma conserva personalização e família")
 	var legado: Dictionary = mundo.partida.capturar(); legado.erase("familia"); legado.erase("carros"); legado.jogador.erase("roupa"); legado.jogador.erase("perfil")
 	exigir(mundo.partida.validar(legado),"Gravações anteriores continuam válidas")
 	for sufixo: String in ["",".bak",".tmp"]:

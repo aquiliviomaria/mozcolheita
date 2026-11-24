@@ -103,6 +103,15 @@ static func construir(a: Node3D) -> void:
 		a.peca(joelho,Vector3(0,-0.34,-0.045),Vector3(0.18,0.22,0.29),Color("70452a"),true)
 		a.peca(joelho,Vector3(0,-0.425,-0.05),Vector3(0.18,0.035,0.30),Color("392b22"),true)
 		a.pernas.append(perna)
+	if a.roupa==4:
+		# Roupão fechado, com gola e cinto; mantém os mesmos pivôs de animação.
+		contorno(a,a.visual,[Vector3(0.48,0.31,0.21),Vector3(0.95,0.25,0.19),Vector3(1.39,0.26,0.18)],Color("f2e8d5"))
+		for lado: float in [-1,1]:
+			var gola: MeshInstance3D = a.peca(a.visual,Vector3(lado*0.075,1.27,-0.193),Vector3(0.065,0.34,0.045),Color("dfd2b9")); gola.rotation.z = lado*0.25
+		contorno(a,a.visual,[Vector3(0.93,0.263,0.203),Vector3(0.99,0.263,0.203)],Color("b9a586"))
+		a.peca(a.visual,Vector3(0,0.96,-0.22),Vector3(0.15,0.08,0.08),Color("b9a586"),true)
+		for braco: Node3D in a.bracos:
+			contorno(a,braco,[Vector3(-0.27,0.085,0.08),Vector3(0.03,0.09,0.08)],Color("f2e8d5"))
 	a.cesto = Node3D.new(); a.visual.add_child(a.cesto)
 	a.peca(a.cesto,Vector3(0,1.01,-0.37),Vector3(0.43,0.25,0.30),Color("ad7b44"))
 	for i: int in range(5): a.peca(a.cesto,Vector3(-0.15+i*0.075,1.15,-0.37),Vector3.ONE*0.08,Color("d7462e"),true)

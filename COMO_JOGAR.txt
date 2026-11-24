@@ -14,14 +14,19 @@ AVANÇAR TEMPO OU DORMIR TAMBÉM AVANÇA PRAZOS E PODE APLICAR MULTAS.
 
 CASA DE DOIS PISOS
 Sala e cozinha no rés-do-chão. Quarto e casa de banho no piso superior.
-Suba pelas escadas ou use E junto ao elevador para chamar e entrar.
-Dentro do elevador: WASD andar, 1 rés-do-chão, 2 quarto, E abrir.
+Suba pelas escadas, com guarda-corpo de ferro em cima, ou use E no elevador.
+Dentro do elevador: WASD andar, rato roda a câmara, 1 rés-do-chão, 2 quarto, E abrir.
 Ao chegar pode ficar na cabine ou sair a pé. Portas de vidro.
 As portas fecham antes de mover e abrem ao chegar. Sensor impede fecho sobre pessoas.
 A porta da casa abre por proximidade.
 E na cama, de dia: senta. E sai da cama.
 E na cama, à noite: dorme com o cônjuge e acorda às 06:00. E sai da cama.
-E junto à mesa: senta. E novamente: come com animação e alimento na mão.
+E junto à mesa: senta na cadeira. E novamente: come com animação e alimento na mão.
+Quatro ementas: xima/matapa, arroz/feijão, milho/salada e pão/fruta/chá.
+Os pratos mudam depois de comer e no novo dia; a rotação fica gravada.
+E no lavatório com espelho: setas ou 1/2 escolhem, E confirma.
+Lavar a cara: 4 s (+12 higiene). Escovar os dentes: 7 s (+18 higiene).
+E/Esc ou WASD interrompem, desligam a torneira e libertam o jogador.
 WASD/Esc levanta da mesa. Quatro refeições iniciais; depois usa produtos reais.
 E no sofá: liga televisão. Espaço liga/desliga; E/WASD/Esc levanta.
 E no roupeiro: alterna quatro conjuntos de roupa.
@@ -50,8 +55,14 @@ V activa câmara livre; WASD move, Q/E altera altura, V regressa.
 ARMAZÉM E ENTREGAS
 Armazém dentro da quinta: (52, 40), sem segurança nem cancela.
 Seguranças e cancelas existem apenas nas fábricas onde vende produtos.
-Entre carregado para guardar. Saia e volte vazio para escolher produto e quantidade.
+Celso espera sentado no armazém e levanta-se para carregar ou descarregar.
+Entre carregado, pare e aguarde que ele guarde a colheita.
+Entre vazio para escolher produto e quantidade; confirme o pedido ao funcionário.
+X junto do armazém também solicita carga ou descarga.
+A carga só muda no fim. Não acelere nem se afaste antes de ele terminar.
 Depois escolha sede/filial de destino; siga a seta até à garagem.
+Cada fábrica tem funcionário para receber e descarregar os produtos aceites.
+Pare dentro da garagem e aguarde a descarga para receber o pagamento.
 Stock excedente fica no armazém. Três carrinhas: 120 unidades; camião: 500.
 M abre missões: escolha 10.000, 50.000, 100.000, 250.000 ou 500.000 MT e urgência.
 Reveja o valor final, quantidade, prazo e multa antes de confirmar.
@@ -89,3 +100,12 @@ Muda de notícia a cada sete segundos, sem repetir até esgotar a edição.
 Notícias da quinta acompanham stock, entregas e empregos reais da partida.
 GTA VI: feitos, recordes e música, com fontes verificadas em 22/11/2026.
 Espaço liga/desliga; E/WASD/Esc sai do sofá. Notícias locais, sem ligação à Internet.
+
+ROTINAS DA CASA E PARQUE DE MÁQUINAS
+- Sanita: E senta; ao levantar dá descarga com som e água animada.
+- Duche: pano mais baixo, chuveiros e água visíveis. Ao sair fica de roupão; E no roupeiro do quarto veste roupa de trabalho.
+- Mesa: começa com pratos vazios. E senta e chama a companhia para preparar, trazer e servir a comida; o casal só come depois de ambos se sentarem. WASD/Esc cancela.
+- C chama o cônjuge a correr, dentro ou fora de casa. Durante o serviço da refeição, deixa-o terminar.
+- Teto, lajes e paredes mantêm-se visíveis no banho e no elevador.
+- No outro lado da casa (à esquerda da fachada), separado dos automóveis: três tractores, dois drones e um preparador, uma semeadora, um irrigador e uma ceifeira. Três carrinhas para transporte.
+- Retomar gravações antigas adapta a frota e conserva as cargas das carrinhas.

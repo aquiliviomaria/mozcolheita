@@ -16,12 +16,12 @@ static func construir(c: Node3D) -> void:
 	caixa(c,Vector3(-7,1.3,0.5),Vector3(4.2,1.3,0.9),"765337")
 	caixa(c,Vector3(-7,3.1,0.3),Vector3(4.1,2.3,0.16),"202c2d",false).name = "Televisao"
 	# Cozinha, duas cadeiras e bancada. Corredor x -2..2 fica livre.
-	caixa(c,Vector3(8,1.63,0),Vector3(4,0.18,2.2),"aa7450")
+	caixa(c,Vector3(8,1.34,0),Vector3(4,0.18,2.2),"aa7450")
 	for x: float in [6.8,9.2]:
-		for lado: float in [-1,1]: caixa(c,Vector3(x+lado*0.38,1.12,0),Vector3(0.14,1,1.6),"765337")
-		caixa(c,Vector3(x,1.17,2),Vector3(1.2,0.16,1),"765337")
-		caixa(c,Vector3(x,1.8,2.45),Vector3(1.2,1.2,0.14),"765337")
-		for lado: float in [-1,1]: caixa(c,Vector3(x+lado*0.45,0.9,2),Vector3(0.12,0.5,0.8),"765337")
+		for lado: float in [-1,1]: caixa(c,Vector3(x+lado*0.38,0.99,0),Vector3(0.14,0.7,1.6),"765337")
+		caixa(c,Vector3(x,1.0,2),Vector3(1.2,0.16,1),"765337")
+		caixa(c,Vector3(x,1.66,2.45),Vector3(1.2,1.2,0.14),"765337")
+		for lado: float in [-1,1]: caixa(c,Vector3(x+lado*0.45,0.82,2),Vector3(0.12,0.36,0.8),"765337")
 	caixa(c,Vector3(10,1.4,-8.5),Vector3(8,1.5,1.5),"7d9a76")
 	caixa(c,Vector3(10,2.2,-8.5),Vector3(8.2,0.15,1.7),"d3c9aa")
 	caixa(c,Vector3(13.8,2.2,-5.5),Vector3(2,3.1,1.7),"e9dfc5")
@@ -37,8 +37,8 @@ static func construir(c: Node3D) -> void:
 	oval(c,Vector3(6,6.15,-7),Vector3(1.1,0.9,1.5),"eeeadd")
 	var aro: MeshInstance3D = MeshInstance3D.new(); var toro: TorusMesh = TorusMesh.new(); toro.inner_radius = 0.32; toro.outer_radius = 0.48; aro.mesh = toro; aro.position = Vector3(6,6.65,-7); aro.scale.z = 1.3; aro.material_override = c.mundo.material(Color("eeeadd")); c.add_child(aro); c.piso_superior.append(aro)
 	caixa(c,Vector3(6,6.7,-7.8),Vector3(1.1,1.4,0.45),"eeeadd")
-	caixa(c,Vector3(4.2,6.5,-9.5),Vector3(2.5,1.6,1.2),"7d9a76")
-	oval(c,Vector3(4.2,7.4,-9.5),Vector3(2.1,0.3,1.1),"eeeadd")
+	caixa(c,Vector3(4.2,6.04,-9.5),Vector3(2.5,0.8,1.2),"7d9a76")
+	oval(c,Vector3(4.2,6.58,-9.5),Vector3(2.1,0.3,1.1),"eeeadd")
 	caixa(c,Vector3(11,5.68,-7),Vector3(4,0.08,4),"b4c8c6",false)
 	for x: float in [9,13]:
 		var vidro: Node3D = c.vidro(Vector3(x,7.2,-7),Vector3(0.05,3,4)); c.piso_superior.append(vidro)

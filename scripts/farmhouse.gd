@@ -33,10 +33,10 @@ func _process(delta: float) -> void:
 	porta.rotation.y = -abertura*PI*0.6
 	if mundo.luz_diaria!=null:
 		luz_interior.light_energy = lerpf(0.9,0.08,mundo.luz_diaria.luminosidade); luz_quarto.light_energy = luz_interior.light_energy
-	var interior: bool = dentro(mundo.jogador.global_position)
-	var corte: bool = mundo.camera!=null and (mundo.camera.enquadramento or mundo.camera.livre)
-	for n: Node3D in telhado: n.visible = not (interior and corte)
-	for n: Node3D in piso_superior: n.visible = not (interior and corte) or local.y>4.6
+	# Arquitectura permanente: as câmaras domésticas permanecem dentro dos compartimentos.
+	for n: Node3D in telhado: n.visible = true
+	for n: Node3D in piso_superior: n.visible = true
+
 func vidro(p: Vector3,tamanho: Vector3) -> Node3D:
 	var janela: MeshInstance3D = mundo.caixa(self,p,tamanho,Color("a0cfdf"),true); janela.name = "JanelaTransparente"
 	var mat: StandardMaterial3D = StandardMaterial3D.new(); mat.albedo_color = Color(0.63,0.81,0.87,0.14); mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA; mat.roughness = 0.15; mat.cull_mode = BaseMaterial3D.CULL_DISABLED; janela.material_override = mat; return janela

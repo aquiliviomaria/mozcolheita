@@ -143,7 +143,7 @@ func _ready() -> void:
 	for indice: int in range(3):
 		var carrinha: Node3D = preload("res://scripts/trailer.gd").new()
 		carrinha.mundo = self
-		carrinha.position = Vector3(-18+indice*8,0,56)
+		carrinha.position = Vector3(-40-indice*10,0,-19)
 		carrinha.position.y = altura(carrinha.position)
 		add_child(carrinha); carrinhas.append(carrinha)
 	criar_drones()
@@ -224,23 +224,22 @@ func criar_maquinas() -> void:
 		var veiculo: CharacterBody3D = preload("res://scripts/tractor.gd").new()
 		veiculo.mundo = self
 		veiculo.numero = indice
-		veiculo.position = Vector3(-51+indice*9,0,24)
+		veiculo.position = Vector3(-40-indice*9,0,-51)
 		veiculo.position.y = altura(veiculo.position)+0.1
 		add_child(veiculo); tratores.append(veiculo)
-	for fila_maquinas: int in range(3):
-		for tipo: int in range(4):
-			var maquina: Node3D = preload("res://scripts/implement.gd").new()
-			maquina.mundo = self; maquina.tipo = tipo
-			maquina.position = Vector3((-51 if fila_maquinas==0 else -70)+tipo*6,0,44 if fila_maquinas==0 else -40 if fila_maquinas==1 else -28)
-			maquina.position.y = altura(maquina.position)
-			add_child(maquina); implementos.append(maquina)
+	for tipo: int in range(4):
+		var maquina: Node3D = preload("res://scripts/implement.gd").new()
+		maquina.mundo = self; maquina.tipo = tipo
+		maquina.position = Vector3(-40-tipo*7,0,-39)
+		maquina.position.y = altura(maquina.position)
+		add_child(maquina); implementos.append(maquina)
 
 func criar_drones() -> void:
-	for indice: int in range(3):
+	for indice: int in range(2):
 		var drone: Node3D = preload("res://scripts/drone.gd").new()
 		drone.mundo = self
 		drone.numero = indice
-		drone.position = Vector3(indice*8,0.7,-18)
+		drone.position = Vector3(-40-indice*8,0.7,-30)
 		drone.position.y = altura(drone.position)+0.7
 		add_child(drone)
 		drones.append(drone)
@@ -306,7 +305,9 @@ func interagir() -> void:
 		return
 	if casa!=null and casa.vida_domestica.interagir(): return
 	for fabrica: Node3D in fabricas:
-		if fabrica.perto(): entregas.entregar(sacola,fabrica.numero); economia.vender(sacola,fabrica.numero); return
+		if fabrica.perto():
+			if not fabrica.encomendar_descarga(): avisar("Funcionário ocupado ou sem produtos aceites pela fábrica")
+			return
 	if armazem!=null and armazem.perto():
 		# Estacionar junto ao armazém não pode impedir voltar a entrar no veículo.
 		var transporte: CharacterBody3D = trator_proximo()
@@ -536,7 +537,7 @@ func testar() -> void:
 	terreno.trabalhar(chave,"regar"); terreno.avancar(Terreno.DURACAO)
 	verificar(terreno.trabalhar(chave,"colher") and not terreno.trabalhar(chave,"colher"),"Colheita única")
 	verificar(int(sacola.get(0,0))==3 and missoes.produzido==3,"Produção entra na sacola e na missão uma única vez")
-	verificar(tratores.size()==3 and implementos.size()==12 and drones.size()==3,"Veículos preservados")
+	verificar(tratores.size()==3 and implementos.size()==4 and drones.size()==2,"Veículos preservados")
 	var veiculo: CharacterBody3D = tratores[0]
 	var maquina: Node3D = implementos[0]
 	maquina.position = veiculo.position+Vector3(0,0,2.8)
@@ -563,10 +564,19 @@ func testar() -> void:
 	verificar(not reboque.acoplar(tractor_teste),"Volume bloqueado impede engate")
 	bloqueio.free(); await get_tree().physics_frame
 	verificar(reboque.acoplar(tractor_teste),"Carrinha acopla após libertar espaço")
-	reboque.carregar({0:7}); tractor_teste.position = armazem.ENTREGA; jogador.position = tractor_teste.position
-	verificar(reboque.transferir()==7 and int(stock.get(0,0))==7,"Carrinha deposita no armazém")
-	reboque.carregar({1:8}); tractor_teste.position = preload("res://scripts/industrial_sites.gd").entrada(1); jogador.position = tractor_teste.position
-	verificar(reboque.transferir()>0 and reboque.total()==0 and reboque.transferir()==0,"Carrinha vende sem duplicação")
+	reboque.carregar({0:7}); tractor_teste.position = armazem.CENTRO-Vector3(0,0,4.8); reboque.position = armazem.CENTRO; jogador.position = tractor_teste.position; armazem.dentro = true
+	Engine.time_scale = 8; reboque.transferir()
+	for i: int in range(600):
+		await get_tree().physics_frame
+		if not armazem.funcionario.ocupado(): break
+	verificar(reboque.total()==0 and int(stock.get(0,0))==7,"Funcionário descarrega carrinha no armazém")
+	reboque.carregar({1:8}); tractor_teste.position = fabricas[1].position-Vector3(0,0,4.8); reboque.position = fabricas[1].position; jogador.position = tractor_teste.position
+	var saldo_venda: int = saldo; reboque.transferir()
+	for i: int in range(600):
+		await get_tree().physics_frame
+		if not fabricas[1].funcionario.ocupado(): break
+	verificar(saldo>saldo_venda and reboque.total()==0 and reboque.transferir()==0,"Funcionário recebe carrinha na fábrica sem duplicação")
+	Engine.time_scale = 1
 	reboque.soltar()
 	testar_contratos()
 	var dinheiro_antes: int = saldo
@@ -763,6 +773,9 @@ func testar_logistica() -> void:
 	for fabrica_teste: Node3D in fabricas: verificar(not preload("res://scripts/layout.gd").dentro(fabrica_teste.position),"Fábrica fora da quinta")
 	stock.clear(); sacola = {0:80,1:70}
 	jogador.position = armazem.CENTRO; armazem.actualizar(1)
+	for i: int in range(1200):
+		await get_tree().physics_frame
+		if not armazem.funcionario.ocupado(): break
 	verificar(sacola.is_empty() and int(stock[0])+int(stock[1])==150,"Entrada deposita colheita no novo armazém")
 	jogador.position = Vector3.ZERO; armazem.actualizar(1)
 	var veiculo: CharacterBody3D = tratores[2]; var reboque: Node3D = carrinhas[2]
@@ -776,6 +789,9 @@ func testar_logistica() -> void:
 	verificar(reboque.total()==120 and int(stock.get(0,0))+int(stock.get(1,0))==30,"Carga escolhida respeita capacidade e excedente")
 	reboque.position = armazem.ENTREGA; armazem.actualizar(1)
 	reboque.position = armazem.CENTRO; armazem.actualizar(1)
+	for i: int in range(1200):
+		await get_tree().physics_frame
+		if not armazem.funcionario.ocupado(): break
 	verificar(reboque.total()==0 and int(stock.get(0,0))+int(stock.get(1,0))==150,"Nova entrada carregada deposita os produtos")
 	reboque.soltar(); veiculo.sair(); central_logistica.fechar()
 	reboque.position = Vector3(6,altura(Vector3(6,0,56)),56); veiculo.position = Vector3(6,altura(Vector3(6,0,20)),20)

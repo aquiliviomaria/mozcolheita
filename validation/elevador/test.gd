@@ -36,9 +36,13 @@ func executar() -> void:
 	exigir(e.abertura[0]>0.95 and is_equal_approx(y,e.position.y),"Sensor impede fechar sobre uma pessoa")
 	mundo.jogador.position = mundo.casa.to_global(Vector3(-4.5,0.64,-5))
 	var fechado_em_viagem: bool = true
+	var estrutura_visivel: bool = true
 	for i: int in range(360):
 		lar._physics_process(1.0/60)
+		mundo.casa._process(0)
+		for n: Node3D in mundo.casa.telhado+mundo.casa.piso_superior: estrutura_visivel = estrutura_visivel and n.visible
 		if e.fase=="mover": fechado_em_viagem = fechado_em_viagem and e.abertura[0]<0.001 and e.abertura[1]<0.001 and e.abre_cabine<0.001
+	exigir(estrutura_visivel,"Teto, lajes e paredes não desaparecem durante a subida")
 	exigir(fechado_em_viagem,"Todos os acessos fechados durante a viagem")
 	exigir(lar.ocupado() and e.fase=="sair" and e.piso==1,"Ao chegar abre e deixa o jogador permanecer na cabine")
 	exigir(absf(mundo.casa.to_local(mundo.jogador.position).x+4.5)<0.01,"Viagem conserva posição horizontal")

@@ -50,7 +50,11 @@ func actualizar_carga() -> void:
 func transferir() -> int:
 	if absf(rapidez)>0.4: mundo.avisar("Pare o camião para carregar/entregar."); return 0
 	for fabrica: Node3D in mundo.fabricas:
-		if preload("res://scripts/layout.gd").distancia(position,fabrica.position+Vector3(0,0,-42))<15:
-			var entregue: int = mundo.entregas.entregar(carga,fabrica.numero); var venda: int = mundo.economia.vender(carga,fabrica.numero); actualizar_carga(); return entregue+venda
-	if mundo.armazem.perto(): mundo.armazem.solicitar_carga(self); return 0
+		if fabrica.na_garagem(self) or preload("res://scripts/layout.gd").distancia(position,fabrica.position+Vector3(0,0,-42))<15:
+			if not fabrica.encomendar_descarga(self): mundo.avisar("Entre na garagem, pare e aguarde o funcionário")
+			return 0
+	if mundo.armazem.perto():
+		if not carga.is_empty(): mundo.armazem.encomendar_descarga(self)
+		else: mundo.armazem.solicitar_carga(self)
+		return 0
 	return carregar(mundo.sacola)

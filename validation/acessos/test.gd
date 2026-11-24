@@ -27,13 +27,21 @@ func executar() -> void:
 	for n: Node in w.get_children(): exigir(n.get_script()!=load("res://scripts/industrial_gate.gd"),"Armazém sem segurança ou cancela")
 	var sacola: Dictionary = {0:24,1:13}; w.receber(sacola)
 	exigir(sacola.is_empty() and mundo.stock.get(0)==24 and mundo.stock.get(1)==13,"Produção depositada no stock da quinta")
+	Engine.time_scale = 4
 	mundo.sacola = {2:9}; mundo.jogador.position = w.CENTRO; w.dentro = false; w.actualizar(1)
+	for i: int in range(3600):
+		await physics_frame
+		if not w.funcionario.ocupado(): break
 	exigir(mundo.sacola.is_empty() and mundo.stock.get(2)==9,"Entrada a pé guarda a colheita")
-	mundo.caminhao.position = w.CENTRO; mundo.caminhao.carga = {3:18}; mundo.trator_actual = mundo.caminhao; w.actualizar(1)
+	mundo.jogador.position = w.ENTREGA
+	mundo.caminhao.position = w.CENTRO; mundo.caminhao.carga = {3:18}; mundo.caminhao.entrar(); w.actualizar(1)
+	for i: int in range(3600):
+		await physics_frame
+		if not w.funcionario.ocupado(): break
 	exigir(mundo.caminhao.carga.is_empty() and mundo.stock.get(3)==18,"Transporte descarrega dentro do armazém")
 	mundo.central_logistica.fechar()
 	exigir(mundo.central_logistica.carregar_escolha(1,7,mundo.caminhao)==7 and mundo.stock.get(1)==6,"Carregamento escolhido preserva stock excedente")
-	mundo.trator_actual = null; mundo.caminhao.position = w.ENTREGA; mundo.jogador.position = w.ENTREGA; mundo.interagir()
+	mundo.caminhao.sair(); mundo.caminhao.position = w.ENTREGA; mundo.jogador.position = w.ENTREGA; mundo.interagir()
 	exigir(mundo.trator_actual==mundo.caminhao and not mundo.central_logistica.aberto,"E permite embarcar no camião estacionado junto ao armazém")
 	mundo.caminhao.sair()
 	for f: Node3D in mundo.fabricas:
@@ -41,4 +49,5 @@ func executar() -> void:
 		for n: Node in f.get_children():
 			if n.get_script()==load("res://scripts/industrial_gate.gd"): seguranca = true
 		exigir(seguranca,"Fábrica de venda mantém segurança e cancela")
+	Engine.time_scale = 1
 	mundo.feedback.audio.stop(); mundo.calendario.amanhecer.stop(); print("ACESSOS · ","PASSOU" if falhas==0 else "FALHOU"," · ",falhas," falhas"); quit(falhas)

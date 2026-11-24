@@ -68,7 +68,15 @@ func abrir_carga(veiculo: Node3D = null) -> void:
 	produto = OptionButton.new(); coluna.add_child(produto)
 	for c: int in range(4): produto.add_item("%s · %d disponíveis" % [preload("res://scripts/crop.gd").NOMES[c],int(mundo.stock.get(c,0))],c)
 	quantidade = SpinBox.new(); quantidade.min_value = 1; quantidade.max_value = 9999; quantidade.value = 50; coluna.add_child(quantidade)
-	mundo.hud.botao(coluna,"Carregar produto escolhido",confirmar_carga)
+	mundo.hud.legenda(coluna,"O funcionário leva a carga ao transporte.
+Mantenha-o parado até terminar.",14)
+	mundo.hud.botao(coluna,"Pedir ao funcionário para carregar",confirmar_carga)
+	if veiculo!=null and veiculo.total()>0:
+		mundo.hud.botao(coluna,"Pedir ao funcionário para descarregar",func() -> void:
+			if mundo.armazem.encomendar_descarga(veiculo): fechar(); mundo.avisar("Funcionário a descarregar · mantenha o transporte parado"))
+	if veiculo==null and not mundo.sacola.is_empty():
+		mundo.hud.botao(coluna,"Entregar a colheita que trago",func() -> void:
+			if mundo.armazem.encomendar_descarga(): fechar(); mundo.avisar("Funcionário a receber a sua colheita"))
 	mundo.hud.botao(coluna,"Consultar missões antes de carregar · M",abrir_missoes)
 func carregar_escolha(c: int,q: int,veiculo: Node3D = null) -> int:
 	if c<0 or c>3 or q<=0: return 0
@@ -84,10 +92,9 @@ func carregar_escolha(c: int,q: int,veiculo: Node3D = null) -> int:
 	if int(mundo.stock[c])==0: mundo.stock.erase(c)
 	return movidas
 func confirmar_carga() -> void:
-	var c: int = produto.get_selected_id(); var q: int = carregar_escolha(c,int(quantidade.value),transporte)
-	if q<=0: mundo.avisar("Sem stock ou capacidade · aproxime e pare o transporte"); return
-	mundo.avisar("%d unidades carregadas · escolha agora a empresa de entrega" % q)
-	abrir_destinos(c)
+	var c: int = produto.get_selected_id()
+	if not mundo.armazem.encomendar_carga(c,int(quantidade.value),transporte): mundo.avisar("Funcionário ocupado, sem stock ou capacidade · pare junto ao armazém"); return
+	fechar(); mundo.avisar("Funcionário a carregar · aguarde com o transporte parado")
 func abrir_destinos(c: int) -> void:
 	limpar("CARGA PRONTA · ONDE ENTREGAR?")
 	mundo.hud.legenda(coluna,"Escolha a empresa. A seta e o minimapa\nindicam o percurso para a garagem.",14)

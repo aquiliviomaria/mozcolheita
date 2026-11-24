@@ -10,6 +10,7 @@ var portas: Array[Node3D] = []
 var visitas: Dictionary = {}
 var caixas: Array[Node3D] = []
 var letreiro: Label3D
+var funcionario: Node3D
 func _ready() -> void:
 	position = CENTRO; position.y = mundo.altura(position)
 	preload("res://scripts/architecture.gd").piso(mundo,self,Rect2(-18,-16,36,32))
@@ -28,15 +29,64 @@ func _ready() -> void:
 		var luz: OmniLight3D = OmniLight3D.new(); luz.position = Vector3(0,5.5,z); luz.omni_range = 26; luz.light_energy = 1.3; luz.shadow_enabled = false; luz.distance_fade_enabled = true; luz.distance_fade_begin = 65; add_child(luz)
 	letreiro = mundo.placa(self,Vector3(0,8,-16),"ARMAZÉM DA QUINTA"); letreiro.visibility_range_end = 100; letreiro.font_size = 48; letreiro.pixel_size = 0.035
 	preload("res://scripts/industrial_art.gd").compactar(self,portas)
+	funcionario = preload("res://scripts/warehouse_attendant.gd").new(); funcionario.mundo = mundo; funcionario.posto = self; add_child(funcionario)
 func perto() -> bool:
-	return preload("res://scripts/layout.gd").distancia(mundo.jogador.global_position,ENTREGA)<10 or ZONA.has_point(Vector2(mundo.jogador.position.x,mundo.jogador.position.z))
+	return preload("res://scripts/layout.gd").distancia(mundo.jogador.global_position,ENTREGA)<10 or SITES.AREA_ARMAZEM.grow(-1).has_point(Vector2(mundo.jogador.position.x,mundo.jogador.position.z))
 func receber(carga: Dictionary) -> void:
 	for cultura: int in carga: mundo.stock[cultura] = int(mundo.stock.get(cultura,0))+int(carga[cultura])
 	carga.clear()
 func retirar() -> Dictionary:
 	var carga: Dictionary = mundo.stock.duplicate(); mundo.stock.clear(); return carga
+func parado(veiculo: Node3D) -> bool:
+	if not is_instance_valid(veiculo): return false
+	var condutor: Node3D = veiculo.tractor if veiculo.get("tractor")!=null else veiculo
+	return condutor.get("rapidez")==null or absf(float(condutor.get("rapidez")))<0.4
+func transporte_proximo() -> Node3D:
+	var candidatos: Array[Node3D] = []; if mundo.caminhao!=null: candidatos.append(mundo.caminhao)
+	candidatos.append_array(mundo.carrinhas)
+	for v: Node3D in candidatos:
+		if v.position.distance_to(CENTRO)<28 and v.position.distance_to(mundo.jogador.position)<18 and parado(v): return v
+	return null
 func solicitar_carga(transporte: Node3D = null) -> void:
+	if funcionario.ocupado(): mundo.avisar("O funcionário está a terminar a operação actual."); return
+	if transporte==null: transporte = transporte_proximo()
 	if mundo.central_logistica!=null: mundo.central_logistica.abrir_carga(transporte)
+func encomendar_carga(cultura: int,q: int,veiculo: Node3D = null) -> bool:
+	if funcionario.ocupado() or cultura<0 or cultura>3 or q<=0: return false
+	if veiculo!=null and (not parado(veiculo) or veiculo.position.distance_to(CENTRO)>28): return false
+	if veiculo==null and not perto(): return false
+	var n: int = mini(q,int(mundo.stock.get(cultura,0)))
+	if veiculo!=null: n = mini(n,veiculo.CAPACIDADE-veiculo.total())
+	if n<=0: return false
+	var alvo: Node3D = mundo.jogador if veiculo==null else veiculo
+	var espera: Vector3 = alvo.global_position
+	var origem: Vector3 = to_global(Vector3(-6.8 if cultura%2==0 else 6.8,0,-7+(cultura/2)*14))
+	var entrega: Vector3 = funcionario.ponto_transporte(veiculo) if veiculo!=null else espera+Vector3(0.8,0,0)
+	var condicao: Callable = func() -> bool: return is_instance_valid(alvo) and alvo.global_position.distance_to(espera)<1.5 and (veiculo==null or parado(veiculo))
+	var aplicar: Callable = func() -> int: return mundo.central_logistica.carregar_escolha(cultura,n,veiculo)
+	var fim: Callable = func(movidas: int) -> void:
+		if movidas>0: mundo.avisar("Funcionário carregou %d unidades" % movidas); mundo.central_logistica.abrir_destinos(cultura)
+		else: mundo.avisar("Stock ou capacidade mudou · nada foi retirado")
+	return funcionario.iniciar("A carregar",n,cultura,veiculo,origem,entrega,condicao,aplicar,fim)
+func encomendar_descarga(veiculo: Node3D = null) -> bool:
+	if funcionario.ocupado(): return false
+	if veiculo!=null and (not parado(veiculo) or veiculo.position.distance_to(CENTRO)>28): return false
+	var carga: Dictionary = mundo.sacola if veiculo==null else veiculo.carga
+	if carga.is_empty(): return false
+	var alvo: Node3D = mundo.jogador if veiculo==null else veiculo; var espera: Vector3 = alvo.global_position
+	var n: int = 0
+	for valor: int in carga.values(): n += valor
+	var cultura: int = int(carga.keys()[0])
+	var recolha: Vector3 = funcionario.ponto_transporte(veiculo) if veiculo!=null else espera+Vector3(0.8,0,0)
+	var condicao: Callable = func() -> bool: return is_instance_valid(alvo) and alvo.global_position.distance_to(espera)<1.5 and (veiculo==null or parado(veiculo))
+	var aplicar: Callable = func() -> int:
+		var total: int = 0
+		for valor: int in carga.values(): total += valor
+		receber(carga)
+		if is_instance_valid(veiculo): veiculo.actualizar_carga()
+		return total
+	var fim: Callable = func(movidas: int) -> void: mundo.avisar("Funcionário guardou %d unidades no armazém" % movidas)
+	return funcionario.iniciar("A descarregar",n,cultura,veiculo,recolha,to_global(Vector3(6.8,0,7)),condicao,aplicar,fim)
 func actualizar(delta: float) -> void:
 	var actores: Array[Node3D] = [mundo.jogador]; actores.append_array(mundo.pessoas); actores.append_array(mundo.tratores); actores.append_array(mundo.carrinhas)
 	if mundo.caminhao!=null: actores.append(mundo.caminhao)
@@ -51,7 +101,8 @@ func actualizar(delta: float) -> void:
 		var colisor: CollisionShape3D = porta.get_child(0).get_child(0); colisor.shape.size.y = h
 	var agora: bool = mundo.trator_actual==null and mundo.drone_actual==null and ZONA.has_point(Vector2(mundo.jogador.position.x,mundo.jogador.position.z))
 	if agora and not dentro:
-		if not mundo.sacola.is_empty(): receber(mundo.sacola); mundo.avisar("Colheita guardada · E escolhe produto e quantidade para carregar")
+		if not mundo.sacola.is_empty():
+			if not encomendar_descarga(): agora = false
 		else: solicitar_carga()
 	dentro = agora
 	var transportes: Array[Node3D] = []; transportes.append_array(mundo.carrinhas)
@@ -61,7 +112,8 @@ func actualizar(delta: float) -> void:
 		var conduzida: bool = mundo.trator_actual==transporte if transporte==mundo.caminhao else transporte.tractor!=null and transporte.tractor==mundo.trator_actual
 		var na_zona: bool = conduzida and ZONA.has_point(Vector2(transporte.position.x,transporte.position.z))
 		if na_zona and not bool(visitas.get(id,false)):
-			if transporte.total()>0: receber(transporte.carga); transporte.actualizar_carga(); mundo.avisar("Carga guardada · saia e volte para escolher o carregamento")
+			if transporte.total()>0:
+				if not encomendar_descarga(transporte): na_zona = false
 			else:
 				if mundo.trator_actual!=null: mundo.trator_actual.rapidez = 0; mundo.trator_actual.velocity = Vector3.ZERO
 				solicitar_carga(transporte)

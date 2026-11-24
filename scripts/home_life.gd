@@ -32,19 +32,22 @@ var televisao: Node3D
 var a_comer: float = 0
 var aviso_cama: Label3D
 var aviso_mesa: Label3D
+var lavatorio: Node3D
+var refeicoes_consumidas: int = 0
+var ementa_refeicao: int = 0
+var servico_mesa: Node
+var descarga: Node3D
 func _ready() -> void:
-	comida = Node3D.new(); comida.name = "RefeicaoNaMesa"; comida.position = Vector3(8,1.76,0); casa.add_child(comida)
-	for x: float in [-1.2,1.2]:
-		mundo.caixa(comida,Vector3(x,0.025,0),Vector3(1.1,0.045,0.8),Color("f8e9cb"))
-		for i: int in range(3):
-			var fruto: MeshInstance3D = MeshInstance3D.new(); fruto.mesh = preload("res://scripts/produce_mesh.gd").modelo(0 if i==0 else 3); fruto.position = Vector3(x-0.3+i*0.3,0.15,0); comida.add_child(fruto)
-		mundo.caixa(comida,Vector3(x,0.14,-0.65),Vector3(0.18,0.28,0.18),Color("729a9b"))
-	for spec: Dictionary in [{"p":CAMA,"t":"E · Cama"},{"p":MESA,"t":"E · Sentar / comer"},{"p":SOFA,"t":"E · Sofá e televisão"},{"p":ROUPEIRO,"t":"E · Trocar roupa"},{"p":DUCHE,"t":"E · Tomar banho"},{"p":SANITA,"t":"E · Usar sanita"},{"p":ELEVADOR,"t":"E · Chamar / entrar no elevador"},{"p":ELEVADOR+Vector3.UP*5,"t":"E · Chamar / entrar no elevador"}]:
+	servico_mesa = preload("res://scripts/meal_service.gd").new(); servico_mesa.lar = self; add_child(servico_mesa)
+	descarga = preload("res://scripts/toilet_flush.gd").new(); descarga.mundo = mundo; descarga.position = SANITA+Vector3(0,0,-1.5); casa.add_child(descarga)
+	comida = preload("res://scripts/meal_table.gd").new(); comida.mundo = mundo; casa.add_child(comida)
+	lavatorio = preload("res://scripts/bathroom_sink.gd").new(); lavatorio.mundo = mundo; lavatorio.casa = casa; lavatorio.lar = self; casa.add_child(lavatorio)
+	for spec: Dictionary in [{"p":CAMA,"t":"E · Cama"},{"p":MESA,"t":"E · Sentar / comer"},{"p":SOFA,"t":"E · Sofá e televisão"},{"p":ROUPEIRO,"t":"E · Trocar roupa"},{"p":DUCHE,"t":"E · Tomar banho"},{"p":SANITA,"t":"E · Usar sanita"},{"p":ELEVADOR,"t":"E · Chamar / entrar no elevador"},{"p":ELEVADOR+Vector3.UP*5,"t":"E · Chamar / entrar no elevador"},{"p":preload("res://scripts/bathroom_sink.gd").LOCAL,"t":"E · Lavar a cara / escovar dentes"}]:
 		var l: Label3D = mundo.placa(casa,spec.p+Vector3.UP*1.8,spec.t); l.visibility_range_end = 16; l.set_meta("ponto",spec.p); avisos.append(l)
 	aviso_cama = avisos[0]; aviso_mesa = avisos[1]
 	var camada: CanvasLayer = CanvasLayer.new(); camada.layer = 30; add_child(camada)
 	cortina = ColorRect.new(); cortina.color = Color(0,0,0,0); cortina.mouse_filter = Control.MOUSE_FILTER_IGNORE; camada.add_child(cortina); cortina.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	agua = CPUParticles3D.new(); agua.name = "AguaDuche"; agua.position = Vector3(11,8.8,-7); agua.amount = 64; agua.lifetime = 0.7; agua.direction = Vector3.DOWN; agua.spread = 8; agua.initial_velocity_min = 3; agua.initial_velocity_max = 4; agua.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX; agua.emission_box_extents = Vector3(1.2,0,0.6); agua.gravity = Vector3(0,-5,0)
+	agua = CPUParticles3D.new(); agua.name = "AguaDuche"; agua.position = Vector3(11,9.03,-8.3); agua.amount = 64; agua.lifetime = 0.7; agua.direction = Vector3.DOWN; agua.spread = 8; agua.initial_velocity_min = 3; agua.initial_velocity_max = 4; agua.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX; agua.emission_box_extents = Vector3(0.9,0,0.16); agua.gravity = Vector3(0,-5,0)
 	var gota: BoxMesh = BoxMesh.new(); gota.size = Vector3(0.025,0.16,0.025); gota.material = mundo.material(Color("83c9dd")); agua.mesh = gota; agua.emitting = false; casa.add_child(agua); casa.piso_superior.append(agua)
 	duche = preload("res://scripts/shower_curtain.gd").new(); duche.lar = self; duche.mundo = mundo; duche.casa = casa; casa.add_child(duche)
 	casa.elevador = preload("res://scripts/house_elevator.gd").new(); casa.elevador.mundo = mundo; casa.elevador.casa = casa; casa.elevador.lar = self; casa.add_child(casa.elevador)
@@ -68,12 +71,13 @@ func interagir() -> bool:
 			if familia()!=null: familia().chamar("cama")
 		else: posar(Vector3(6,5.64,4.3),false); mundo.avisar("Sentado na cama · E para levantar")
 		return true
-	if perto(MESA): iniciar("sentado"); posar(Vector3(6.8,0.64,2),false); mundo.avisar("E comer · E durante a refeição não gasta outra porção · WASD/Esc levantar · C chamar companhia"); return true
+	if perto(MESA): iniciar("sentado"); posar(Vector3(6.8,0.64,2),false); mundo.jogador.sentar_no_assento(casa.to_global(Vector3(6.8,1.08,2)).y); servico_mesa.iniciar(); mundo.avisar("A preparar a refeição · aguarde a comida e a companhia"); return true
 	if perto(SOFA): iniciar("televisao"); posar(Vector3(-8.2,0.64,6.8),false); televisao.ligada = true; mundo.avisar("E/WASD levantar · Espaço televisão · C chamar companhia"); return true
 	if perto(ROUPEIRO): trocar_roupa(); return true
 	if perto(DUCHE):
 		iniciar("banho"); roupa_anterior = mundo.jogador.roupa; mudar_roupa(3); mundo.jogador.visual.rotation = Vector3.ZERO; duche.iniciar(); mundo.avisar("Banho · E terminar · C chamar companhia"); return true
-	if perto(SANITA): iniciar("sanita"); posar(Vector3(6,5.64,-7),true); mundo.avisar("E terminar"); return true
+	if perto(preload("res://scripts/bathroom_sink.gd").LOCAL): lavatorio.abrir(); return true
+	if perto(SANITA): iniciar("sanita"); posar(Vector3(6,5.64,-7),true); mundo.jogador.sentar_no_assento(casa.to_global(Vector3(6,6.65,-7)).y); mundo.avisar("E levantar e dar descarga"); return true
 	for piso: int in range(2):
 		if perto(ELEVADOR+Vector3.UP*piso*5):
 			iniciar("elevador"); casa.elevador.iniciar(piso); return true
@@ -89,8 +93,11 @@ func posar(p: Vector3,virar: bool) -> void:
 func levantar() -> void:
 	if not ocupado(): return
 	var anterior: String = estado
+	if anterior in ["lavatorio","lavar_rosto","escovar_dentes"]: lavatorio.cancelar()
 	if anterior=="elevador": casa.elevador.terminar()
-	if anterior=="banho": duche.cancelar(); mudar_roupa(roupa_anterior)
+	if anterior=="banho": duche.cancelar(); mudar_roupa(4)
+	if anterior=="sanita": descarga.accionar()
+	if anterior=="sentado": servico_mesa.cancelar()
 	estado = ""; cortina.color.a = 0; a_comer = 0; agua.emitting = false; televisao.ligada = false
 	if is_instance_valid(alimento_mao): alimento_mao.queue_free()
 	mundo.jogador.position = retorno; mundo.jogador.visual.transform = visual_anterior; mundo.jogador.collision_layer = camada_anterior; mundo.jogador.bloqueado = false; mundo.jogador.velocity = Vector3.ZERO; mundo.jogador.repor_pose(); mundo.ferramentas.vista.visible = ferramenta_visivel
@@ -99,16 +106,17 @@ func mudar_roupa(indice: int) -> void:
 	mundo.jogador.roupa = indice; mundo.jogador.criar_avatar(); mundo.ferramentas.seleccionar(mundo.ferramentas.actual)
 	if ocupado(): mundo.ferramentas.vista.hide()
 func trocar_roupa() -> void:
-	mudar_roupa((mundo.jogador.roupa+1)%4); mundo.avisar("Roupa: "+["Trabalho verde","Camisa azul","Capulana e terra","Conjunto de lazer"][mundo.jogador.roupa])
+	mudar_roupa(0 if mundo.jogador.roupa==4 else (mundo.jogador.roupa+1)%4); mundo.avisar("Roupa: "+["Trabalho verde","Camisa azul","Capulana e terra","Conjunto de lazer"][mundo.jogador.roupa])
 func origem_refeicao() -> Dictionary:
 	for origem: Dictionary in [mundo.sacola,mundo.stock]:
 		for cultura: int in [0,3,2,1]:
 			if int(origem.get(cultura,0))>0: return origem
 	return {}
 func tem_comida() -> bool: return refeicoes>0 or not origem_refeicao().is_empty()
-func comer() -> bool:
-	if estado!="sentado" or a_comer>0: return false
-	if mundo.vitais.fome>=99 and mundo.vitais.energia>=99 and mundo.vitais.vida>=99: mundo.avisar("Já está alimentado e descansado."); return false
+func comer(automatico: bool = false) -> bool:
+	if estado!="sentado" or a_comer>0 or not comida.servida: return false
+	if familia()!=null and (familia().actividade!="mesa" or not familia().pronta): return false
+	if not automatico and mundo.vitais.fome>=99 and mundo.vitais.energia>=99 and mundo.vitais.vida>=99: mundo.avisar("Já está alimentado e descansado."); return false
 	if refeicoes>0: refeicoes -= 1
 	else:
 		var origem: Dictionary = origem_refeicao(); var cultura: int = -1
@@ -117,14 +125,19 @@ func comer() -> bool:
 		if cultura<0: mundo.avisar("Sem comida · traga um produto ou guarde colheita."); return false
 		origem[cultura] = int(origem[cultura])-1
 		if origem[cultura]==0: origem.erase(cultura)
+	ementa_refeicao = comida.indice; refeicoes_consumidas += 1
 	mundo.vitais.alimentar(); mundo.armazem.actualizar(1); a_comer = 2.8
-	alimento_mao = MeshInstance3D.new(); alimento_mao.mesh = preload("res://scripts/produce_mesh.gd").modelo(0); alimento_mao.scale = Vector3.ONE*0.65; mundo.jogador.maos[1].add_child(alimento_mao)
+	alimento_mao = MeshInstance3D.new(); alimento_mao.mesh = preload("res://scripts/meal_table.gd").bocado(ementa_refeicao); alimento_mao.scale = Vector3.ONE*0.65; mundo.jogador.maos[1].add_child(alimento_mao)
 	mundo.avisar("A comer · refeição +35 alimentação · C convida companhia"); return true
 func entrada(evento: InputEvent) -> void:
 	if not evento is InputEventKey or not evento.pressed or evento.echo: return
-	if evento.physical_keycode==KEY_C and familia()!=null: familia().chamar(actividade()); return
+	if evento.physical_keycode==KEY_C and familia()!=null:
+		if estado=="sentado" and servico_mesa.activo(): mundo.avisar("A companhia está a preparar e servir a refeição.")
+		else: familia().chamar(actividade())
+		return
 	if evento.physical_keycode==KEY_F9: mundo.partida.carregar(); return
 	if evento.physical_keycode==KEY_F5: mundo.partida.guardar(); return
+	if estado in ["lavatorio","lavar_rosto","escovar_dentes"]: lavatorio.entrada(evento); return
 	if estado=="elevador":
 		if evento.physical_keycode==KEY_1: casa.elevador.seleccionar(0)
 		elif evento.physical_keycode==KEY_2: casa.elevador.seleccionar(1)
@@ -153,13 +166,16 @@ func _process(delta: float) -> void:
 	if mundo.jogador==null or mundo.hud==null: return
 	for l: Label3D in avisos: l.visible = not ocupado() and not mundo.pausado() and perto(l.get_meta("ponto"))
 	aviso_cama.text = "E · Dormir até amanhecer" if noite() else "E · Sentar na cama"
-	comida.visible = tem_comida()
+	comida.visible = true
 	if mundo.pausado(): return
+	if not comida.servida: comida.mostrar(int(floorf(mundo.calendario.decorrido/DIA))+refeicoes_consumidas)
 	var real_delta: float = delta/maxf(1,Engine.time_scale)
 	if estado in ["sentado","televisao","cama_dia","sanita"]: mundo.jogador.animar(0,0,true)
+	if estado=="sentado": mundo.jogador.sentar_no_assento(casa.to_global(Vector3(6.8,1.08,2)).y)
+	if estado in ["lavatorio","lavar_rosto","escovar_dentes"]: lavatorio.actualizar(real_delta)
 	if estado in ["televisao","cama_dia","sanita"]:
 		for i: int in range(2): mundo.jogador.bracos[i].rotation.x = 0.15; mundo.jogador.cotovelos[i].rotation.x = 0.4
-	if estado=="sanita": mundo.vitais.higiene = minf(100,mundo.vitais.higiene+real_delta*5)
+	if estado=="sanita": mundo.jogador.sentar_no_assento(casa.to_global(Vector3(6,6.65,-7)).y); mundo.vitais.higiene = minf(100,mundo.vitais.higiene+real_delta*5)
 	if estado=="banho":
 		duche.actualizar(real_delta)
 		if agua.emitting: mundo.vitais.higiene = minf(100,mundo.vitais.higiene+real_delta*18); mundo.jogador.animar(delta,0)

@@ -1,5 +1,5 @@
 extends Node3D
-## Pano opaco com pregas: entra, fecha, liga água; abre para receber companhia/sair.
+## Pano de privacidade à altura do corpo, deixando visíveis as cabeças do duche: entra, fecha, liga água; abre para receber companhia/sair.
 var lar: Node3D
 var mundo: Node3D
 var casa: Node3D
@@ -23,11 +23,11 @@ func _ready() -> void:
 		if lado==0: esquerda = metade
 		else: direita = metade
 		for i: int in range(12):
-			var p: Vector3 = Vector3((i+0.5)/6.0*(1 if lado==0 else -1),1.65,(0.035 if i%2==0 else -0.035))
-			var painel: MeshInstance3D = mundo.caixa(metade,p,Vector3(0.18,3.08,0.07),Color.WHITE); painel.material_override = pano
-	for spec: Vector3 in [Vector3(-2,1.65,0),Vector3(2,1.65,0),Vector3(0,1.65,-2)]:
-		var n: MeshInstance3D = mundo.caixa(self,spec,Vector3(0.07,3.08,4) if spec.x!=0 else Vector3(4,3.08,0.07),Color.WHITE); n.material_override = pano
-	mundo.caixa(self,Vector3(0,3.25,2.05),Vector3(4.3,0.06,0.06),Color("a2b3b6"))
+			var p: Vector3 = Vector3((i+0.5)/6.0*(1 if lado==0 else -1),1.05,(0.035 if i%2==0 else -0.035))
+			var painel: MeshInstance3D = mundo.caixa(metade,p,Vector3(0.18,1.8,0.07),Color.WHITE); painel.material_override = pano
+	for spec: Vector3 in [Vector3(-2,1.05,0),Vector3(2,1.05,0),Vector3(0,1.05,-2)]:
+		var n: MeshInstance3D = mundo.caixa(self,spec,Vector3(0.07,1.8,4) if spec.x!=0 else Vector3(4,1.8,0.07),Color.WHITE); n.material_override = pano
+	mundo.caixa(self,Vector3(0,2.05,2.05),Vector3(4.3,0.06,0.06),Color("a2b3b6"))
 	casa.piso_superior.append(self); aplicar_pano()
 func aplicar_pano() -> void:
 	esquerda.scale.x = lerpf(1,0.12,abertura); direita.scale.x = esquerda.scale.x
